@@ -85,11 +85,11 @@ JB :
   comments :
     provider : disqus
     disqus :
-      short_name : Heroin
+      short_name : tinyfisher
     livefyre :
-      site_id : Heroin
+      site_id : tinyfisher
     intensedebate :
-      account : Heroin
+      account : tinyfisher
     facebook :
       appid : 123
       num_posts: 5
