@@ -11,12 +11,12 @@ paginate: 5
 # Themes are encouraged to use these universal variables 
 # so be sure to set them if your theme uses them.
 #
-title : Heroin blog
-tagline: Heroin blog
+title : tinyfisher blog
+tagline: tinyfisher blog
 author :
-  name : Heroin
-  email : heroin.nee@gmail.com
-  github : heroin
+  name : tinyfisher
+  email : tinyfisher@foxmail.com
+  github : tinyfisher
   twitter : None
   feedburner : None
 
