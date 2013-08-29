@@ -1,22 +1,24 @@
 # This is the default format. 
-# For more see: http://jekyllrb.com/docs/permalinks/
+# For more see: https://github.com/mojombo/jekyll/wiki/Permalinks
 permalink: /:categories/:year/:month/:day/:title 
 
 exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
 auto: true
 pygments: true
 
+paginate: 5
+
 # Themes are encouraged to use these universal variables 
 # so be sure to set them if your theme uses them.
 #
-title : tinyfisher's blog
-tagline: Site Tagline
+title : Heroin blog
+tagline: Heroin blog
 author :
-  name : tinyfisher
-  email : tinyfisher@foxmail.com
-  github : tinyfisher
-  twitter : tinyfisher
-  feedburner : tinyfisher
+  name : Heroin
+  email : heroin.nee@gmail.com
+  github : heroin
+  twitter : None
+  feedburner : None
 
 # The production_url is only used when full-domain names are needed
 # such as sitemap.txt 
@@ -26,12 +28,12 @@ author :
 # Else if you are pushing to username.github.io, replace with your username.
 # Finally if you are pushing to a GitHub project page, include the project name at the end.
 #
-production_url : http://username.github.io
+production_url : http://heroin.so
 
 # All Jekyll-Bootstrap specific configurations are namespaced into this hash
 #
 JB :
-  version : 0.3.0
+  version : 0.2.13
 
   # All links will be namespaced by BASE_PATH if defined.
   # Links in your website should always be prefixed with {{BASE_PATH}}
@@ -68,7 +70,7 @@ JB :
   ASSET_PATH : false
 
   # These paths are to the main pages Jekyll-Bootstrap ships with.
-  # Some JB helpers refer to these paths; change them here if needed.
+  # Some JB helpers refer to these paths; change theme here if needed.
   #
   archive_path: /archive.html
   categories_path : /categories.html
@@ -83,11 +85,11 @@ JB :
   comments :
     provider : disqus
     disqus :
-      short_name : jekyllbootstrap
+      short_name : Heroin
     livefyre :
-      site_id : 123
+      site_id : Heroin
     intensedebate :
-      account : 123abc
+      account : Heroin
     facebook :
       appid : 123
       num_posts: 5
@@ -101,14 +103,11 @@ JB :
   analytics :
     provider : google 
     google : 
-        tracking_id : 'UA-123-12'
+        tracking_id : 'UA-31884821-1'
     getclicky :
       site_id : 
     mixpanel :
-        token : '_MIXPANEL_TOKEN_'
-    piwik :
-        baseURL : 'myserver.tld/piwik' # Piwik installation address (without protocol)
-        idsite : '1'                   # the id of the site on Piwik
+        token : '_trackPageview'
 
   # Settings for sharing helper. 
   # Sharing is for things like tweet, plusone, like, reddit buttons etc.

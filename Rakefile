@@ -65,7 +65,7 @@ task :post do
     post.puts "title: \"#{title.gsub(/-/,' ')}\""
     post.puts 'description: ""'
     post.puts "category: "
-    post.puts "tags: #{tags}"
+    post.puts "tags: []"
     post.puts "---"
     post.puts "{% include JB/setup %}"
   end
@@ -109,7 +109,7 @@ namespace :theme do
   # Public: Switch from one theme to another for your blog.
   #
   # name - String, Required. name of the theme you want to switch to.
-  #        The theme must be installed into your JB framework.
+  #        The the theme must be installed into your JB framework.
   #
   # Examples
   #
