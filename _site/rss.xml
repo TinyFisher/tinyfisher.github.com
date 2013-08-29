@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+<channel>
+        <title>tinyfisher blog</title>
+        <description>tinyfisher blog - tinyfisher</description>
+        <link>http://tinyfisher.github.com</link>
+        <link>http://tinyfisher.github.com</link>
+        <lastBuildDate>2013-08-29T21:22:28+08:00</lastBuildDate>
+        <pubDate>2013-08-29T21:22:28+08:00</pubDate>
+        <ttl>1800</ttl>
+
+
+        <item>
+                <title>github 搭建博客</title>
+                <description>&lt;p&gt;注册github帐号 在github上注册帐号, 如果你的帐号为tinyfisher 创建tinyfisher.github.com这个项目.&lt;/p&gt;
+
+&lt;p&gt;安装jekyll 安装jekyll到github上, 这里我用的是 Jekyll-Bootstrap&lt;/p&gt;</description>
+                <link>http://tinyfisher.github.com/blog/2012/04/01/blog</link>
+                <guid>http://tinyfisher.github.com/blog/2012/04/01/blog</guid>
+                <pubDate>2012-04-01T00:00:00+08:00</pubDate>
+        </item>
+
+
+</channel>
+</rss>
