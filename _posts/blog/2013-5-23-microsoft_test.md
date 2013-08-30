@@ -183,7 +183,7 @@ D选项，同C
 	
 	E. None of the above  
 
-解析：不是很清楚，关于MVC，请看这篇blog，写得挺直白的http://www.ruanyifeng.com/blog/2007/11/mvc.html  
+解析：不是很清楚，关于MVC，请看这篇blog，写得挺直白的[http://www.ruanyifeng.com/blog/2007/11/mvc.html](http://www.ruanyifeng.com/blog/2007/11/mvc.html)  
 
 
 **Given a set of N balls and one of which is defective (weighs less than others), you are allowed to weigh with a balance 3 times to find the defective. Which of the following are possible N?(13 Points)** ABCD  

@@ -26,7 +26,10 @@ fluentd默认支持了一些插件，如apache，但是最近做项目对squid�
 	</match>  
 
 用于输出，这里输出到stdout，可以是file，mongodb等，看自己需要.
-调试模式：td-agent -vv  
+调试模式：
+  
+	td-agent -vv  
+  
 
 ruby脚本如下  
 
