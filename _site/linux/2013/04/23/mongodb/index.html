@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Mongodb的备份与恢复 - tinyfisher blog</title>
+    <meta name="keywords" content="Linux，mongodb" />
+    <meta name="description" content="Mongodb的备份与恢复" />
+    <meta name="author" content="tinyfisher">
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!-- <link href="http://lib.sinaapp.com/js/bootstrap/latest/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all"> -->
+    <link href="http://lib.sinaapp.com/js/bootstrap/2.0.3/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/google-code-prettify/prettify.css" rel="stylesheet" type="text/css" media="all">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <!-- <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/latest/js/bootstrap.min.js"></script> -->
+    <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/2.0.3/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/google-code-prettify/prettify.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/js/application.js"></script>
+  </head>
+
+  <body data-spy="scroll" data-target=".subnav" data-offset="100">
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="/">tinyfisher blog</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+
+
+              <li><a href="/archive.html">归档</a></li>
+              <li><a href="/categories.html">目录</a></li>
+              <li><a href="/pages.html">页面</a></li>
+              <li><a href="/tags.html">标签</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="content">
+        
+
+<div class="page-header">
+  <h1>Mongodb的备份与恢复 </h1>
+</div>
+
+
+<div class="row">
+  <div class="span8">
+    <p>坑爹的保密检查需要擦除硬盘，所有环境都需要重新安装，Mongodb数据库需要进行备份，还好Mongodb为我们提供了<code>mongodump</code>和<code>mongorestore</code>两种方法，非常方便。</p>
+
+<p>进到mongodb的bin目录下：</p>
+
+<p>备份：</p>
+
+<pre><code>mongodump -d Injection   //Injection 就是你要备份的数据库</code></pre>
+
+<p>执行之后会生成dump文件夹，里面子目录Injection就是备份的数据</p>
+
+<p>恢复：</p>
+
+<pre><code>mongorestore -d Injection dump/Injection</code></pre>
+
+<p>这样就完成的备份与恢复，是不是十分方便呢~随后送上其他环境配置日志，坑爹的保密检查。</p>
+    <hr>
+    <div class="pagination">
+      <ul>
+      
+        <li class="prev"><a href="/linux/2013/03/05/tplink" title="TL-WN822N TL-WN722N linux安装驱动">&larr; 上一篇</a></li>
+      
+        <li><a href="/archive.html">归档</a></li>
+      
+        <li class="next"><a href="/linux/2013/05/01/fluentd" title="fluentd插件开发">下一篇 &rarr;</a></li>
+      
+      </ul>
+    </div>
+    <hr>
+    
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'tinyfisher'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+  </div>
+  
+  <div class="span4">
+    <h4>发布日期</h4>
+    <div class="date"><span>2013-04-23</span></div>
+
+  
+    <h4>标签</h4>
+    <ul class="tag_box">
+    
+    
+
+
+  
+     
+    	<li><a href="/tags.html#Linux，mongodb-ref">Linux，mongodb <span>1</span></a></li>
+    
+  
+
+
+
+    </ul>
+    
+
+  <section>
+    <h4>最近发表</h4>
+    <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/linux/2013/06/23/hostapd">利用Hostapd搭建无线wifi</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/23/microsoft_test">2013微软暑期实习笔试错题、疑题整理</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/05/01/fluentd">fluentd插件开发</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/04/23/mongodb">Mongodb的备份与恢复</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/03/05/tplink">TL-WN822N TL-WN722N linux安装驱动</a>
+      </li>
+    
+    </ul>
+  </section>
+  </div>
+</div>
+
+
+      </div>
+
+      <footer>
+        <p>&copy; tinyfisher 2013 
+          基于 <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          和 <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a> 构建
+        </p>
+      </footer>
+
+    </div> <!-- /container -->
+    
+  </body>
+</html>
+

@@ -1,0 +1,513 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>tinyfisher blog</title>
+    <meta name="author" content="tinyfisher">
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!-- <link href="http://lib.sinaapp.com/js/bootstrap/latest/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all"> -->
+    <link href="http://lib.sinaapp.com/js/bootstrap/2.0.3/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/google-code-prettify/prettify.css" rel="stylesheet" type="text/css" media="all">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <!-- <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/latest/js/bootstrap.min.js"></script> -->
+    <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/2.0.3/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/google-code-prettify/prettify.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/js/application.js"></script>
+  </head>
+
+  <body data-spy="scroll" data-target=".subnav" data-offset="100">
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="/">tinyfisher blog</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+
+
+              <li><a href="/archive.html">归档</a></li>
+              <li><a href="/categories.html">目录</a></li>
+              <li><a href="/pages.html">页面</a></li>
+              <li><a href="/tags.html">标签</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="content">
+        
+
+
+<div class="row">
+  <div class="span12">
+    
+
+
+<div class="subnav page-launcher">
+  <ul class="nav nav-pills">
+    <li><a href="#linux20130207loadbalance" title="使用ip route命令实现多链路负载均衡">使用ip route命令实现多链路负载均衡...</a></li>
+    <li><a href="#linux20130129ppp" title="pppd拨号与默认网关">pppd拨号与默认网关</a></li>
+    <li><a href="#algorithm20130123LIS" title="DP实例之最长上升子序列LIS">DP实例之最长上升子序列LIS</a></li>
+    <li><a href="#algorithm20121212LCS" title="DP实例之最长公共子序列LCS">DP实例之最长公共子序列LCS</a></li>
+    <li><a href="#linux20121205iptables" title="iptables配置笔记">iptables配置笔记</a></li>
+  </ul>
+</div>
+
+
+<div class="row">
+  <div class="span8">
+  
+  
+  <section id="linux20130207loadbalance">
+    <article>
+      <header>
+      <h1><a href="/linux/2013/02/07/loadbalance">使用ip route命令实现多链路负载均衡</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-02-07</span></div>
+    </header>
+    <div class="content"><p>其实在linux下实现多链路负载均衡很简单，只需借助ip route命令即可。</p>
+
+<p>环境：<code>ubuntu 10.04</code> ，两个3G网卡，分别为<code>CDMA2000</code> 和 <code>WCDMA</code></p>
+
+<ol>
+<li>
+<p>分别将两个网卡拨号上网，方法不再具体描述，拨号成功后会多出两条链路<code>ppp0</code>和<code>ppp1</code>，注意拨号脚本里不要添加默认网关，（具体请参见《pppd拨号与默认网关》），而是手动添加两条默认路由。</p>
+</li>
+
+<li>
+<p>利用<code>iptables</code>进行<code>nat</code>转换，不再赘述。</p>
+</li>
+</ol>
+
+<p>3.此时路由表里会有两条默认路由，其实只有第一个起作用，所有的流量都会从这条链路出去，没有实现负载均衡的效果，只需使用如下命令：</p>
+
+<pre><code>ip route replace default equalize nexthop dev ppp0 weight 1 nexthop dev ppp1 weight 1   </code></pre>
+
+<p>其中weight表示权重，根据链路的实际情况设置相应数值。</p>
+
+<p>4.测试：内网机器进行网络活动，在网关利用命令</p>
+
+<pre><code>tc -s qdisc ls dev ppp0,tc -s qdisc ls dev ppp1  </code></pre>
+
+<p>分别查看两条链路的流量，发现基本流量是按照1:1的比率的。</p>
+
+<ol>
+<li>问题：内网的机器通过多链路网关访问外网速度比单链路得到提升，但是网关本身访问外网的速度比单链路要慢得多，甚至不能访问网站，原因不详，猜想是http数据包从不同的链路进出，不能很好的拼凑给网关。总之现在这个项目不需要网关访问外网，留待以后再讨论。</li>
+</ol></div>
+    </article>
+  </section>
+  
+  
+  <section id="linux20130129ppp">
+    <article>
+      <header>
+      <h1><a href="/linux/2013/01/29/ppp">pppd拨号与默认网关</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-01-29</span></div>
+    </header>
+    <div class="content"><p>在linux下使用3G网卡上网，使用pppd工具进行拨号，拨号脚本如下：</p>
+
+<pre><code>nodetach
+/dev/ttyUSB0
+19200
+nocrtscts
+connect &#39;/usr/sbin/chat -v -f /etc/ppp/peers/chat_script_unicom&#39;
+debug
+user &quot;card&quot;
+password &quot;card&quot;
+ipcp-accept-local
+ipcp-accept-remote
+defaultroute</code></pre>
+
+<p>其中<code>defaultroute</code>表示拨号成功后，自动添加一条默认路由，如果只使用一个网卡拨号，当然很方便;</p>
+
+<p>但是我发现如果使用两个以上的网卡进行拨号，会产生多条默认路由，这当然也没有问题，只是当其中一条断开后，所有的默认路由都消失了，即使其他的网卡工作正常，也不能上网，所以当有多个网卡拨号的时侯，不建议使用<code>defaultroute</code>这个选项，可以手动添加默认路由：</p>
+
+<pre><code>route add default gw x.x.x.x</code></pre></div>
+    </article>
+  </section>
+  
+  
+  <section id="algorithm20130123LIS">
+    <article>
+      <header>
+      <h1><a href="/algorithm/2013/01/23/LIS">DP实例之最长上升子序列LIS</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-01-23</span></div>
+    </header>
+    <div class="content"><pre><code>/*
+    LIS:最长递增子序列，例如：23453267，最长递增子序列为：234567
+    lis(i)表示以a[i]结束的递增子序列的长度
+    lis(i)=max{lis(k)+1,1}  k from 0 to i-1
+    最长递增子序列长度为max(lis[]);
+*/
+
+
+int LIS(int a[],int len)
+{
+   int *p=(int *)malloc(sizeof(int)*len);
+   int i=0;
+   int j=0;
+   int result=0;
+   if(p==NULL)
+        return -1;
+   for(i=0;i&lt;len;i++)
+   {
+       p[i]=1;
+       for(j=0;j&lt;i;j++)
+       {
+           if(a[i]&gt;a[j]&amp;&amp;p[j]+1&gt;p[i])
+           {
+               p[i]=p[j]+1;
+           }
+       }
+   }
+   for(i=0;i&lt;len;i++)
+   {
+       if(result&lt;p[i])
+       {
+           result =p[i];
+       }
+   }
+   free(p);
+   return result;
+}</code></pre></div>
+    </article>
+  </section>
+  
+  
+  <section id="algorithm20121212LCS">
+    <article>
+      <header>
+      <h1><a href="/algorithm/2012/12/12/LCS">DP实例之最长公共子序列LCS</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-12-12</span></div>
+    </header>
+    <div class="content"><pre><code>/*
+    LCS：求最长公共子序列
+    例如：s1=&quot;abdrge&quot;,s2=&quot;adreg&quot;,则LCS=&quot;adre&quot;
+    状态方程：lcs(i,j)=lcs(i-1,j-1)+1,其中s1[i]=s2[j]
+    或者 lcs(i,j)=max{lcs(i,j-1),lcs(i-1,j)}
+*/
+int LCS(char *a,char *b)
+{
+    int len_a=strlen(a);   //行
+    int len_b=strlen(b);   //列
+    int **len=NULL;
+    int **r=NULL;
+    int i=0;
+    int j=0;
+    int lcs_len=0;
+    len=(int **)malloc(sizeof(int *)*(len_a+1));       //申请二维数组空间
+    r=(int **)malloc(sizeof(int *)*(len_a+1));
+    if (len==NULL||r==NULL)
+        return -1;
+    for(;i&lt;=len_a;i++)
+    {
+        *(len+i)=(int *)malloc(sizeof(int)*(len_b+1));
+        *(r+i)=(int *)malloc(sizeof(int)*(len_b+1));
+        if (*(len+i)==NULL||*(r+i)==NULL)
+            return -1;
+    }
+
+    //LCS状态方程
+    for(i=0;i&lt;=len_a;i++)     //初始化
+    {
+        for(j=0;j&lt;=len_b;j++)
+        {
+            len[i][j]=0;
+            r[i][j]=0;
+        }
+    }
+    for(i=1;i&lt;=len_a;i++)
+    {
+        for(j=1;j&lt;=len_b;j++)
+        {
+            if(a[i-1]==b[j-1])
+            {
+                len[i][j]=len[i-1][j-1]+1;
+                r[i][j]=1;
+            }
+            else if(len[i][j-1]&gt;=len[i-1][j])  //左边的大于等于上边的
+            {
+                len[i][j]=len[i][j-1];
+                r[i][j]=2;
+            }
+            else
+            {
+                 len[i][j]=len[i-1][j];
+                 r[i][j]=3;
+            }
+        }
+    }
+
+    //打印公共子序列
+    print_lcs(r,a,len_a,len_b);
+    free(r);
+    lcs_len= len[len_a][len_b];
+    free(len);
+    return lcs_len;
+}
+
+void print_lcs(int **r,char *a,int i,int j)
+{
+    if(i==0||j==0)
+        return ;
+    else if(r[i][j]==1)
+    {
+        print_lcs(r,a,i-1,j-1);
+        printf(&quot;%c&quot;,*(a+i-1));
+    }
+    else if(r[i][j]==2)
+        print_lcs(r,a,i,j-1);
+    else
+        print_lcs(r,a,i-1,j);
+}</code></pre>
+
+<p><img alt='alt text' src='../../assets/themes/images/20130613111911031.png' /></p></div>
+    </article>
+  </section>
+  
+  
+  <section id="linux20121205iptables">
+    <article>
+      <header>
+      <h1><a href="/linux/2012/12/05/iptables">iptables配置笔记</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-12-05</span></div>
+    </header>
+    <div class="content"><pre><code>1.配置准备
+＃iptables -F //清除原有规则
+＃iptables -X //清除自定义链
+ 
+2.定义策略
+＃iptables -P INPUT DROP //默认丢弃，即丢弃所有的包
+＃iptables -P OUTPUT DROP
+＃iptables -P FORWARD DROP
+ 
+3.典型的规则配置实例
+# iptables -A INPUT|OUTPUT|FORWARD -s 源IP -d 目的IP -p tcp|udp|icmp --sport 源端口--dport 目的端口 -j ACCEPT|DROP
+ 
+4.添加规则
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放HTTP
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 80 -j ACCEPT //针对本机,若本机不需要，可省略
+＃iptables -A OUTPUT -p tcp --dport 80 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 80 -j ACCEPT //允许转发
+＃iptables -A FORWARD -p tcp --dport 80 -j ACCEPT //下面类似
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放DNS
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p udp --sport 53 -j ACCEPT
+＃iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
+＃iptables -A FORWARD -p udp --sport 53 -j ACCEPT
+＃iptables -A FORWARD -p udp --dport 53 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放SMTP和POP3
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 25 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 25 -j ACCEPT
+＃iptables -A INPUT -p tcp --sport 110 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 110 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 25 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 25 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 110 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 110 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放SSH
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 22 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 22 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 22 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 22 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放Telnet
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 23 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 23 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 23 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 23 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放FTP
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 21 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 21 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 21 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 21 -j ACCEPT
+＃iptables -A INPUT -p tcp --sport 20 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 20 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 20 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 20 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放SSL
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 443 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 443 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 443 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 443 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放ICMP
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p icmp -j ACCEPT
+＃iptables -A OUTPUT -p icmp -j ACCEPT
+＃iptables -A FORWARD -p icmp -j ACCEPT
+＃iptables -A FORWARD -p icmp -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放TCP
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp -j ACCEPT
+＃iptables -A OUTPUT -p tcp -j ACCEPT
+＃iptables -A FORWARD -p tcp -j ACCEPT
+＃iptables -A FORWARD -p tcp -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放udp
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p udp -j ACCEPT
+＃iptables -A OUTPUT -p udp -j ACCEPT
+＃iptables -A FORWARD -p udp -j ACCEPT
+＃iptables -A FORWARD -p udp -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃实现NAT
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth0 -j SNAT --to-source 1.2.3.4
+＃iptables -t nat -A PREROUTING -d 192.168.1.0/24 -i eth1 -j DNAT --to-destination 1.2.3.4
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃规则的保存和重载
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables-save -c &gt; /etc/iptables-save
+＃iptables-restore -c &lt; /etc/iptables-save
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃根据数据出入网卡匹配，假设eth0连接内网，eth1连接外网
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables –A INPUT –i eth0 –j ACCEPT  //从eth0流入的数据都接收
+＃iptables – A FORWARD – o eth1 –j ACCEPT //从eth1流出的数据都转发</code></pre>
+
+<p>以上是一些基本配置，可以开放更多的服务，还可以进行更详尽的匹配，如源目地址，出入网卡等，以后可以根据要求进一步设置。</p></div>
+    </article>
+  </section>
+  
+  <div class="pagination">
+      <ul>
+        <li class="next"><a href='/'>&larr; 上一页</a></li>
+        <li><a href="/archive.html">归档</a></li>
+        <li class="prev"><a href='/page3'>下一页 &rarr;</a></li>
+      </ul>
+  </div>
+  </div>
+
+  <aside class="span4">
+
+    <section>
+    <h4>最近发表</h4>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="/linux/2013/06/23/hostapd">利用Hostapd搭建无线wifi</a>
+      </li>
+      <li class="post">
+        <a href="/blog/2013/05/23/microsoft_test">2013微软暑期实习笔试错题、疑题整理</a>
+      </li>
+      <li class="post">
+        <a href="/linux/2013/05/01/fluentd">fluentd插件开发</a>
+      </li>
+      <li class="post">
+        <a href="/linux/2013/04/23/mongodb">Mongodb的备份与恢复</a>
+      </li>
+      <li class="post">
+        <a href="/linux/2013/03/05/tplink">TL-WN822N TL-WN722N linux安装驱动</a>
+      </li>
+      <li class="post">
+        <a href="/linux/2013/02/07/loadbalance">使用ip route命令实现多链路负载均衡</a>
+      </li>
+      <li class="post">
+        <a href="/linux/2013/01/29/ppp">pppd拨号与默认网关</a>
+      </li>
+      <li class="post">
+        <a href="/algorithm/2013/01/23/LIS">DP实例之最长上升子序列LIS</a>
+      </li>
+      <li class="post">
+        <a href="/algorithm/2012/12/12/LCS">DP实例之最长公共子序列LCS</a>
+      </li>
+      <li class="post">
+        <a href="/linux/2012/12/05/iptables">iptables配置笔记</a>
+      </li>
+    </ul>
+    </section>
+    
+  
+    <h4>分类</h4>
+    <ul class="tag_box">
+      
+      
+
+
+  
+     
+    	<li><a href="/categories.html#blog-ref">
+    		blog <span>2</span>
+    	</a></li>
+     
+    	<li><a href="/categories.html#algorithm-ref">
+    		algorithm <span>8</span>
+    	</a></li>
+     
+    	<li><a href="/categories.html#link-ref">
+    		link <span>2</span>
+    	</a></li>
+     
+    	<li><a href="/categories.html#btree-ref">
+    		btree <span>3</span>
+    	</a></li>
+     
+    	<li><a href="/categories.html#vim-ref">
+    		vim <span>1</span>
+    	</a></li>
+     
+    	<li><a href="/categories.html#linux-ref">
+    		linux <span>8</span>
+    	</a></li>
+     
+    	<li><a href="/categories.html#c-ref">
+    		c <span>2</span>
+    	</a></li>
+    
+  
+
+
+    </ul>
+  
+
+  </aside>
+</div>
+
+  </div>
+</div>
+
+
+      </div>
+
+      <footer>
+        <p>&copy; tinyfisher 2013 
+          基于 <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          和 <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a> 构建
+        </p>
+      </footer>
+
+    </div> <!-- /container -->
+    
+  </body>
+</html>
+

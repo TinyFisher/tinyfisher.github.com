@@ -1,0 +1,314 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>单链表操作大全 - tinyfisher blog</title>
+    <meta name="keywords" content="C,algorithm,data_struct,link" />
+    <meta name="description" content="单链表操作大全" />
+    <meta name="author" content="tinyfisher">
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!-- <link href="http://lib.sinaapp.com/js/bootstrap/latest/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all"> -->
+    <link href="http://lib.sinaapp.com/js/bootstrap/2.0.3/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/google-code-prettify/prettify.css" rel="stylesheet" type="text/css" media="all">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <!-- <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/latest/js/bootstrap.min.js"></script> -->
+    <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/2.0.3/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/google-code-prettify/prettify.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/js/application.js"></script>
+  </head>
+
+  <body data-spy="scroll" data-target=".subnav" data-offset="100">
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="/">tinyfisher blog</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+
+
+              <li><a href="/archive.html">归档</a></li>
+              <li><a href="/categories.html">目录</a></li>
+              <li><a href="/pages.html">页面</a></li>
+              <li><a href="/tags.html">标签</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="content">
+        
+
+<div class="page-header">
+  <h1>单链表操作大全 </h1>
+</div>
+
+
+<div class="row">
+  <div class="span8">
+    <p>单链表的操作一般包括：建立，删除节点，插入节点，链表反转</p>
+
+<p>1.单链表建立，包括从终端输入和由数组转换而来两种：</p>
+
+<pre><code>typedef struct node
+{
+    int num;
+    struct node * next;
+}Node,*pNode;
+
+pNode CreateLink()
+{
+    pNode head=(pNode)malloc(sizeof(Node));
+    pNode p=head;
+    int a;
+    printf(&quot;please input:\n&quot;);
+    scanf(&quot;%d&quot;,&amp;a);
+    while(a!=-1)
+    {
+        pNode q=(pNode)malloc(sizeof(Node));
+        q-&gt;num=a;
+        p-&gt;next=q;
+        p=q;
+        scanf(&quot;%d&quot;,&amp;a);
+    }
+    p-&gt;next=NULL;
+    head=head-&gt;next;
+    return head;
+}
+
+pNode CreateLinkFromArray(int a[],int len)
+{
+    pNode head=(pNode)malloc(sizeof(Node));
+    pNode p=head;
+    int i=0;
+    while(i&lt;len)
+    {
+        pNode q=(pNode)malloc(sizeof(Node));
+        q-&gt;num=a[i];
+        p-&gt;next=q;
+        p=q;
+        i++;
+    }
+    p-&gt;next=NULL;
+    head=head-&gt;next;
+    return head;
+}</code></pre>
+
+<p>2.单链表删除节点，考虑删除头结点，尾节点和中间节点：</p>
+
+<pre><code>pNode del(pNode head,int key)
+{
+pNode p=head;
+pNode q=head;
+if(p==NULL) &amp;nbsp; //若链表为空
+{
+    return NULL;
+}
+if(p-&gt;num==key) //删除头指针
+{
+    head=head-&gt;next;
+    free(p);    // 释放删除节点空间
+    return head;
+}
+while(p-&gt;num!=key&amp;&amp;p-&gt;next!=NULL) //遍历链表直到最后一个元素 寻找key，若有删掉
+{
+    q=p;
+    p=p-&gt;next;
+}
+if(p-&gt;next==NULL&amp;&amp;p-&gt;num==key) //删除尾元素
+{
+    q-&gt;next=NULL;
+    free(p);
+}
+else if(p-&gt;next!=NULL) &amp;nbsp;//删除中间元素
+{
+    q-&gt;next=p-&gt;next;
+    free(p);
+}
+else
+{
+    printf(&quot;not found\n&quot;);
+}
+return head;
+}</code></pre>
+
+<p>3.单链表插入元素，考虑插入头结点，尾节点和中间节点</p>
+
+<pre><code>pNode insert(pNode head,int value)
+{
+    pNode s=(pNode)malloc(sizeof(Node));
+    s-&gt;num=value;
+    pNode p=head;
+    pNode q=head;
+    if(head==NULL) //链表为空
+    {
+        s-&gt;next=NULL;
+        return s;
+    }
+    while(p-&gt;num&lt;value&amp;&amp;p-&gt;next!=NULL)
+    {
+        q=p;
+        p=p-&gt;next;
+    }
+    if(p-&gt;next==NULL&amp;&amp;p-&gt;num&lt;value)  //插入尾节点
+    {
+        p-&gt;next=s;
+        s-&gt;next=NULL;
+        return head;
+    }
+    else if(p==head) //插入头结点
+    {
+        p=s;
+        s-&gt;next=q;
+        return p;
+    }
+    else
+    {
+        q-&gt;next=s;
+        s-&gt;next=p;
+        return head;
+    }
+}</code></pre>
+
+<p>4.单链表反转</p>
+
+<pre><code>pNode reverse(pNode head)
+{
+    if(head==NULL)
+    {
+        return NULL;
+    }
+    if(head-&gt;next==NULL)
+    {
+        return head;
+    }
+    pNode p1,p2,p3;
+    p1=head;
+    p2=head;
+    while(p2-&gt;next!=NULL)
+    {
+        p3=p2-&gt;next;
+        p2-&gt;next=p1;
+        p1=p2;
+        p2=p3;
+    }
+    p2-&gt;next=p1;
+    head-&gt;next=NULL;
+    head=p2;
+    return head;
+}</code></pre>
+    <hr>
+    <div class="pagination">
+      <ul>
+      
+        <li class="prev"><a href="/algorithm/2012/06/22/bin-search" title="二分查找C语言实现">&larr; 上一篇</a></li>
+      
+        <li><a href="/archive.html">归档</a></li>
+      
+        <li class="next"><a href="/link/2012/08/01/doublelink" title="双链表操作大全">下一篇 &rarr;</a></li>
+      
+      </ul>
+    </div>
+    <hr>
+    
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'tinyfisher'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+  </div>
+  
+  <div class="span4">
+    <h4>发布日期</h4>
+    <div class="date"><span>2012-07-22</span></div>
+
+  
+    <h4>标签</h4>
+    <ul class="tag_box">
+    
+    
+
+
+  
+     
+    	<li><a href="/tags.html#C-ref">C <span>14</span></a></li>
+     
+    	<li><a href="/tags.html#algorithm-ref">algorithm <span>13</span></a></li>
+     
+    	<li><a href="/tags.html#data_struct-ref">data_struct <span>8</span></a></li>
+     
+    	<li><a href="/tags.html#link-ref">link <span>1</span></a></li>
+    
+  
+
+
+
+    </ul>
+    
+
+  <section>
+    <h4>最近发表</h4>
+    <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/linux/2013/06/23/hostapd">利用Hostapd搭建无线wifi</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/23/microsoft_test">2013微软暑期实习笔试错题、疑题整理</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/05/01/fluentd">fluentd插件开发</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/04/23/mongodb">Mongodb的备份与恢复</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/03/05/tplink">TL-WN822N TL-WN722N linux安装驱动</a>
+      </li>
+    
+    </ul>
+  </section>
+  </div>
+</div>
+
+
+      </div>
+
+      <footer>
+        <p>&copy; tinyfisher 2013 
+          基于 <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          和 <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a> 构建
+        </p>
+      </footer>
+
+    </div> <!-- /container -->
+    
+  </body>
+</html>
+

@@ -1,0 +1,342 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>2013微软暑期实习笔试错题、疑题整理 - tinyfisher blog</title>
+    <meta name="keywords" content="Linux，C，C++，Math，CS" />
+    <meta name="description" content="2013微软暑期实习笔试错题、疑题整理" />
+    <meta name="author" content="tinyfisher">
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!-- <link href="http://lib.sinaapp.com/js/bootstrap/latest/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all"> -->
+    <link href="http://lib.sinaapp.com/js/bootstrap/2.0.3/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/google-code-prettify/prettify.css" rel="stylesheet" type="text/css" media="all">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <!-- <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/latest/js/bootstrap.min.js"></script> -->
+    <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/2.0.3/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/google-code-prettify/prettify.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/js/application.js"></script>
+  </head>
+
+  <body data-spy="scroll" data-target=".subnav" data-offset="100">
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="/">tinyfisher blog</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+
+
+              <li><a href="/archive.html">归档</a></li>
+              <li><a href="/categories.html">目录</a></li>
+              <li><a href="/pages.html">页面</a></li>
+              <li><a href="/tags.html">标签</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="content">
+        
+
+<div class="page-header">
+  <h1>2013微软暑期实习笔试错题、疑题整理 </h1>
+</div>
+
+
+<div class="row">
+  <div class="span8">
+    <h3 id='id14'>参加了微软“智在未来”暑期实习笔试，跪了，将错题、疑题整理如下，方便后面复习整理。</h3>
+
+<p><strong>What&#8217;s the output of the following code?(3 Points)</strong> B</p>
+
+<pre><code>class A  
+{  
+public:  
+    virtual void f()  
+    {  
+        cout&lt;&lt;&quot;A::f()&quot;&lt;&lt;endl;  
+    }  
+    void f() const  
+    {  
+        cout&lt;&lt;&quot;A::f() const&quot;&lt;&lt;endl;  
+    }  
+};  
+  
+class B: public A  
+{  
+public:  
+    void f()  
+    {  
+        cout&lt;&lt;&quot;B::f()&quot;&lt;&lt;endl;  
+    }  
+    void f() const  
+    {  
+        cout&lt;&lt;&quot;B::f() const&quot;&lt;&lt;endl;  
+    }  
+};  
+  
+void g(const A* a)  
+{  
+    a-&gt;f();  
+}  
+  
+int main()  
+{  
+    A* a = new B();  
+    a-&gt;f();  
+    g(a);  
+    delete a ;  
+}  
+
+A. B::f()B::f()const    
+B. B::f()A::f()const  
+C. A::f()B::f()const    
+D. A::f()A::f()const  </code></pre>
+
+<p>解析：类的成员函数后面加 const，<strong>表明这个函数不会对这个类对象的数据成员（准确地说是非静态数据成员）作任何改</strong>变。</p>
+
+<p>在设计类的时候，一个原则就是对于不改变数据成员的成员函数都要在后面加 const，而对于改变数据成员的成员函数不能加 const。所以 const 关键字对成员函数的行为作了更加明确的限定：<strong>有 const 修饰的成员函数（指 const 放在函数参数表的后面，而不是在函数前面或者参数表内），只能读取数据成员，不能改变数据成员；</strong></p>
+
+<p>没有 const 修饰的成员函数，对数据成员则是可读可写的。除此之外，在类的成员函数后面加 const 还有什么好处呢？<strong>那就是常量（即 const）对象可以调用 const 成员函数，而不能调用非const修饰的函数。</strong></p>
+
+<p><strong>What is the difference between a linked list and an array?(3 Points)</strong> （全选）</p>
+
+<pre><code>A. Search complexity when both are sorted  
+
+B. Dynamically add/remove  
+
+C. Random access efficiency  
+
+D. Data storage type  </code></pre>
+
+<p>【此题D选项存在疑问】</p>
+
+<p><strong>About the Thread and Process in Windows, which description(s) is(are) correct:(3 Points)</strong> C</p>
+
+<pre><code>A. One application in OS must have one Process, but not a necessary to have one Thread  
+
+B. The Process could have its own Stack but the thread only could share the Stack of its parent Process  
+
+C. Thread must belongs to a Process  
+
+D. Thread could change its belonging Process  </code></pre>
+
+<p>解析：A选项，一个程序至少有一个进程，一个进程至少包含一个线程（主线程）</p>
+
+<p>B选项，线程共享父进程的数据空间，也可以拥有自己的栈空间</p>
+
+<p>C对，线程不能独立存在，必须属于一个进程</p>
+
+<p>D明显错误</p>
+
+<p><strong>Please choose the right statement about const usage:(3 Points)</strong> ABC</p>
+
+<pre><code>A. const int a; //const integer  
+
+B. int const a; //const integer  
+
+C. int const *a; //a pointer which point to const integer  
+
+D. const int *a; //a const pointer which point to integer  
+
+E. int const *a; // a const pointer which point to integer  </code></pre>
+
+<p>解析：这里注意一下A、B的写法均可，两者意思一样</p>
+
+<p><strong>1 of 1000 bottles of water is poisoned which will kill a rat in 1 week if the rat drunk any amout of the water. Given the bottles of water have no visual difference, how many rats are needed at least to find the poisoned one in 1 week?(5 Points)</strong> B</p>
+
+<pre><code>A. 9  
+
+B. 10  
+
+C. 32  
+
+D. None of the above  </code></pre>
+
+<p>解析：2的10次方=1024，大于1000，用二进制的思维思考问题</p>
+
+<p><strong>Which of the following statement(s) equal(s) value 1 in C programming language?(5 Points)</strong> BCD</p>
+
+<pre><code>A. the return value of main function if program ends normally
+
+B. return (7&amp;1)  
+
+C. char *str=&quot;microsoft&quot;; return str==&quot;microsoft&quot;  
+
+D. return &quot;microsoft&quot;==&quot;microsoft&quot;  
+
+E. None of the above  </code></pre>
+
+<p>解析：A选项，C程序正常退出，return 0；</p>
+
+<p>B选项，计算即可得</p>
+
+<p>C选项，因为C语言中是没有bool类型的（1个字节，只有0,1），所以返回1</p>
+
+<p>D选项，同C</p>
+
+<p><strong>How many rectangles you can find from 3X4 grid?(5 Points)</strong> D</p>
+
+<pre><code>A. 18  
+
+B. 20  
+
+C. 40  
+
+D. 60 
+
+E. None of above is correct  </code></pre>
+
+<p>解析：智力题 整不了</p>
+
+<p><strong>Which of the following sorting algorithm(s) is(are) stable sorting?(5 Points)</strong> A</p>
+
+<pre><code>A. bubble sort  
+
+B. quick sort  
+
+C. heap sort  
+
+D. merge sort  
+
+E. Selection sort  </code></pre>
+
+<p>解析：不稳定排序：“快选希堆”，原地排序：“快选希堆冒”</p>
+
+<p><strong>Model-View-Controller(MVC) is an architectural pattern that frequently used in web applications. Which of the following statement(s) is(are) correct:(5 Points)</strong> AB</p>
+
+<pre><code>A. Models often represent data and the business logics needed to manipulate the data in the application  
+
+B. A view is a (visual) representation of its model. It renders the model into a form suitable for interaction, typically a user interface element  
+
+C. A controller is the link between a user and the system. It accepts input from the user and instructs the model and a view to perform actions based on that input  
+
+D. The common practice of MVC in web applications is, the model receives GET or POST input from user and decides what to do with it, handing over to controller and which hand control to views(HTML-generating components)  
+
+E. None of the above  </code></pre>
+
+<p>解析：不是很清楚，关于MVC，请看这篇blog，写得挺直白的http://www.ruanyifeng.com/blog/2007/11/mvc.html</p>
+
+<p><strong>Given a set of N balls and one of which is defective (weighs less than others), you are allowed to weigh with a balance 3 times to find the defective. Which of the following are possible N?(13 Points)</strong> ABCD</p>
+
+<pre><code>A. 12  
+
+B. 16  
+
+C. 20  
+
+D. 24  
+
+E. 28  </code></pre>
+
+<p>解析：A选项：第一次：4,4,4 第二次：2,2，第三次：1,1, B选项：第一次：5,5,6，第二次：若在某一个5中，2,2,1；若在6中，2,2,2,；第三次1,1, C选项：第一次：7,7,6,；第二次：若在某一个7中，2,2,3；若在6中，2,2,2；第三次，1,1 D选项：第一次：8,8,8；第二次：2,3,3；第三次1,1</p>
+    <hr>
+    <div class="pagination">
+      <ul>
+      
+        <li class="prev"><a href="/linux/2013/05/01/fluentd" title="fluentd插件开发">&larr; 上一篇</a></li>
+      
+        <li><a href="/archive.html">归档</a></li>
+      
+        <li class="next"><a href="/linux/2013/06/23/hostapd" title="利用Hostapd搭建无线wifi">下一篇 &rarr;</a></li>
+      
+      </ul>
+    </div>
+    <hr>
+    
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'tinyfisher'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+  </div>
+  
+  <div class="span4">
+    <h4>发布日期</h4>
+    <div class="date"><span>2013-05-23</span></div>
+
+  
+    <h4>标签</h4>
+    <ul class="tag_box">
+    
+    
+
+
+  
+     
+    	<li><a href="/tags.html#Linux，C，C++，Math，CS-ref">Linux，C，C++，Math，CS <span>1</span></a></li>
+    
+  
+
+
+
+    </ul>
+    
+
+  <section>
+    <h4>最近发表</h4>
+    <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/linux/2013/06/23/hostapd">利用Hostapd搭建无线wifi</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/23/microsoft_test">2013微软暑期实习笔试错题、疑题整理</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/05/01/fluentd">fluentd插件开发</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/04/23/mongodb">Mongodb的备份与恢复</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/03/05/tplink">TL-WN822N TL-WN722N linux安装驱动</a>
+      </li>
+    
+    </ul>
+  </section>
+  </div>
+</div>
+
+
+      </div>
+
+      <footer>
+        <p>&copy; tinyfisher 2013 
+          基于 <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          和 <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a> 构建
+        </p>
+      </footer>
+
+    </div> <!-- /container -->
+    
+  </body>
+</html>
+

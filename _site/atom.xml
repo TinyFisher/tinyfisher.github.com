@@ -4,13 +4,1487 @@
  <title>tinyfisher blog</title>
  <link href="http://tinyfisher.github.com/" rel="self"/>
  <link href="http://tinyfisher.github.com"/>
- <updated>2013-08-30T10:26:55+08:00</updated>
+ <updated>2013-08-30T15:15:07+08:00</updated>
  <id>http://tinyfisher.github.com</id>
  <author>
    <name>tinyfisher</name>
    <email>tinyfisher@foxmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>利用Hostapd搭建无线wifi</title>
+   <link href="http://tinyfisher.github.com/linux/2013/06/23/hostapd"/>
+   <updated>2013-06-23T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/linux/2013/06/23/hostapd</id>
+   <content type="html">&lt;p&gt;网上这类文章一大堆，但都有一些问题，应该是环境不一样，所以在搭建之前，先说下我的环境：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Linux系统：&lt;code&gt;ubuntu 10.04&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;无线网卡：&lt;code&gt;TP-LINK WN822N&lt;/code&gt;（需要网卡支持Master模式，其他网卡请自行搜索）&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;ok, 下面介绍如何搭建：&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;step1：&lt;/strong&gt;安装网卡驱动，网卡都不识别的话就gg了，请参见我的博文《TL-WN822N TL-WN722N linux安装驱动》，识别之后&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ifconfig wlan1 10.0.0.1  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;为网卡设置ip地址。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;step2：&lt;/strong&gt;下载&lt;a href='http://hostap.epitest.fi/releases/hostapd-1.1.tar.gz'&gt;hostapd&lt;/a&gt;，在解压安装之前，先安装libnl和libssl，否则hostapd无法编译通过，命令如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo apt-get install libnl-dev
+sudo apt-get install libssl-dev  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;step3：&lt;/strong&gt;安装hostapd，解压压缩包，终端进入到hostapd文件夹，&lt;code&gt;configure&lt;/code&gt;，&lt;code&gt;make&lt;/code&gt;，&lt;code&gt;make install&lt;/code&gt; 常见的三个步骤&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;step4：&lt;/strong&gt;修改配置文件，在hostapd文件夹里的etc目录下，找到&lt;code&gt;hostapd.conf&lt;/code&gt;文件，编辑如下&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;interface=wlan1 // 根据你的无线网卡名修改
+driver=nl80211  //重要
+ssid=tinyfisher  //这是AP名称
+channel=6
+hw_mode=g
+ignore_broadcast_ssid=0
+auth_algs=1
+wpa=3
+wpa_passphrase=xxxxxxxx   //这是你的密码
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;启动hostapd，命令：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;./hostapd -B hostapd.conf  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;之后就可以搜索到 tinyfisher的wifi了。&lt;/p&gt;
+
+&lt;p&gt;但是此时设备还不能通过wifi上网，还需要搭建dhcp服务器：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo apt-get install dnsmasq  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;修改&lt;code&gt;/etc/dnsmasq.conf&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;interface=wlan1 #根据你的网卡名称修改
+dhcp-range=10.0.0.10,10.0.0.110,6h     #设置dhcp地址范围，即租借时间6小时
+dhcp-option=3,10.0.0.1 #配置网关
+dhcp-option=6,202.114.128.2  #配置dns，请自己修改为外网的dns地址  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;重启&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;dnsmasq：/etc/init.d/dnsmasq restart  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ok，此时连接到wifi上的设备都能被随机分配到从&lt;code&gt;10.0.0.10~10.0.0.110&lt;/code&gt; 的地址&lt;/p&gt;
+
+&lt;p&gt;现在就能上网了吗？不行，我们还需要一个外网出口，并且将内网的流量通过这个外网接口连出去，其实就是做一个&lt;code&gt;SNAT&lt;/code&gt;，所以我们还需要设置&lt;code&gt;iptables&lt;/code&gt;，命令如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;iptables -F
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t nat -A POSTROUTING -s 10.0.0.0/8 -o eth0 -j MASQUERADE    //其中eth0就是外网接口，请根据你的实际情况修改  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最后一步，开启网卡转发功能：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;echo 1 &amp;gt;/proc/sys/net/ipv4/ip_forward  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;搞定收工！&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>2013微软暑期实习笔试错题、疑题整理</title>
+   <link href="http://tinyfisher.github.com/blog/2013/05/23/microsoft_test"/>
+   <updated>2013-05-23T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/blog/2013/05/23/microsoft_test</id>
+   <content type="html">&lt;h3 id='id14'&gt;参加了微软“智在未来”暑期实习笔试，跪了，将错题、疑题整理如下，方便后面复习整理。&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;What&amp;#8217;s the output of the following code?(3 Points)&lt;/strong&gt; B&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class A  
+{  
+public:  
+    virtual void f()  
+    {  
+        cout&amp;lt;&amp;lt;&amp;quot;A::f()&amp;quot;&amp;lt;&amp;lt;endl;  
+    }  
+    void f() const  
+    {  
+        cout&amp;lt;&amp;lt;&amp;quot;A::f() const&amp;quot;&amp;lt;&amp;lt;endl;  
+    }  
+};  
+  
+class B: public A  
+{  
+public:  
+    void f()  
+    {  
+        cout&amp;lt;&amp;lt;&amp;quot;B::f()&amp;quot;&amp;lt;&amp;lt;endl;  
+    }  
+    void f() const  
+    {  
+        cout&amp;lt;&amp;lt;&amp;quot;B::f() const&amp;quot;&amp;lt;&amp;lt;endl;  
+    }  
+};  
+  
+void g(const A* a)  
+{  
+    a-&amp;gt;f();  
+}  
+  
+int main()  
+{  
+    A* a = new B();  
+    a-&amp;gt;f();  
+    g(a);  
+    delete a ;  
+}  
+
+A. B::f()B::f()const    
+B. B::f()A::f()const  
+C. A::f()B::f()const    
+D. A::f()A::f()const  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;解析：类的成员函数后面加 const，&lt;strong&gt;表明这个函数不会对这个类对象的数据成员（准确地说是非静态数据成员）作任何改&lt;/strong&gt;变。&lt;/p&gt;
+
+&lt;p&gt;在设计类的时候，一个原则就是对于不改变数据成员的成员函数都要在后面加 const，而对于改变数据成员的成员函数不能加 const。所以 const 关键字对成员函数的行为作了更加明确的限定：&lt;strong&gt;有 const 修饰的成员函数（指 const 放在函数参数表的后面，而不是在函数前面或者参数表内），只能读取数据成员，不能改变数据成员；&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;没有 const 修饰的成员函数，对数据成员则是可读可写的。除此之外，在类的成员函数后面加 const 还有什么好处呢？&lt;strong&gt;那就是常量（即 const）对象可以调用 const 成员函数，而不能调用非const修饰的函数。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;What is the difference between a linked list and an array?(3 Points)&lt;/strong&gt; （全选）&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;A. Search complexity when both are sorted  
+
+B. Dynamically add/remove  
+
+C. Random access efficiency  
+
+D. Data storage type  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;【此题D选项存在疑问】&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;About the Thread and Process in Windows, which description(s) is(are) correct:(3 Points)&lt;/strong&gt; C&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;A. One application in OS must have one Process, but not a necessary to have one Thread  
+
+B. The Process could have its own Stack but the thread only could share the Stack of its parent Process  
+
+C. Thread must belongs to a Process  
+
+D. Thread could change its belonging Process  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;解析：A选项，一个程序至少有一个进程，一个进程至少包含一个线程（主线程）&lt;/p&gt;
+
+&lt;p&gt;B选项，线程共享父进程的数据空间，也可以拥有自己的栈空间&lt;/p&gt;
+
+&lt;p&gt;C对，线程不能独立存在，必须属于一个进程&lt;/p&gt;
+
+&lt;p&gt;D明显错误&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Please choose the right statement about const usage:(3 Points)&lt;/strong&gt; ABC&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;A. const int a; //const integer  
+
+B. int const a; //const integer  
+
+C. int const *a; //a pointer which point to const integer  
+
+D. const int *a; //a const pointer which point to integer  
+
+E. int const *a; // a const pointer which point to integer  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;解析：这里注意一下A、B的写法均可，两者意思一样&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;1 of 1000 bottles of water is poisoned which will kill a rat in 1 week if the rat drunk any amout of the water. Given the bottles of water have no visual difference, how many rats are needed at least to find the poisoned one in 1 week?(5 Points)&lt;/strong&gt; B&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;A. 9  
+
+B. 10  
+
+C. 32  
+
+D. None of the above  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;解析：2的10次方=1024，大于1000，用二进制的思维思考问题&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Which of the following statement(s) equal(s) value 1 in C programming language?(5 Points)&lt;/strong&gt; BCD&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;A. the return value of main function if program ends normally
+
+B. return (7&amp;amp;1)  
+
+C. char *str=&amp;quot;microsoft&amp;quot;; return str==&amp;quot;microsoft&amp;quot;  
+
+D. return &amp;quot;microsoft&amp;quot;==&amp;quot;microsoft&amp;quot;  
+
+E. None of the above  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;解析：A选项，C程序正常退出，return 0；&lt;/p&gt;
+
+&lt;p&gt;B选项，计算即可得&lt;/p&gt;
+
+&lt;p&gt;C选项，因为C语言中是没有bool类型的（1个字节，只有0,1），所以返回1&lt;/p&gt;
+
+&lt;p&gt;D选项，同C&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;How many rectangles you can find from 3X4 grid?(5 Points)&lt;/strong&gt; D&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;A. 18  
+
+B. 20  
+
+C. 40  
+
+D. 60 
+
+E. None of above is correct  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;解析：智力题 整不了&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Which of the following sorting algorithm(s) is(are) stable sorting?(5 Points)&lt;/strong&gt; A&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;A. bubble sort  
+
+B. quick sort  
+
+C. heap sort  
+
+D. merge sort  
+
+E. Selection sort  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;解析：不稳定排序：“快选希堆”，原地排序：“快选希堆冒”&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Model-View-Controller(MVC) is an architectural pattern that frequently used in web applications. Which of the following statement(s) is(are) correct:(5 Points)&lt;/strong&gt; AB&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;A. Models often represent data and the business logics needed to manipulate the data in the application  
+
+B. A view is a (visual) representation of its model. It renders the model into a form suitable for interaction, typically a user interface element  
+
+C. A controller is the link between a user and the system. It accepts input from the user and instructs the model and a view to perform actions based on that input  
+
+D. The common practice of MVC in web applications is, the model receives GET or POST input from user and decides what to do with it, handing over to controller and which hand control to views(HTML-generating components)  
+
+E. None of the above  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;解析：不是很清楚，关于MVC，请看这篇blog，写得挺直白的http://www.ruanyifeng.com/blog/2007/11/mvc.html&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Given a set of N balls and one of which is defective (weighs less than others), you are allowed to weigh with a balance 3 times to find the defective. Which of the following are possible N?(13 Points)&lt;/strong&gt; ABCD&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;A. 12  
+
+B. 16  
+
+C. 20  
+
+D. 24  
+
+E. 28  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;解析：A选项：第一次：4,4,4 第二次：2,2，第三次：1,1, B选项：第一次：5,5,6，第二次：若在某一个5中，2,2,1；若在6中，2,2,2,；第三次1,1, C选项：第一次：7,7,6,；第二次：若在某一个7中，2,2,3；若在6中，2,2,2；第三次，1,1 D选项：第一次：8,8,8；第二次：2,3,3；第三次1,1&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>fluentd插件开发</title>
+   <link href="http://tinyfisher.github.com/linux/2013/05/01/fluentd"/>
+   <updated>2013-05-01T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/linux/2013/05/01/fluentd</id>
+   <content type="html">&lt;p&gt;fluentd默认支持了一些插件，如apache，但是最近做项目对squid日志进行分析时，发现fluentd没有这个默认插件，需要自己开发，方法如下 自己编写一个ruby脚本，比如:&lt;code&gt;in_mytail.rb&lt;/code&gt;,将他放到&lt;code&gt;/etc/td-agent/plugin&lt;/code&gt; 即可&lt;/p&gt;
+
+&lt;p&gt;修改&lt;code&gt;/etc/td-agent/td-agent.conf&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;source&amp;gt;
+	type mytail
+	path /path/to/myformat_file
+	tag myapp.mytail
+&amp;lt;source&amp;gt;  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;标签里面是日志来源，type表示input插件类型，这里是自己编写的类型，path是源日志文件，tag是标签，用于区分其他插件.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;match **&amp;gt;
+	type stdout
+&amp;lt;/match&amp;gt;  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;用于输出，这里输出到stdout，可以是file，mongodb等，看自己需要. 调试模式：td-agent -vv&lt;/p&gt;
+
+&lt;p&gt;ruby脚本如下&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class MyTailInput &amp;lt; Fluent::TailInput  
+  Fluent::Plugin.register_input(&amp;#39;mytail&amp;#39;, self)  
+  
+  # Override &amp;#39;configure_parser(conf)&amp;#39; method.  
+  # You can get config parameters in this method.  
+  def configure_parser(conf)  
+    @time_format = conf[&amp;#39;time_format&amp;#39;] || &amp;#39;%Y-%M-%d %H:%M:%S&amp;#39;  
+  end  
+    
+  # Override &amp;#39;parse_line(line)&amp;#39; method that returns time and record.  
+  # This example method assumes following log format:  
+  #   %Y-%m-%d %H:%M:%S\tkey1\tvalue1\tkey2\tvalue2...  
+  #   %Y-%m-%d %H:%M:%S\tkey1\tvalue1\tkey2\tvalue2...  
+  #   ...  
+  def parse_line(line)  
+    elements = line.split(&amp;quot;\t&amp;quot;)  
+    time=&amp;quot;2012-11-11 11:11:11&amp;quot;  #why unknow  
+    t_time = Time.strptime(time, @time_format).to_i  
+    record = {}  
+    record[&amp;#39;logtime&amp;#39;]=elements[0]  
+    record[&amp;#39;logcontent&amp;#39;]=elements[1]  
+    return t_time, record  
+  end  
+end  &lt;/code&gt;&lt;/pre&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>Mongodb的备份与恢复</title>
+   <link href="http://tinyfisher.github.com/linux/2013/04/23/mongodb"/>
+   <updated>2013-04-23T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/linux/2013/04/23/mongodb</id>
+   <content type="html">&lt;p&gt;坑爹的保密检查需要擦除硬盘，所有环境都需要重新安装，Mongodb数据库需要进行备份，还好Mongodb为我们提供了&lt;code&gt;mongodump&lt;/code&gt;和&lt;code&gt;mongorestore&lt;/code&gt;两种方法，非常方便。&lt;/p&gt;
+
+&lt;p&gt;进到mongodb的bin目录下：&lt;/p&gt;
+
+&lt;p&gt;备份：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;mongodump -d Injection   //Injection 就是你要备份的数据库&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;执行之后会生成dump文件夹，里面子目录Injection就是备份的数据&lt;/p&gt;
+
+&lt;p&gt;恢复：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;mongorestore -d Injection dump/Injection&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样就完成的备份与恢复，是不是十分方便呢~随后送上其他环境配置日志，坑爹的保密检查。&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>TL-WN822N TL-WN722N linux安装驱动</title>
+   <link href="http://tinyfisher.github.com/linux/2013/03/05/tplink"/>
+   <updated>2013-03-05T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/linux/2013/03/05/tplink</id>
+   <content type="html">&lt;p&gt;这两款的芯片都是AR系列的芯片，所以只要安装这款芯片的驱动：&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;ath9k_htc&lt;/code&gt;即可,只需要两步&lt;/p&gt;
+
+&lt;p&gt;(1)安装&lt;a href='https://www.kernel.org/pub/linux/kernel/projects/backports/stable/v3.7.9/'&gt;compat-drivers-3.7.9-1.tar.gz&lt;/a&gt;,这类似于万能驱动，里面包含了很多芯片的驱动，很好用，编译时间有点长，耐心等待&lt;/p&gt;
+
+&lt;p&gt;下载完成之后，将压缩包解压，从命令行终端进入到解压的文件夹中，输入命令&lt;code&gt;sudo make&lt;/code&gt;，等待时间较长，再输入命令 &lt;code&gt;make install&lt;/code&gt;,等待时间也较长，便完成了安装&lt;/p&gt;
+
+&lt;p&gt;(2)安装&lt;a href='http://nl.archive.ubuntu.com/ubuntu/pool/main/l/linux-firmware/linux-firmware_1.60_all.deb'&gt;linux-firmware&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;下载完成之后，直接双击文件包，即可自动安装&lt;/p&gt;
+
+&lt;p&gt;重新启动 ，插上usb无线网卡，命令行输入&lt;code&gt;ifconfig -a&lt;/code&gt; ，如果出现&lt;code&gt;wlan0&lt;/code&gt;，&lt;code&gt;wlan1&lt;/code&gt; 等信息，则驱动成功&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>使用ip route命令实现多链路负载均衡</title>
+   <link href="http://tinyfisher.github.com/linux/2013/02/07/loadbalance"/>
+   <updated>2013-02-07T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/linux/2013/02/07/loadbalance</id>
+   <content type="html">&lt;p&gt;其实在linux下实现多链路负载均衡很简单，只需借助ip route命令即可。&lt;/p&gt;
+
+&lt;p&gt;环境：&lt;code&gt;ubuntu 10.04&lt;/code&gt; ，两个3G网卡，分别为&lt;code&gt;CDMA2000&lt;/code&gt; 和 &lt;code&gt;WCDMA&lt;/code&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;分别将两个网卡拨号上网，方法不再具体描述，拨号成功后会多出两条链路&lt;code&gt;ppp0&lt;/code&gt;和&lt;code&gt;ppp1&lt;/code&gt;，注意拨号脚本里不要添加默认网关，（具体请参见《pppd拨号与默认网关》），而是手动添加两条默认路由。&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;利用&lt;code&gt;iptables&lt;/code&gt;进行&lt;code&gt;nat&lt;/code&gt;转换，不再赘述。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;3.此时路由表里会有两条默认路由，其实只有第一个起作用，所有的流量都会从这条链路出去，没有实现负载均衡的效果，只需使用如下命令：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ip route replace default equalize nexthop dev ppp0 weight 1 nexthop dev ppp1 weight 1   &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中weight表示权重，根据链路的实际情况设置相应数值。&lt;/p&gt;
+
+&lt;p&gt;4.测试：内网机器进行网络活动，在网关利用命令&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;tc -s qdisc ls dev ppp0,tc -s qdisc ls dev ppp1  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;分别查看两条链路的流量，发现基本流量是按照1:1的比率的。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;问题：内网的机器通过多链路网关访问外网速度比单链路得到提升，但是网关本身访问外网的速度比单链路要慢得多，甚至不能访问网站，原因不详，猜想是http数据包从不同的链路进出，不能很好的拼凑给网关。总之现在这个项目不需要网关访问外网，留待以后再讨论。&lt;/li&gt;
+&lt;/ol&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>pppd拨号与默认网关</title>
+   <link href="http://tinyfisher.github.com/linux/2013/01/29/ppp"/>
+   <updated>2013-01-29T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/linux/2013/01/29/ppp</id>
+   <content type="html">&lt;p&gt;在linux下使用3G网卡上网，使用pppd工具进行拨号，拨号脚本如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;nodetach
+/dev/ttyUSB0
+19200
+nocrtscts
+connect &amp;#39;/usr/sbin/chat -v -f /etc/ppp/peers/chat_script_unicom&amp;#39;
+debug
+user &amp;quot;card&amp;quot;
+password &amp;quot;card&amp;quot;
+ipcp-accept-local
+ipcp-accept-remote
+defaultroute&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中&lt;code&gt;defaultroute&lt;/code&gt;表示拨号成功后，自动添加一条默认路由，如果只使用一个网卡拨号，当然很方便;&lt;/p&gt;
+
+&lt;p&gt;但是我发现如果使用两个以上的网卡进行拨号，会产生多条默认路由，这当然也没有问题，只是当其中一条断开后，所有的默认路由都消失了，即使其他的网卡工作正常，也不能上网，所以当有多个网卡拨号的时侯，不建议使用&lt;code&gt;defaultroute&lt;/code&gt;这个选项，可以手动添加默认路由：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;route add default gw x.x.x.x&lt;/code&gt;&lt;/pre&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>DP实例之最长上升子序列LIS</title>
+   <link href="http://tinyfisher.github.com/algorithm/2013/01/23/LIS"/>
+   <updated>2013-01-23T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/algorithm/2013/01/23/LIS</id>
+   <content type="html">&lt;pre&gt;&lt;code&gt;/*
+    LIS:最长递增子序列，例如：23453267，最长递增子序列为：234567
+    lis(i)表示以a[i]结束的递增子序列的长度
+    lis(i)=max{lis(k)+1,1}  k from 0 to i-1
+    最长递增子序列长度为max(lis[]);
+*/
+
+
+int LIS(int a[],int len)
+{
+   int *p=(int *)malloc(sizeof(int)*len);
+   int i=0;
+   int j=0;
+   int result=0;
+   if(p==NULL)
+        return -1;
+   for(i=0;i&amp;lt;len;i++)
+   {
+       p[i]=1;
+       for(j=0;j&amp;lt;i;j++)
+       {
+           if(a[i]&amp;gt;a[j]&amp;amp;&amp;amp;p[j]+1&amp;gt;p[i])
+           {
+               p[i]=p[j]+1;
+           }
+       }
+   }
+   for(i=0;i&amp;lt;len;i++)
+   {
+       if(result&amp;lt;p[i])
+       {
+           result =p[i];
+       }
+   }
+   free(p);
+   return result;
+}&lt;/code&gt;&lt;/pre&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>DP实例之最长公共子序列LCS</title>
+   <link href="http://tinyfisher.github.com/algorithm/2012/12/12/LCS"/>
+   <updated>2012-12-12T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/algorithm/2012/12/12/LCS</id>
+   <content type="html">&lt;pre&gt;&lt;code&gt;/*
+    LCS：求最长公共子序列
+    例如：s1=&amp;quot;abdrge&amp;quot;,s2=&amp;quot;adreg&amp;quot;,则LCS=&amp;quot;adre&amp;quot;
+    状态方程：lcs(i,j)=lcs(i-1,j-1)+1,其中s1[i]=s2[j]
+    或者 lcs(i,j)=max{lcs(i,j-1),lcs(i-1,j)}
+*/
+int LCS(char *a,char *b)
+{
+    int len_a=strlen(a);   //行
+    int len_b=strlen(b);   //列
+    int **len=NULL;
+    int **r=NULL;
+    int i=0;
+    int j=0;
+    int lcs_len=0;
+    len=(int **)malloc(sizeof(int *)*(len_a+1));       //申请二维数组空间
+    r=(int **)malloc(sizeof(int *)*(len_a+1));
+    if (len==NULL||r==NULL)
+        return -1;
+    for(;i&amp;lt;=len_a;i++)
+    {
+        *(len+i)=(int *)malloc(sizeof(int)*(len_b+1));
+        *(r+i)=(int *)malloc(sizeof(int)*(len_b+1));
+        if (*(len+i)==NULL||*(r+i)==NULL)
+            return -1;
+    }
+
+    //LCS状态方程
+    for(i=0;i&amp;lt;=len_a;i++)     //初始化
+    {
+        for(j=0;j&amp;lt;=len_b;j++)
+        {
+            len[i][j]=0;
+            r[i][j]=0;
+        }
+    }
+    for(i=1;i&amp;lt;=len_a;i++)
+    {
+        for(j=1;j&amp;lt;=len_b;j++)
+        {
+            if(a[i-1]==b[j-1])
+            {
+                len[i][j]=len[i-1][j-1]+1;
+                r[i][j]=1;
+            }
+            else if(len[i][j-1]&amp;gt;=len[i-1][j])  //左边的大于等于上边的
+            {
+                len[i][j]=len[i][j-1];
+                r[i][j]=2;
+            }
+            else
+            {
+                 len[i][j]=len[i-1][j];
+                 r[i][j]=3;
+            }
+        }
+    }
+
+    //打印公共子序列
+    print_lcs(r,a,len_a,len_b);
+    free(r);
+    lcs_len= len[len_a][len_b];
+    free(len);
+    return lcs_len;
+}
+
+void print_lcs(int **r,char *a,int i,int j)
+{
+    if(i==0||j==0)
+        return ;
+    else if(r[i][j]==1)
+    {
+        print_lcs(r,a,i-1,j-1);
+        printf(&amp;quot;%c&amp;quot;,*(a+i-1));
+    }
+    else if(r[i][j]==2)
+        print_lcs(r,a,i,j-1);
+    else
+        print_lcs(r,a,i-1,j);
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img alt='alt text' src='../../assets/themes/images/20130613111911031.png' /&gt;&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>iptables配置笔记</title>
+   <link href="http://tinyfisher.github.com/linux/2012/12/05/iptables"/>
+   <updated>2012-12-05T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/linux/2012/12/05/iptables</id>
+   <content type="html">&lt;pre&gt;&lt;code&gt;1.配置准备
+＃iptables -F //清除原有规则
+＃iptables -X //清除自定义链
+ 
+2.定义策略
+＃iptables -P INPUT DROP //默认丢弃，即丢弃所有的包
+＃iptables -P OUTPUT DROP
+＃iptables -P FORWARD DROP
+ 
+3.典型的规则配置实例
+# iptables -A INPUT|OUTPUT|FORWARD -s 源IP -d 目的IP -p tcp|udp|icmp --sport 源端口--dport 目的端口 -j ACCEPT|DROP
+ 
+4.添加规则
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放HTTP
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 80 -j ACCEPT //针对本机,若本机不需要，可省略
+＃iptables -A OUTPUT -p tcp --dport 80 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 80 -j ACCEPT //允许转发
+＃iptables -A FORWARD -p tcp --dport 80 -j ACCEPT //下面类似
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放DNS
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p udp --sport 53 -j ACCEPT
+＃iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
+＃iptables -A FORWARD -p udp --sport 53 -j ACCEPT
+＃iptables -A FORWARD -p udp --dport 53 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放SMTP和POP3
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 25 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 25 -j ACCEPT
+＃iptables -A INPUT -p tcp --sport 110 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 110 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 25 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 25 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 110 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 110 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放SSH
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 22 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 22 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 22 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 22 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放Telnet
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 23 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 23 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 23 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 23 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放FTP
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 21 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 21 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 21 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 21 -j ACCEPT
+＃iptables -A INPUT -p tcp --sport 20 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 20 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 20 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 20 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放SSL
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 443 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 443 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 443 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 443 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放ICMP
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p icmp -j ACCEPT
+＃iptables -A OUTPUT -p icmp -j ACCEPT
+＃iptables -A FORWARD -p icmp -j ACCEPT
+＃iptables -A FORWARD -p icmp -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放TCP
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp -j ACCEPT
+＃iptables -A OUTPUT -p tcp -j ACCEPT
+＃iptables -A FORWARD -p tcp -j ACCEPT
+＃iptables -A FORWARD -p tcp -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放udp
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p udp -j ACCEPT
+＃iptables -A OUTPUT -p udp -j ACCEPT
+＃iptables -A FORWARD -p udp -j ACCEPT
+＃iptables -A FORWARD -p udp -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃实现NAT
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth0 -j SNAT --to-source 1.2.3.4
+＃iptables -t nat -A PREROUTING -d 192.168.1.0/24 -i eth1 -j DNAT --to-destination 1.2.3.4
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃规则的保存和重载
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables-save -c &amp;gt; /etc/iptables-save
+＃iptables-restore -c &amp;lt; /etc/iptables-save
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃根据数据出入网卡匹配，假设eth0连接内网，eth1连接外网
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables –A INPUT –i eth0 –j ACCEPT  //从eth0流入的数据都接收
+＃iptables – A FORWARD – o eth1 –j ACCEPT //从eth1流出的数据都转发&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以上是一些基本配置，可以开放更多的服务，还可以进行更详尽的匹配，如源目地址，出入网卡等，以后可以根据要求进一步设置。&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>makefile 编写问题记录</title>
+   <link href="http://tinyfisher.github.com/c/2012/11/23/makefile"/>
+   <updated>2012-11-23T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/c/2012/11/23/makefile</id>
+   <content type="html">&lt;p&gt;最近写了个小程序，用到了&lt;code&gt;pow()&lt;/code&gt;函数，我们都知道需要添加头文件&lt;code&gt;&amp;lt;math.h&amp;gt;&lt;/code&gt;，以及在&lt;code&gt;gcc&lt;/code&gt;编译的侍侯加上&lt;code&gt;-lm&lt;/code&gt;选项，但是这个&lt;code&gt;-lm&lt;/code&gt;选项的位值也是有讲究的，我之前的makefile如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;solution:solution.o
+     gcc  -lm solution.o  -o solution 
+solution.o:solution.c
+     gcc  -c  solution.c&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;报出错误：&lt;code&gt;undefined reference to pow&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;原因是&lt;code&gt;-lm&lt;/code&gt;的位置在&lt;code&gt;solution.o&lt;/code&gt;之前，所以编译器链接的时侯先去链接&lt;code&gt;lm&lt;/code&gt;库，之后无法解释&lt;code&gt;solution.o&lt;/code&gt;里的&lt;code&gt;pow&lt;/code&gt;函数&lt;/p&gt;
+
+&lt;p&gt;所以正确的makefile如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;solution:solution.o
+     gcc  solution.o  -o solution  -lm
+solution.o:solution.c
+     gcc  -c  solution.c&lt;/code&gt;&lt;/pre&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>DP实例之01背包问题C语言实现</title>
+   <link href="http://tinyfisher.github.com/algorithm/2012/11/02/bag"/>
+   <updated>2012-11-02T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/algorithm/2012/11/02/bag</id>
+   <content type="html">&lt;h4 id='id12'&gt;问题描述：&lt;/h4&gt;
+
+&lt;p&gt;有N件物品和一个容量为V的背包。第i件物品的费用是&lt;code&gt;c[i]&lt;/code&gt;，价值是&lt;code&gt;w[i]&lt;/code&gt;。求解将哪些物品装入背包可使这些物品的费用总和不超过背包容量，且价值总和最大。&lt;br /&gt;这是最基础的背包问题，特点是：每种物品仅有一件，可以选择放或不放。&lt;/p&gt;
+
+&lt;p&gt;用子问题定义状态：即&lt;code&gt;f[i][v]&lt;/code&gt;表示前i件物品恰放入一个容量为v的背包可以获得的最大价值。则其状态转移方程便是：&lt;code&gt;f[i][v]&lt;/code&gt;=&lt;code&gt;max{f[i-1][v],f[i-1][v-c[i]]+w[i]}&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;用二维数组记录每个子问题的值，避免重复计算，行从0到N，列从0到V。&lt;code&gt;f[][0]=0,f[0][]=0&lt;/code&gt;;&lt;/p&gt;
+
+&lt;p&gt;很容易算出01背包的时间和空间复杂度，&lt;code&gt;O(V*N)&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;C语言代码实现如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;int Bag()  
+{  
+    int i,j;  
+    int num=4;      //有4个物品  
+    int vol=10;     //背包容量为10  
+    int w[5]={0,3,1,4,3}; //此处需要多添加一个首元素元素0，因为下面的循环从1开始，若不添加0，则i-1会出现数组越界  
+    int v[5]={0,1,3,4,2};//此处需要多添加一个首元素元素0，因为下面的循环从1开始，若不添加0，则i-1会出现数组越界  
+    int f[5][11]={0}; //用来保存结果 ，以上几个数组长度都比num，vol多一个  
+    for(i=1;i&amp;lt;=num;i++)  //状态方程  
+    {  
+        for(j=1;j&amp;lt;=vol;j++)  
+        {  
+            if (w[j]&amp;gt;j)                            //如果第i个物品放不进背包  
+                f[i][j]=f[i-1][j];  
+            else if(f[i-1][j]&amp;gt;(f[i-1][j-w[i]]+v[i]))    //状态方程 取&amp;lt;span style=&amp;quot;font-size: 14px;&amp;quot;&amp;gt;max{f[i-1][v],f[i-1][v-c[i]]+w[i]}&amp;lt;/span&amp;gt;  
+                f[i][j]=f[i-1][j];  
+            else  
+                f[i][j]=f[i-1][j-w[i]]+v[i];  
+        }  
+    }  
+    return f[4][10];  
+}  &lt;/code&gt;&lt;/pre&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>关于回调函数</title>
+   <link href="http://tinyfisher.github.com/c/2012/10/07/callback"/>
+   <updated>2012-10-07T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/c/2012/10/07/callback</id>
+   <content type="html">&lt;h3 id='id10'&gt;关于回调函数，搜集了一些网上的说法：&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;1.形象的例子：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;你饿了,想吃饭,就一会去问你妈一声&amp;#8221;开饭没有啊?&amp;#8221;这就正常函数调用. 但是今天你妈包饺子,花的时间比较长,你跑啊跑啊,就烦了.于是你给你妈说,我先出去玩会,开饭的时候打我手机.等过了一阵,你妈给你打电话说&amp;#8221;开饭啦,快回来吃饭吧!&amp;#8221;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;其中,你告诉你妈打手机找你,就是个你把回调函数句柄保存到你妈的动作.你妈打电话叫你,就是个回调过程.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;2.为什么使用回调函数&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;本质上都是“&lt;strong&gt;你想让别人的代码执行你的代码，而别人的代码你又不能动&lt;/strong&gt;”这种需求下产生的&lt;/p&gt;
+
+&lt;p&gt;别人给你的不是源代码，是一个已经编译好的模块，并且不会给你源代码，那是商业机密，留给你一个接口，你把你要执行的代码以回调函数的形式交给这个接口，由别人编写的模块在需要的时候调用&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;3.怎么调用回调函数&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;使用回调函数实际上就是在调用某个函数（通常是API函数）时，将自己的一个函数（这个函数为回调函数）的地址作为参数传递给那个函数。而那个函数在需要的时候，利用传递的地址调用回调函数，这时你可以利用这个机会在回调函数中处理消息或完成一定的操作。至于如何定义回调函数，跟具体使用的API函数有关，一般在帮助中有说明回调函数的参数和返回值等。C++中一般要求在回调函数前加CALLBACK，这主要是说明该函数的调用方式。&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>分段和分页内存管理</title>
+   <link href="http://tinyfisher.github.com/linux/2012/09/23/OS-memory"/>
+   <updated>2012-09-23T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/linux/2012/09/23/OS-memory</id>
+   <content type="html">&lt;h3 id='id5'&gt;&lt;strong&gt;两者描述&lt;/strong&gt;&lt;/h3&gt;
+
+&lt;p&gt;打个比方，比如说你去听课，带了一个纸质笔记本做笔记。笔记本有100张纸，课程有语文、数学、英语三门，对于这个笔记本的使用，为了便于以后复习方便，你可以有两种选择。&lt;/p&gt;
+
+&lt;p&gt;第一种是，你从本子的第一张纸开始用，并且事先在本子上做划分：第2张到第30张纸记语文笔记，第31到60张纸记数学笔记，第61到100张纸记英语笔记，最后在第一张纸做个列表，记录着三门笔记各自的范围。这就是分段管理，第一张纸叫段表。&lt;/p&gt;
+
+&lt;p&gt;第二种是，你从第二张纸开始做笔记，各种课的笔记是连在一起的：第2张纸是数学，第3张是语文，第4张英语……最后呢，你在第一张纸做了一个目录，记录着语文笔记在第3、7、14、15张纸……，数学笔记在第2、6、8、9、11……，英语笔记在第4、5、12……。这就是分页管理，第一张纸叫页表。你要复习哪一门课，就到页表里查寻相关的纸的编号，然后翻到那一页去复习&lt;/p&gt;
+
+&lt;h3 id='id6'&gt;&lt;strong&gt;两者的优缺点：&lt;/strong&gt;&lt;/h3&gt;
+
+&lt;p&gt;在段式存储管理中，将程序的地址空间划分为若干段（segment），如代码段，数据段，堆栈段；这样每个进程有一个二维地址空间，相互独立，互不干扰。&lt;em&gt;段式管理的优点是：没有内碎片（因为段大小可变，改变段大小来消除内碎片）。但段换入换出时，会产生外碎片（比如4k的段换5k的段，会产生1k的外碎片）&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;在页式存储管理中，将程序的逻辑地址划分为固定大小的页（page），而物理内存划分为同样大小的页框，程序加载时，可以将任意一页放入内存中任意一个页框，这些页框不必连续，从而实现了离散分离。&lt;em&gt;页式存储管理的优点是：没有外碎片（因为页的大小固定），但会产生内碎片（一个页可能填充不满）&lt;/em&gt;&lt;/p&gt;
+
+&lt;h3 id='id7'&gt;&lt;strong&gt;两者的不同点：&lt;/strong&gt;&lt;/h3&gt;
+
+&lt;p&gt;(1) 分页仅仅是由于系统管理的需要而不是用户的需要。段则是信息的逻辑单位，它含有一组其意义相对完整的信息。分段的目的是为了能更好地满足用户的需要。&lt;/p&gt;
+
+&lt;p&gt;(2) 页的大小固定且由系统决定，由系统把逻辑地址划分为页号和页内地址两部分，是由机器硬件实现的，因而在系统中只能有一种大小的页面；而段的长度却不固定，决定于用户所编写的程序，通常由编译程序在对源程序进行编译时，根据信息的性质来划分。&lt;/p&gt;
+
+&lt;p&gt;(3) 分页的作业地址空间是一维的，即单一的线性地址空间，程序员只需利用一个记忆符，即可表示一个地址；而分段的作业地址空间则是二维的，程序员在标识一个地址时，既需给出段名，又需给出段内地址。&lt;/p&gt;
+
+&lt;h3 id='id8'&gt;&lt;strong&gt;两者结合——段页式存储管理：&lt;/strong&gt;&lt;/h3&gt;
+
+&lt;p&gt;1．基本思想：&lt;/p&gt;
+
+&lt;p&gt;分页系统能有效地提高内存的利用率，而分段系统能反映程序的逻辑结构，便于段的共享与保护，将分页与分段两种存储方式结合起来，就形成了段页式存储管理方式。&lt;/p&gt;
+
+&lt;p&gt;在段页式存储管理系统中，作业的地址空间首先被分成若干个逻辑分段，每段都有自己的段号，然后再将每段分成若干个大小相等的页。对于主存空间也分成大小相等的页，主存的分配以页为单位。&lt;/p&gt;
+
+&lt;p&gt;段页式系统中，作业的地址结构包含三部分的内容：段号，页号，页内位移量&lt;/p&gt;
+
+&lt;p&gt;程序员按照分段系统的地址结构将地址分为段号与段内位移量，地址变换机构将段内位移量分解为页号和页内位移量。&lt;/p&gt;
+
+&lt;p&gt;为实现段页式存储管理，系统应为每个进程设置一个段表，包括每段的段号，该段的页表始址和页表长度。每个段有自己的页表，记录段中的每一页的页号和存放在主存中的物理块号。&lt;/p&gt;
+
+&lt;p&gt;2．地址变换的过程：&lt;/p&gt;
+
+&lt;p&gt;（1）程序执行时，从PCB中取出段表始址和段表长度，装入段表寄存器。&lt;/p&gt;
+
+&lt;p&gt;（2）由地址变换机构将逻辑地址自动分成段号、页号和页内地址。&lt;/p&gt;
+
+&lt;p&gt;（3）将段号与段表长度进行比较，若段号大于或等于段表长度，则表示本次访问的地址已超越进程的地址空间，产生越界中断。&lt;/p&gt;
+
+&lt;p&gt;（4）将段表始址与段号和段表项长度的乘积相加，便得到该段表项在段表中的位置。&lt;/p&gt;
+
+&lt;p&gt;（5）取出段描述子得到该段的页表始址和页表长度。&lt;/p&gt;
+
+&lt;p&gt;（6）将页号与页表长度进行比较，若页号大于或等于页表长度，则表示本次访问的地址已超越进程的地址空间，产生越界中断。&lt;/p&gt;
+
+&lt;p&gt;（7）将页表始址与页号和页表项长度的乘积相加，便得到该页表项在页表中的位置。&lt;/p&gt;
+
+&lt;p&gt;（8）取出页描述子得到该页的物理块号。&lt;/p&gt;
+
+&lt;p&gt;（9）对该页的存取控制进行检查。&lt;/p&gt;
+
+&lt;p&gt;（10）将物理块号送入物理地址寄存器中，再将有效地址寄存器中的页内地址直接送入物理地址寄存器的块内地址字段中，拼接得到实际的物理地址。&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>vim的备份和还原</title>
+   <link href="http://tinyfisher.github.com/vim/2012/09/01/vim"/>
+   <updated>2012-09-01T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/vim/2012/09/01/vim</id>
+   <content type="html">&lt;p&gt;vim是编辑神器，配置成IDE风格，用起来十分顺手，但是配置过程比较麻烦，前几天配置完了，重做系统还需要再配一遍吗，答案是否定的，如何还原vim环境呢？&lt;/p&gt;
+
+&lt;p&gt;我的实验环境：&lt;code&gt;ubuntu10.04.2&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;step0&lt;/strong&gt;:安装vim：&lt;code&gt;sudo apt-get install vim&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;step1:&lt;/strong&gt;备份文件：1.文件夹：&lt;code&gt;/.vim&lt;/code&gt; 2.配置文件：&lt;code&gt;/etc/vimrc&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;step2:&lt;/strong&gt;&lt;code&gt;sudo apt-get install exuberant-ctags&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;step3:&lt;/strong&gt;复制刚才备份的文件到相应的目录下，并修改权限，简单暴力的777权限&lt;/p&gt;
+
+&lt;p&gt;ok，还原成功！&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>根据二叉树的先序和中序遍历还原二叉树</title>
+   <link href="http://tinyfisher.github.com/btree/2012/08/26/btree-back"/>
+   <updated>2012-08-26T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/btree/2012/08/26/btree-back</id>
+   <content type="html">&lt;pre&gt;&lt;code&gt;#include&amp;lt;stdio.h&amp;gt;
+#include&amp;lt;stdlib.h&amp;gt;
+typedef struct node
+{
+	int value;
+	struct node *left;
+	struct node *right;
+}Node,*pNode;
+
+/*
+ *根据二叉树的先序遍历和中序遍历，还原二叉树
+ *先序：1,2,4,7,3,5,6,8;中序：4,7,2,1,5,3,8,6
+*/
+
+pNode BuildTree(int pre[],int mid[],int len)
+{
+	if(len&amp;lt;=0)
+	{
+		return NULL;
+	}
+	pNode root=(pNode)malloc(sizeof(Node));
+	root-&amp;gt;value=pre[0];                    //先序的第一个节点一定是根节点
+	int left_len=0;
+	int right_len=0;
+	int root_value=pre[0];
+	int i=0;
+	while(mid[i]!=root_value)              //获取左子树长度
+	{
+		i++;
+		left_len++;
+	}
+	right_len=len-left_len-1;              //获取右子树长度
+	//printf(&amp;quot;left_len is %d\n&amp;quot;,left_len);
+	//printf(&amp;quot;right_len is %d\n&amp;quot;,right_len);
+	root-&amp;gt;left=BuildTree(pre+1,mid,left_len);     //递归还原左子树
+	root-&amp;gt;right=BuildTree(pre+1+left_len,mid+1+left_len,right_len);  //递归还原右子树
+	return root;
+}&lt;/code&gt;&lt;/pre&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>获取二叉树叶子数、高度及左右子树交换</title>
+   <link href="http://tinyfisher.github.com/btree/2012/08/21/btree-getinfo"/>
+   <updated>2012-08-21T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/btree/2012/08/21/btree-getinfo</id>
+   <content type="html">&lt;p&gt;二叉树的一些操作具有天然的递归性，本文实现了获取二叉树的叶子总数、获取二叉树高度以及交换二叉树的左右子树，代码均已编译通过。&lt;/p&gt;
+
+&lt;p&gt;1.获取二叉树叶子总数：左子树叶子总数+右子树叶子总数&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;typedef struct BNode
+{
+    char value;  //类型假设为char
+    struct BNode *left;
+    struct BNode *right;
+
+} Node,*pNode,**ppNode;
+int GetLeafeNum(pNode root)
+{
+    if(root==NULL)  //空节点叶子数为0
+    {
+        return 0;
+    }
+    else if(root-&amp;gt;left==NULL&amp;amp;&amp;amp;root-&amp;gt;right==NULL)
+    {
+       return 1;
+    }
+    return GetLeafeNum(root-&amp;gt;left)+GetLeafeNum(root-&amp;gt;right);
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;2.交换左右子树&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;void swap_tree(pNode root)
+{
+    if(root==NULL)
+        return;
+    else
+    {
+        pNode temp=root-&amp;gt;left;
+        root-&amp;gt;left=root-&amp;gt;right;
+        root-&amp;gt;right=temp;
+        swap_tree(root-&amp;gt;left);
+        swap_tree(root-&amp;gt;right);
+    }
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;获取二叉树高度：左右子树高度较大的+1&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;int GetHeight(pNode root)
+{
+    if(root==NULL)
+    {
+        return 0;
+    }
+    //max(left,right)+1; 左右子树最高高度+1
+    return (GetHeight(root-&amp;gt;left)&amp;gt;=GetHeight(root-&amp;gt;right)?(GetHeight(root-&amp;gt;left)+1):(GetHeight(root-&amp;gt;right)+1));
+}&lt;/code&gt;&lt;/pre&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>二叉树创建和遍历</title>
+   <link href="http://tinyfisher.github.com/btree/2012/08/03/btree-create-traversal"/>
+   <updated>2012-08-03T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/btree/2012/08/03/btree-create-traversal</id>
+   <content type="html">&lt;p&gt;二叉树的概念、性质等就不多介绍了，这里用C语言实现了二叉树的建立（1.用户输入，2.给数组参数），前中后序遍历和按层遍历。&lt;/p&gt;
+
+&lt;p&gt;1.二叉树的建立&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;typedef struct BNode
+{
+    char value;  //类型假设为char
+    struct BNode *left;
+    struct BNode *right;
+
+} Node,*pNode,**ppNode;
+
+pNode CreateBTree()  //通过输入建立二叉树，&amp;#39;@&amp;#39;表示空节点，先序顺序，空节点必须输入
+{
+    char ch;
+    pNode q;
+    scanf(&amp;quot; %c&amp;quot;,&amp;amp;ch);  //%c前面的空格 用来清空缓冲区
+   // fflush(stdin);  //或者这样清空缓冲区
+    if(ch==&amp;#39;@&amp;#39;)
+    {
+        return NULL;
+    }
+    else
+    {
+        q=(pNode)malloc(sizeof(Node));
+        if(q==NULL)
+        {
+            printf(&amp;quot;malloc error\n&amp;quot;);
+            return NULL;
+        }
+        q-&amp;gt;value=ch;
+        q-&amp;gt;left=CreateBTree();
+        q-&amp;gt;right=CreateBTree();
+        return q;
+    }
+
+}
+
+pNode CreateBTree_from_array(char a[],int index,int len) //根据数组创建二叉树双链表
+{
+	if(index&amp;gt;=len) //叶子节点
+		return NULL;
+	else
+	{
+	pNode root=(pNode)malloc(sizeof(Node));
+	if(root==NULL)
+	{
+		printf(&amp;quot;malloc error\n&amp;quot;);
+		return NULL;
+	}
+	root-&amp;gt;value=a[index];
+	root-&amp;gt;left=CreateBTree_from_array(a,2*index+1,len);
+	root-&amp;gt;right=CreateBTree_from_array(a,2*index+2,len);
+	return root;
+	}
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;2.二叉树的前中后序遍历：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;void preorder(pNode root)  //先序遍历
+{
+    if(root==NULL)
+        return;
+    else
+    {
+        printf(&amp;quot;%c&amp;quot;,root-&amp;gt;value);
+        preorder(root-&amp;gt;left);
+        preorder(root-&amp;gt;right);
+    }
+}
+
+void midorder(pNode root)  //中序遍历
+{
+    if(root==NULL)
+        return;
+    else
+    {
+        midorder(root-&amp;gt;left);
+        printf(&amp;quot;%c&amp;quot;,root-&amp;gt;value);
+        midorder(root-&amp;gt;right);
+    }
+}
+
+void postorder(pNode root)//后序遍历
+{
+    if(root==NULL)
+        return;
+    else
+    {
+        postorder(root-&amp;gt;left);
+        postorder(root-&amp;gt;right);
+        printf(&amp;quot;%c&amp;quot;,root-&amp;gt;value);
+    }
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;3.二叉树按层遍历&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/*
+    二叉树按层遍历，借助队列，构建一个队列专门用来储存二叉树节点指针，先把根节点入队，假设是A，对A元素进行访问，
+    然后对A的左右孩子依次入队，假设B,C。A出队列，再是对B进行访问，同样将B的左右孩子入队列，B出对列······
+    重复以上，直到队列为空。
+*/
+#define LEN 10
+typedef struct queue  //队列，包含pNode数组，首尾index
+{
+    pNode data[LEN];
+    int front;
+    int rear;
+}BTreeQueue,*pBTreeQueue;
+
+void TransLevel(pNode root)
+{
+    pBTreeQueue pqueue=(pBTreeQueue)malloc(sizeof(BTreeQueue));
+    pNode proot=root;
+    pqueue-&amp;gt;front=0;
+    pqueue-&amp;gt;rear=0;
+    if(proot==NULL)
+    {
+        printf(&amp;quot;tree is null&amp;quot;);
+        return;
+    }
+    else
+    {
+        printf(&amp;quot;%c&amp;quot;,proot-&amp;gt;value);
+        pqueue-&amp;gt;data[pqueue-&amp;gt;front]=proot;  //根节点入队；
+        (pqueue-&amp;gt;rear)++;
+        while((pqueue-&amp;gt;front)&amp;lt;(pqueue-&amp;gt;rear))
+        {
+            proot=pqueue-&amp;gt;data[pqueue-&amp;gt;front];
+            (pqueue-&amp;gt;front)++;  //队列首元素出列，保存为proot
+            if(proot-&amp;gt;left!=NULL)
+            {
+                printf(&amp;quot;%c&amp;quot;,proot-&amp;gt;left-&amp;gt;value);
+                pqueue-&amp;gt;data[pqueue-&amp;gt;rear]=proot-&amp;gt;left; //左子节点入队
+                (pqueue-&amp;gt;rear)++;
+            }
+            if(proot-&amp;gt;right!=NULL)
+            {
+                printf(&amp;quot;%c&amp;quot;,proot-&amp;gt;right-&amp;gt;value);
+                pqueue-&amp;gt;data[pqueue-&amp;gt;rear]=proot-&amp;gt;right; //右子节点入队
+                (pqueue-&amp;gt;rear)++;
+            }
+        }
+    }
+}&lt;/code&gt;&lt;/pre&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>双链表操作大全</title>
+   <link href="http://tinyfisher.github.com/link/2012/08/01/doublelink"/>
+   <updated>2012-08-01T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/link/2012/08/01/doublelink</id>
+   <content type="html">&lt;p&gt;双向链表的操作和单链表很像，主要包括创建，删除，插入；只要注意下指针的操作即可，废话不多说，直接上代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;typedef struct dnode
+{
+    int num;
+    struct dnode *pre;
+    struct dnode *next;
+}Dnode,*pDnode;
+
+pDnode Create()  //用户输入创建，-1表示结束
+{
+    pDnode head=(pDnode)malloc(sizeof(Dnode));
+    pDnode p=head;
+    int a;
+    printf(&amp;quot;please input :\n&amp;quot;);
+    scanf(&amp;quot;%d&amp;quot;,&amp;amp;a);
+    while(a!=-1)
+    {
+        pDnode q=(pDnode)malloc(sizeof(Dnode));
+        q-&amp;gt;num=a;
+        p-&amp;gt;next=q;
+        q-&amp;gt;pre=p;
+        p=q;
+        scanf(&amp;quot;%d&amp;quot;,&amp;amp;a);
+    }
+    p-&amp;gt;next=NULL;
+    head=head-&amp;gt;next;
+    head-&amp;gt;pre=NULL;
+    return head;
+}
+
+pDnode CreateFromArray(int a[],int len)    //根据数组创建
+{
+    pDnode head=(pDnode)malloc(sizeof(Dnode));
+    pDnode p=head;
+    int i=0;
+    while(i&amp;lt;len)
+    {
+        pDnode q=(pDnode)malloc(sizeof(Dnode));
+        q-&amp;gt;num=a[i];
+        p-&amp;gt;next=q;
+        q-&amp;gt;pre=p;
+        p=q;
+        i++;
+    }
+    p-&amp;gt;next=NULL;
+    head=head-&amp;gt;next;
+    head-&amp;gt;pre=NULL;
+    return head;
+}
+
+pDnode del(pDnode head, int key)   //删除
+{
+    pDnode q1=head;
+    pDnode q2=head;
+    if(head==NULL)
+        return NULL;
+    if(head-&amp;gt;num==key)
+    {
+        head=head-&amp;gt;next;
+        head-&amp;gt;pre=NULL;
+        free(q1);
+        return head;
+    }
+    while(q1-&amp;gt;num!=key&amp;amp;&amp;amp;q1-&amp;gt;next!=NULL)
+    {
+        q2=q1;
+        q1=q1-&amp;gt;next;
+    }
+    if(q1-&amp;gt;num==key&amp;amp;&amp;amp;q1-&amp;gt;next==NULL)
+    {
+        q2-&amp;gt;next=NULL;
+        free(q1);
+    }
+    else if(q1-&amp;gt;num==key&amp;amp;&amp;amp;q1-&amp;gt;next!=NULL)
+    {
+        q2-&amp;gt;next=q1-&amp;gt;next;
+        q1-&amp;gt;next-&amp;gt;pre=q2;
+        free(q1);
+    }
+    else
+    {
+        printf(&amp;quot;not found\n&amp;quot;);
+    }
+    return head;
+}
+
+pDnode insert(pDnode head,int key)    // 插入
+{
+    pDnode s=(pDnode)malloc(sizeof(Dnode));
+    s-&amp;gt;num=key;
+    pDnode p=head;
+    pDnode q=head;
+    while(p-&amp;gt;num&amp;lt;key&amp;amp;&amp;amp;p-&amp;gt;next!=NULL)
+    {
+        p=p-&amp;gt;next;
+    }
+    if(p==head)
+    {
+        s-&amp;gt;next=head;
+        head-&amp;gt;pre=s;
+        head=s;
+        head-&amp;gt;pre=NULL;
+    }
+    else if(p-&amp;gt;next==NULL&amp;amp;&amp;amp;p-&amp;gt;num&amp;lt;key)
+    {
+        p-&amp;gt;next=s;
+        s-&amp;gt;pre=p;
+        s-&amp;gt;next=NULL;
+    }
+    else
+    {
+        q=p-&amp;gt;next;
+        p-&amp;gt;next=s;
+        s-&amp;gt;next=q;
+        s-&amp;gt;pre=p;
+        q-&amp;gt;pre=s;
+    }
+    return head;
+}
+
+void print_from_head(pDnode head)  //打印
+{
+    while(head-&amp;gt;next!=NULL)
+    {
+        printf(&amp;quot;%d&amp;quot;,head-&amp;gt;num);
+        head=head-&amp;gt;next;
+    }
+    printf(&amp;quot;%d&amp;quot;,head-&amp;gt;num);
+    printf(&amp;quot;\n&amp;quot;);
+}
+
+void print_from_tail(pDnode head)
+{
+    while(head-&amp;gt;next!=NULL)
+        head=head-&amp;gt;next;
+    while(head-&amp;gt;pre!=NULL)
+    {
+        printf(&amp;quot;%d&amp;quot;,head-&amp;gt;num);
+        head=head-&amp;gt;pre;
+    }
+    printf(&amp;quot;%d&amp;quot;,head-&amp;gt;num);
+    printf(&amp;quot;\n&amp;quot;);
+}&lt;/code&gt;&lt;/pre&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>单链表操作大全</title>
+   <link href="http://tinyfisher.github.com/link/2012/07/22/link"/>
+   <updated>2012-07-22T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/link/2012/07/22/link</id>
+   <content type="html">&lt;p&gt;单链表的操作一般包括：建立，删除节点，插入节点，链表反转&lt;/p&gt;
+
+&lt;p&gt;1.单链表建立，包括从终端输入和由数组转换而来两种：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;typedef struct node
+{
+    int num;
+    struct node * next;
+}Node,*pNode;
+
+pNode CreateLink()
+{
+    pNode head=(pNode)malloc(sizeof(Node));
+    pNode p=head;
+    int a;
+    printf(&amp;quot;please input:\n&amp;quot;);
+    scanf(&amp;quot;%d&amp;quot;,&amp;amp;a);
+    while(a!=-1)
+    {
+        pNode q=(pNode)malloc(sizeof(Node));
+        q-&amp;gt;num=a;
+        p-&amp;gt;next=q;
+        p=q;
+        scanf(&amp;quot;%d&amp;quot;,&amp;amp;a);
+    }
+    p-&amp;gt;next=NULL;
+    head=head-&amp;gt;next;
+    return head;
+}
+
+pNode CreateLinkFromArray(int a[],int len)
+{
+    pNode head=(pNode)malloc(sizeof(Node));
+    pNode p=head;
+    int i=0;
+    while(i&amp;lt;len)
+    {
+        pNode q=(pNode)malloc(sizeof(Node));
+        q-&amp;gt;num=a[i];
+        p-&amp;gt;next=q;
+        p=q;
+        i++;
+    }
+    p-&amp;gt;next=NULL;
+    head=head-&amp;gt;next;
+    return head;
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;2.单链表删除节点，考虑删除头结点，尾节点和中间节点：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;pNode del(pNode head,int key)
+{
+pNode p=head;
+pNode q=head;
+if(p==NULL) &amp;amp;nbsp; //若链表为空
+{
+    return NULL;
+}
+if(p-&amp;gt;num==key) //删除头指针
+{
+    head=head-&amp;gt;next;
+    free(p);    // 释放删除节点空间
+    return head;
+}
+while(p-&amp;gt;num!=key&amp;amp;&amp;amp;p-&amp;gt;next!=NULL) //遍历链表直到最后一个元素 寻找key，若有删掉
+{
+    q=p;
+    p=p-&amp;gt;next;
+}
+if(p-&amp;gt;next==NULL&amp;amp;&amp;amp;p-&amp;gt;num==key) //删除尾元素
+{
+    q-&amp;gt;next=NULL;
+    free(p);
+}
+else if(p-&amp;gt;next!=NULL) &amp;amp;nbsp;//删除中间元素
+{
+    q-&amp;gt;next=p-&amp;gt;next;
+    free(p);
+}
+else
+{
+    printf(&amp;quot;not found\n&amp;quot;);
+}
+return head;
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;3.单链表插入元素，考虑插入头结点，尾节点和中间节点&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;pNode insert(pNode head,int value)
+{
+    pNode s=(pNode)malloc(sizeof(Node));
+    s-&amp;gt;num=value;
+    pNode p=head;
+    pNode q=head;
+    if(head==NULL) //链表为空
+    {
+        s-&amp;gt;next=NULL;
+        return s;
+    }
+    while(p-&amp;gt;num&amp;lt;value&amp;amp;&amp;amp;p-&amp;gt;next!=NULL)
+    {
+        q=p;
+        p=p-&amp;gt;next;
+    }
+    if(p-&amp;gt;next==NULL&amp;amp;&amp;amp;p-&amp;gt;num&amp;lt;value)  //插入尾节点
+    {
+        p-&amp;gt;next=s;
+        s-&amp;gt;next=NULL;
+        return head;
+    }
+    else if(p==head) //插入头结点
+    {
+        p=s;
+        s-&amp;gt;next=q;
+        return p;
+    }
+    else
+    {
+        q-&amp;gt;next=s;
+        s-&amp;gt;next=p;
+        return head;
+    }
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;4.单链表反转&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;pNode reverse(pNode head)
+{
+    if(head==NULL)
+    {
+        return NULL;
+    }
+    if(head-&amp;gt;next==NULL)
+    {
+        return head;
+    }
+    pNode p1,p2,p3;
+    p1=head;
+    p2=head;
+    while(p2-&amp;gt;next!=NULL)
+    {
+        p3=p2-&amp;gt;next;
+        p2-&amp;gt;next=p1;
+        p1=p2;
+        p2=p3;
+    }
+    p2-&amp;gt;next=p1;
+    head-&amp;gt;next=NULL;
+    head=p2;
+    return head;
+}&lt;/code&gt;&lt;/pre&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>二分查找C语言实现</title>
+   <link href="http://tinyfisher.github.com/algorithm/2012/06/22/bin-search"/>
+   <updated>2012-06-22T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/algorithm/2012/06/22/bin-search</id>
+   <content type="html">&lt;p&gt;据说90%的程序员都无法正确的写出二分搜索，试了下果然如此，需要注意的地方挺多（边界条件），所以讲递归与非递归的写法记录下来，以便于复习&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;int binary_search(int array[],int n,int key)  //非递归
+{
+    int low=0;
+    int high=n-1;
+    while(low&amp;lt;=high)    //请注意=
+    {
+        if(array[low+(high-low)/2]==key)
+        {
+            return low+(high-low)/2;   //请注意 low+
+        }
+        else if(array[low+(high-low)/2]&amp;gt;key)
+        {
+            high=low+(high-low)/2 -1;    //请注意-1
+        }
+        else
+        {
+            low=low+(high-low)/2 +1 ;  //请注意+1
+        }
+    }
+    return -1;
+}
+int binary_search(int array[],int low,int high,int key)  //递归 ,需要参数 low high
+{
+    if(low&amp;lt;=high)
+    {
+        if(key==array[low+(high-low)/2])
+            return (low+(high-low)/2);
+        else if(key&amp;gt;array[low+(high-low)/2])
+            return binary_search(array,low+(high-low)/2+1,high,key);
+        else
+            return binary_search(array,low,low+(high-low)/2-1,key);
+    }
+    else
+    {
+        return -1;
+    }
+}&lt;/code&gt;&lt;/pre&gt;</content>
+ </entry>
  
  <entry>
    <title>归并排序C语言实现</title>

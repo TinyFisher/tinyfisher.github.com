@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>二叉树创建和遍历 - tinyfisher blog</title>
+    <meta name="keywords" content="C,algorithm,data_struct,btree" />
+    <meta name="description" content="二叉树创建和遍历" />
+    <meta name="author" content="tinyfisher">
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!-- <link href="http://lib.sinaapp.com/js/bootstrap/latest/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all"> -->
+    <link href="http://lib.sinaapp.com/js/bootstrap/2.0.3/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/google-code-prettify/prettify.css" rel="stylesheet" type="text/css" media="all">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <!-- <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/latest/js/bootstrap.min.js"></script> -->
+    <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/2.0.3/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/google-code-prettify/prettify.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/js/application.js"></script>
+  </head>
+
+  <body data-spy="scroll" data-target=".subnav" data-offset="100">
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="/">tinyfisher blog</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+
+
+              <li><a href="/archive.html">归档</a></li>
+              <li><a href="/categories.html">目录</a></li>
+              <li><a href="/pages.html">页面</a></li>
+              <li><a href="/tags.html">标签</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="content">
+        
+
+<div class="page-header">
+  <h1>二叉树创建和遍历 </h1>
+</div>
+
+
+<div class="row">
+  <div class="span8">
+    <p>二叉树的概念、性质等就不多介绍了，这里用C语言实现了二叉树的建立（1.用户输入，2.给数组参数），前中后序遍历和按层遍历。</p>
+
+<p>1.二叉树的建立</p>
+
+<pre><code>typedef struct BNode
+{
+    char value;  //类型假设为char
+    struct BNode *left;
+    struct BNode *right;
+
+} Node,*pNode,**ppNode;
+
+pNode CreateBTree()  //通过输入建立二叉树，&#39;@&#39;表示空节点，先序顺序，空节点必须输入
+{
+    char ch;
+    pNode q;
+    scanf(&quot; %c&quot;,&amp;ch);  //%c前面的空格 用来清空缓冲区
+   // fflush(stdin);  //或者这样清空缓冲区
+    if(ch==&#39;@&#39;)
+    {
+        return NULL;
+    }
+    else
+    {
+        q=(pNode)malloc(sizeof(Node));
+        if(q==NULL)
+        {
+            printf(&quot;malloc error\n&quot;);
+            return NULL;
+        }
+        q-&gt;value=ch;
+        q-&gt;left=CreateBTree();
+        q-&gt;right=CreateBTree();
+        return q;
+    }
+
+}
+
+pNode CreateBTree_from_array(char a[],int index,int len) //根据数组创建二叉树双链表
+{
+	if(index&gt;=len) //叶子节点
+		return NULL;
+	else
+	{
+	pNode root=(pNode)malloc(sizeof(Node));
+	if(root==NULL)
+	{
+		printf(&quot;malloc error\n&quot;);
+		return NULL;
+	}
+	root-&gt;value=a[index];
+	root-&gt;left=CreateBTree_from_array(a,2*index+1,len);
+	root-&gt;right=CreateBTree_from_array(a,2*index+2,len);
+	return root;
+	}
+}</code></pre>
+
+<p>2.二叉树的前中后序遍历：</p>
+
+<pre><code>void preorder(pNode root)  //先序遍历
+{
+    if(root==NULL)
+        return;
+    else
+    {
+        printf(&quot;%c&quot;,root-&gt;value);
+        preorder(root-&gt;left);
+        preorder(root-&gt;right);
+    }
+}
+
+void midorder(pNode root)  //中序遍历
+{
+    if(root==NULL)
+        return;
+    else
+    {
+        midorder(root-&gt;left);
+        printf(&quot;%c&quot;,root-&gt;value);
+        midorder(root-&gt;right);
+    }
+}
+
+void postorder(pNode root)//后序遍历
+{
+    if(root==NULL)
+        return;
+    else
+    {
+        postorder(root-&gt;left);
+        postorder(root-&gt;right);
+        printf(&quot;%c&quot;,root-&gt;value);
+    }
+}</code></pre>
+
+<p>3.二叉树按层遍历</p>
+
+<pre><code>/*
+    二叉树按层遍历，借助队列，构建一个队列专门用来储存二叉树节点指针，先把根节点入队，假设是A，对A元素进行访问，
+    然后对A的左右孩子依次入队，假设B,C。A出队列，再是对B进行访问，同样将B的左右孩子入队列，B出对列······
+    重复以上，直到队列为空。
+*/
+#define LEN 10
+typedef struct queue  //队列，包含pNode数组，首尾index
+{
+    pNode data[LEN];
+    int front;
+    int rear;
+}BTreeQueue,*pBTreeQueue;
+
+void TransLevel(pNode root)
+{
+    pBTreeQueue pqueue=(pBTreeQueue)malloc(sizeof(BTreeQueue));
+    pNode proot=root;
+    pqueue-&gt;front=0;
+    pqueue-&gt;rear=0;
+    if(proot==NULL)
+    {
+        printf(&quot;tree is null&quot;);
+        return;
+    }
+    else
+    {
+        printf(&quot;%c&quot;,proot-&gt;value);
+        pqueue-&gt;data[pqueue-&gt;front]=proot;  //根节点入队；
+        (pqueue-&gt;rear)++;
+        while((pqueue-&gt;front)&lt;(pqueue-&gt;rear))
+        {
+            proot=pqueue-&gt;data[pqueue-&gt;front];
+            (pqueue-&gt;front)++;  //队列首元素出列，保存为proot
+            if(proot-&gt;left!=NULL)
+            {
+                printf(&quot;%c&quot;,proot-&gt;left-&gt;value);
+                pqueue-&gt;data[pqueue-&gt;rear]=proot-&gt;left; //左子节点入队
+                (pqueue-&gt;rear)++;
+            }
+            if(proot-&gt;right!=NULL)
+            {
+                printf(&quot;%c&quot;,proot-&gt;right-&gt;value);
+                pqueue-&gt;data[pqueue-&gt;rear]=proot-&gt;right; //右子节点入队
+                (pqueue-&gt;rear)++;
+            }
+        }
+    }
+}</code></pre>
+    <hr>
+    <div class="pagination">
+      <ul>
+      
+        <li class="prev"><a href="/link/2012/08/01/doublelink" title="双链表操作大全">&larr; 上一篇</a></li>
+      
+        <li><a href="/archive.html">归档</a></li>
+      
+        <li class="next"><a href="/btree/2012/08/21/btree-getinfo" title="获取二叉树叶子数、高度及左右子树交换">下一篇 &rarr;</a></li>
+      
+      </ul>
+    </div>
+    <hr>
+    
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'tinyfisher'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+  </div>
+  
+  <div class="span4">
+    <h4>发布日期</h4>
+    <div class="date"><span>2012-08-03</span></div>
+
+  
+    <h4>标签</h4>
+    <ul class="tag_box">
+    
+    
+
+
+  
+     
+    	<li><a href="/tags.html#C-ref">C <span>14</span></a></li>
+     
+    	<li><a href="/tags.html#algorithm-ref">algorithm <span>13</span></a></li>
+     
+    	<li><a href="/tags.html#data_struct-ref">data_struct <span>8</span></a></li>
+     
+    	<li><a href="/tags.html#btree-ref">btree <span>3</span></a></li>
+    
+  
+
+
+
+    </ul>
+    
+
+  <section>
+    <h4>最近发表</h4>
+    <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/linux/2013/06/23/hostapd">利用Hostapd搭建无线wifi</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/23/microsoft_test">2013微软暑期实习笔试错题、疑题整理</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/05/01/fluentd">fluentd插件开发</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/04/23/mongodb">Mongodb的备份与恢复</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/03/05/tplink">TL-WN822N TL-WN722N linux安装驱动</a>
+      </li>
+    
+    </ul>
+  </section>
+  </div>
+</div>
+
+
+      </div>
+
+      <footer>
+        <p>&copy; tinyfisher 2013 
+          基于 <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          和 <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a> 构建
+        </p>
+      </footer>
+
+    </div> <!-- /container -->
+    
+  </body>
+</html>
+

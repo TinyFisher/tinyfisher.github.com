@@ -1,0 +1,431 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>tinyfisher blog</title>
+    <meta name="author" content="tinyfisher">
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!-- <link href="http://lib.sinaapp.com/js/bootstrap/latest/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all"> -->
+    <link href="http://lib.sinaapp.com/js/bootstrap/2.0.3/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/google-code-prettify/prettify.css" rel="stylesheet" type="text/css" media="all">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <!-- <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/latest/js/bootstrap.min.js"></script> -->
+    <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/2.0.3/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/google-code-prettify/prettify.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/js/application.js"></script>
+  </head>
+
+  <body data-spy="scroll" data-target=".subnav" data-offset="100">
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="/">tinyfisher blog</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+
+
+              <li><a href="/archive.html">归档</a></li>
+              <li><a href="/categories.html">目录</a></li>
+              <li><a href="/pages.html">页面</a></li>
+              <li><a href="/tags.html">标签</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="content">
+        
+
+
+<div class="row">
+  <div class="span12">
+    
+
+
+<div class="subnav page-launcher">
+  <ul class="nav nav-pills">
+    <li><a href="#algorithm20120622bin-search" title="二分查找C语言实现">二分查找C语言实现</a></li>
+    <li><a href="#algorithm20120603merge-sort" title="归并排序C语言实现">归并排序C语言实现</a></li>
+    <li><a href="#algorithm20120524quick-sort" title="快速排序C语言实现">快速排序C语言实现</a></li>
+    <li><a href="#algorithm20120515heap-sort" title="堆排序C语言实现">堆排序C语言实现</a></li>
+    <li><a href="#algorithm20120502bubble-sort" title="冒泡排序C语言实现">冒泡排序C语言实现</a></li>
+  </ul>
+</div>
+
+
+<div class="row">
+  <div class="span8">
+  
+  
+  <section id="algorithm20120622bin-search">
+    <article>
+      <header>
+      <h1><a href="/algorithm/2012/06/22/bin-search">二分查找C语言实现</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-06-22</span></div>
+    </header>
+    <div class="content"><p>据说90%的程序员都无法正确的写出二分搜索，试了下果然如此，需要注意的地方挺多（边界条件），所以讲递归与非递归的写法记录下来，以便于复习</p>
+
+<pre><code>int binary_search(int array[],int n,int key)  //非递归
+{
+    int low=0;
+    int high=n-1;
+    while(low&lt;=high)    //请注意=
+    {
+        if(array[low+(high-low)/2]==key)
+        {
+            return low+(high-low)/2;   //请注意 low+
+        }
+        else if(array[low+(high-low)/2]&gt;key)
+        {
+            high=low+(high-low)/2 -1;    //请注意-1
+        }
+        else
+        {
+            low=low+(high-low)/2 +1 ;  //请注意+1
+        }
+    }
+    return -1;
+}
+int binary_search(int array[],int low,int high,int key)  //递归 ,需要参数 low high
+{
+    if(low&lt;=high)
+    {
+        if(key==array[low+(high-low)/2])
+            return (low+(high-low)/2);
+        else if(key&gt;array[low+(high-low)/2])
+            return binary_search(array,low+(high-low)/2+1,high,key);
+        else
+            return binary_search(array,low,low+(high-low)/2-1,key);
+    }
+    else
+    {
+        return -1;
+    }
+}</code></pre></div>
+    </article>
+  </section>
+  
+  
+  <section id="algorithm20120603merge-sort">
+    <article>
+      <header>
+      <h1><a href="/algorithm/2012/06/03/merge-sort">归并排序C语言实现</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-06-03</span></div>
+    </header>
+    <div class="content"><p>话不多说，直接上代码</p>
+
+<pre><code>void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+void merge_array(int a[],int low,int mid,int high,int result[])
+{
+    int i,j,k;
+    i=low;
+    j=mid+1;
+    k=0;
+    while(i&lt;=mid&amp;&amp;j&lt;=high)
+    {
+        if(a[i]&lt;a[j])
+        {
+            result[k]=a[i];
+            i++;
+            k++;
+        }
+        else
+        {
+            result[k]=a[j];
+            k++;
+            j++;
+        }
+    }
+    while(i&lt;=mid)
+    {
+        result[k]=a[i];
+        i++;
+        k++;
+    }
+    while(j&lt;=high)
+    {
+        result[k]=a[j];
+        j++;
+        k++;
+    }
+    for(i=0;i&lt;k;i++)    //注意 需要这一步
+    {
+        a[low+i]=result[i];  //low+i
+    }
+}</code></pre></div>
+    </article>
+  </section>
+  
+  
+  <section id="algorithm20120524quick-sort">
+    <article>
+      <header>
+      <h1><a href="/algorithm/2012/05/24/quick-sort">快速排序C语言实现</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-05-24</span></div>
+    </header>
+    <div class="content"><p>快速排序，经典必须掌握</p>
+
+<pre><code>void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+int partition (int input[],int low,int high)
+{
+    int position=low-1;
+    int key=input[high];
+    while(low&lt;high)
+    {
+        if(input[low]&lt;key)
+        {
+            position++;
+            swap(&amp;input[position],&amp;input[low]);
+        }
+        low++;
+    }
+    position++;
+    swap(&amp;input[position],&amp;input[high]);
+    return position;
+
+}
+void q_sort(int a[],int low,int high)
+{
+    if(low &lt; high)               //不是while，因为是递归调用
+    {
+        int p;
+        p=partition(a,low,high);
+        q_sort(a,low,p-1);
+        q_sort(a,p+1,high);
+     }
+}</code></pre></div>
+    </article>
+  </section>
+  
+  
+  <section id="algorithm20120515heap-sort">
+    <article>
+      <header>
+      <h1><a href="/algorithm/2012/05/15/heap-sort">堆排序C语言实现</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-05-15</span></div>
+    </header>
+    <div class="content"><p>堆的概念这里不再描述，这里主要实现堆排序，堆排序主要分为两步：<br />1.堆化数组（最小堆）；<br />2.交换首尾元素，（则最后一个元素为最小），调整前n-1个元素，使前n-1个元素仍为为最小堆，循环，直到还剩一个元素；这样排序下来，数组为倒序。<br />代码如下：</p>
+
+<pre><code>void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+void FixdownMinHeap(int a[],int index,int len)   //向下调整堆
+{
+    int father_index=index;
+    int left_child_index=2*father_index+1;
+    int right_child_index=2*father_index+2;
+    int min=0;
+    int min_index=0;
+    while(left_child_index&lt;len)   //重要  判断father_index不是叶子节点  
+    {
+
+        if(a[left_child_index]&gt;a[right_child_index]&amp;&amp;right_child_index&lt;len) //右节点存在且最小
+        {
+            min=a[right_child_index];
+            min_index=right_child_index;
+        }
+        else
+        {
+            min=a[left_child_index];
+            min_index=left_child_index;
+        }
+
+        if(a[father_index]&gt;min)
+        {
+            swap(&amp;a[father_index],&amp;a[min_index]);
+        }
+
+        father_index=left_child_index;
+        left_child_index=2*father_index+1;
+        right_child_index=2*father_index+2;
+    }
+}
+void createMinHeap(int a[],int n)//堆化数组
+{
+    int i=(n-1-1)/2; //因为n是数组长度，（n-1-1）/2表示最大父节点index
+    while(i&gt;=0)
+    {
+        FixdownMinHeap(a,i,n);
+        i--;
+    }
+}
+void MinHeapSort(int a[],int n)
+{
+    createMinHeap(a,n);
+    int i=0;
+    for(i=n-1;i&gt;0;i--)
+    {
+        swap(&amp;a[i],&amp;a[0]);  //交换首尾元素
+        FixdownMinHeap(a,0,i);  //调整堆
+    }
+}</code></pre></div>
+    </article>
+  </section>
+  
+  
+  <section id="algorithm20120502bubble-sort">
+    <article>
+      <header>
+      <h1><a href="/algorithm/2012/05/02/bubble-sort">冒泡排序C语言实现</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-05-02</span></div>
+    </header>
+    <div class="content"><p>最近打算将各种常用的算法（排序，查找等）复习一遍，都是用C语言实现，代码均在codeblocks下编译通过。<br />第一篇：冒泡排序</p>
+
+<pre><code>void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+
+void bubble_sort(int input[],int length)
+{
+    int i,j,flag=1;
+    for(i=0;i&lt;length&amp;&amp;flag;i++)
+    {
+        flag=0;             //若flag为0 表示这一趟没有交换，则已经排序完成，无需再扫描，即使扫描 也不会发生交换
+        for(j=length-1;j&gt;i;j--)
+        {
+            if(input[j]&lt;input[j-1])
+            {
+                 swap(&amp;input[j],&amp;input[j-1]);
+                 flag=1;
+            }
+        }
+    }
+}</code></pre></div>
+    </article>
+  </section>
+  
+  <div class="pagination">
+      <ul>
+        <li class="next"><a href='/page4'>&larr; 上一页</a></li>
+        <li><a href="/archive.html">归档</a></li>
+        <li class="prev"><a href='/page6'>下一页 &rarr;</a></li>
+      </ul>
+  </div>
+  </div>
+
+  <aside class="span4">
+
+    <section>
+    <h4>最近发表</h4>
+    <ul id="recent_posts">
+      <li class="post">
+        <a href="/linux/2013/06/23/hostapd">利用Hostapd搭建无线wifi</a>
+      </li>
+      <li class="post">
+        <a href="/blog/2013/05/23/microsoft_test">2013微软暑期实习笔试错题、疑题整理</a>
+      </li>
+      <li class="post">
+        <a href="/linux/2013/05/01/fluentd">fluentd插件开发</a>
+      </li>
+      <li class="post">
+        <a href="/linux/2013/04/23/mongodb">Mongodb的备份与恢复</a>
+      </li>
+      <li class="post">
+        <a href="/linux/2013/03/05/tplink">TL-WN822N TL-WN722N linux安装驱动</a>
+      </li>
+      <li class="post">
+        <a href="/linux/2013/02/07/loadbalance">使用ip route命令实现多链路负载均衡</a>
+      </li>
+      <li class="post">
+        <a href="/linux/2013/01/29/ppp">pppd拨号与默认网关</a>
+      </li>
+      <li class="post">
+        <a href="/algorithm/2013/01/23/LIS">DP实例之最长上升子序列LIS</a>
+      </li>
+      <li class="post">
+        <a href="/algorithm/2012/12/12/LCS">DP实例之最长公共子序列LCS</a>
+      </li>
+      <li class="post">
+        <a href="/linux/2012/12/05/iptables">iptables配置笔记</a>
+      </li>
+    </ul>
+    </section>
+    
+  
+    <h4>分类</h4>
+    <ul class="tag_box">
+      
+      
+
+
+  
+     
+    	<li><a href="/categories.html#blog-ref">
+    		blog <span>2</span>
+    	</a></li>
+     
+    	<li><a href="/categories.html#algorithm-ref">
+    		algorithm <span>8</span>
+    	</a></li>
+     
+    	<li><a href="/categories.html#link-ref">
+    		link <span>2</span>
+    	</a></li>
+     
+    	<li><a href="/categories.html#btree-ref">
+    		btree <span>3</span>
+    	</a></li>
+     
+    	<li><a href="/categories.html#vim-ref">
+    		vim <span>1</span>
+    	</a></li>
+     
+    	<li><a href="/categories.html#linux-ref">
+    		linux <span>8</span>
+    	</a></li>
+     
+    	<li><a href="/categories.html#c-ref">
+    		c <span>2</span>
+    	</a></li>
+    
+  
+
+
+    </ul>
+  
+
+  </aside>
+</div>
+
+  </div>
+</div>
+
+
+      </div>
+
+      <footer>
+        <p>&copy; tinyfisher 2013 
+          基于 <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          和 <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a> 构建
+        </p>
+      </footer>
+
+    </div> <!-- /container -->
+    
+  </body>
+</html>
+

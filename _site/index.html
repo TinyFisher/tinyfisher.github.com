@@ -52,11 +52,11 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
-    <li><a href="#algorithm20120603merge-sort" title="归并排序C语言实现">归并排序C语言实现</a></li>
-    <li><a href="#algorithm20120524quick-sort" title="快速排序C语言实现">快速排序C语言实现</a></li>
-    <li><a href="#algorithm20120515heap-sort" title="堆排序C语言实现">堆排序C语言实现</a></li>
-    <li><a href="#algorithm20120502bubble-sort" title="冒泡排序C语言实现">冒泡排序C语言实现</a></li>
-    <li><a href="#blog20120401blog" title="github 搭建博客">github 搭建博客...</a></li>
+    <li><a href="#linux20130623hostapd" title="利用Hostapd搭建无线wifi">利用Hostapd搭建无线wifi</a></li>
+    <li><a href="#blog20130523microsoft_test" title="2013微软暑期实习笔试错题、疑题整理">2013微软暑期实习笔试错题、疑题整理</a></li>
+    <li><a href="#linux20130501fluentd" title="fluentd插件开发">fluentd插件开发</a></li>
+    <li><a href="#linux20130423mongodb" title="Mongodb的备份与恢复">Mongodb的备份与恢复</a></li>
+    <li><a href="#linux20130305tplink" title="TL-WN822N TL-WN722N linux安装驱动">TL-WN822N TL-WN722N...</a></li>
   </ul>
 </div>
 
@@ -65,277 +65,394 @@
   <div class="span8">
   
   
-  <section id="algorithm20120603merge-sort">
+  <section id="linux20130623hostapd">
     <article>
       <header>
-      <h1><a href="/algorithm/2012/06/03/merge-sort">归并排序C语言实现</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-06-03</span></div>
+      <h1><a href="/linux/2013/06/23/hostapd">利用Hostapd搭建无线wifi</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-06-23</span></div>
     </header>
-    <div class="content"><p>话不多说，直接上代码</p>
+    <div class="content"><p>网上这类文章一大堆，但都有一些问题，应该是环境不一样，所以在搭建之前，先说下我的环境：</p>
 
-<pre><code>void swap(int *a,int *b)
-{
-    int temp=*a;
-    *a=*b;
-    *b=temp;
-}
-void merge_array(int a[],int low,int mid,int high,int result[])
-{
-    int i,j,k;
-    i=low;
-    j=mid+1;
-    k=0;
-    while(i&lt;=mid&amp;&amp;j&lt;=high)
-    {
-        if(a[i]&lt;a[j])
-        {
-            result[k]=a[i];
-            i++;
-            k++;
-        }
-        else
-        {
-            result[k]=a[j];
-            k++;
-            j++;
-        }
-    }
-    while(i&lt;=mid)
-    {
-        result[k]=a[i];
-        i++;
-        k++;
-    }
-    while(j&lt;=high)
-    {
-        result[k]=a[j];
-        j++;
-        k++;
-    }
-    for(i=0;i&lt;k;i++)    //注意 需要这一步
-    {
-        a[low+i]=result[i];  //low+i
-    }
-}</code></pre></div>
+<ol>
+<li>
+<p>Linux系统：<code>ubuntu 10.04</code></p>
+</li>
+
+<li>
+<p>无线网卡：<code>TP-LINK WN822N</code>（需要网卡支持Master模式，其他网卡请自行搜索）</p>
+</li>
+</ol>
+
+<p>ok, 下面介绍如何搭建：</p>
+
+<p><strong>step1：</strong>安装网卡驱动，网卡都不识别的话就gg了，请参见我的博文《TL-WN822N TL-WN722N linux安装驱动》，识别之后</p>
+
+<pre><code>ifconfig wlan1 10.0.0.1  </code></pre>
+
+<p>为网卡设置ip地址。</p>
+
+<p><strong>step2：</strong>下载<a href='http://hostap.epitest.fi/releases/hostapd-1.1.tar.gz'>hostapd</a>，在解压安装之前，先安装libnl和libssl，否则hostapd无法编译通过，命令如下：</p>
+
+<pre><code>sudo apt-get install libnl-dev
+sudo apt-get install libssl-dev  </code></pre>
+
+<p><strong>step3：</strong>安装hostapd，解压压缩包，终端进入到hostapd文件夹，<code>configure</code>，<code>make</code>，<code>make install</code> 常见的三个步骤</p>
+
+<p><strong>step4：</strong>修改配置文件，在hostapd文件夹里的etc目录下，找到<code>hostapd.conf</code>文件，编辑如下</p>
+
+<pre><code>interface=wlan1 // 根据你的无线网卡名修改
+driver=nl80211  //重要
+ssid=tinyfisher  //这是AP名称
+channel=6
+hw_mode=g
+ignore_broadcast_ssid=0
+auth_algs=1
+wpa=3
+wpa_passphrase=xxxxxxxx   //这是你的密码
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP  </code></pre>
+
+<p>启动hostapd，命令：</p>
+
+<pre><code>./hostapd -B hostapd.conf  </code></pre>
+
+<p>之后就可以搜索到 tinyfisher的wifi了。</p>
+
+<p>但是此时设备还不能通过wifi上网，还需要搭建dhcp服务器：</p>
+
+<pre><code>sudo apt-get install dnsmasq  </code></pre>
+
+<p>修改<code>/etc/dnsmasq.conf</code></p>
+
+<pre><code>interface=wlan1 #根据你的网卡名称修改
+dhcp-range=10.0.0.10,10.0.0.110,6h     #设置dhcp地址范围，即租借时间6小时
+dhcp-option=3,10.0.0.1 #配置网关
+dhcp-option=6,202.114.128.2  #配置dns，请自己修改为外网的dns地址  </code></pre>
+
+<p>重启</p>
+
+<pre><code>dnsmasq：/etc/init.d/dnsmasq restart  </code></pre>
+
+<p>ok，此时连接到wifi上的设备都能被随机分配到从<code>10.0.0.10~10.0.0.110</code> 的地址</p>
+
+<p>现在就能上网了吗？不行，我们还需要一个外网出口，并且将内网的流量通过这个外网接口连出去，其实就是做一个<code>SNAT</code>，所以我们还需要设置<code>iptables</code>，命令如下：</p>
+
+<pre><code>iptables -F
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t nat -A POSTROUTING -s 10.0.0.0/8 -o eth0 -j MASQUERADE    //其中eth0就是外网接口，请根据你的实际情况修改  </code></pre>
+
+<p>最后一步，开启网卡转发功能：</p>
+
+<pre><code>echo 1 &gt;/proc/sys/net/ipv4/ip_forward  </code></pre>
+
+<p>搞定收工！</p></div>
     </article>
   </section>
   
   
-  <section id="algorithm20120524quick-sort">
+  <section id="blog20130523microsoft_test">
     <article>
       <header>
-      <h1><a href="/algorithm/2012/05/24/quick-sort">快速排序C语言实现</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-05-24</span></div>
+      <h1><a href="/blog/2013/05/23/microsoft_test">2013微软暑期实习笔试错题、疑题整理</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-05-23</span></div>
     </header>
-    <div class="content"><p>快速排序，经典必须掌握</p>
+    <div class="content"><h3 id='id14'>参加了微软“智在未来”暑期实习笔试，跪了，将错题、疑题整理如下，方便后面复习整理。</h3>
 
-<pre><code>void swap(int *a,int *b)
-{
-    int temp=*a;
-    *a=*b;
-    *b=temp;
-}
-int partition (int input[],int low,int high)
-{
-    int position=low-1;
-    int key=input[high];
-    while(low&lt;high)
-    {
-        if(input[low]&lt;key)
-        {
-            position++;
-            swap(&amp;input[position],&amp;input[low]);
-        }
-        low++;
-    }
-    position++;
-    swap(&amp;input[position],&amp;input[high]);
-    return position;
+<p><strong>What&#8217;s the output of the following code?(3 Points)</strong> B</p>
 
-}
-void q_sort(int a[],int low,int high)
-{
-    if(low &lt; high)               //不是while，因为是递归调用
-    {
-        int p;
-        p=partition(a,low,high);
-        q_sort(a,low,p-1);
-        q_sort(a,p+1,high);
-     }
-}</code></pre></div>
+<pre><code>class A  
+{  
+public:  
+    virtual void f()  
+    {  
+        cout&lt;&lt;&quot;A::f()&quot;&lt;&lt;endl;  
+    }  
+    void f() const  
+    {  
+        cout&lt;&lt;&quot;A::f() const&quot;&lt;&lt;endl;  
+    }  
+};  
+  
+class B: public A  
+{  
+public:  
+    void f()  
+    {  
+        cout&lt;&lt;&quot;B::f()&quot;&lt;&lt;endl;  
+    }  
+    void f() const  
+    {  
+        cout&lt;&lt;&quot;B::f() const&quot;&lt;&lt;endl;  
+    }  
+};  
+  
+void g(const A* a)  
+{  
+    a-&gt;f();  
+}  
+  
+int main()  
+{  
+    A* a = new B();  
+    a-&gt;f();  
+    g(a);  
+    delete a ;  
+}  
+
+A. B::f()B::f()const    
+B. B::f()A::f()const  
+C. A::f()B::f()const    
+D. A::f()A::f()const  </code></pre>
+
+<p>解析：类的成员函数后面加 const，<strong>表明这个函数不会对这个类对象的数据成员（准确地说是非静态数据成员）作任何改</strong>变。</p>
+
+<p>在设计类的时候，一个原则就是对于不改变数据成员的成员函数都要在后面加 const，而对于改变数据成员的成员函数不能加 const。所以 const 关键字对成员函数的行为作了更加明确的限定：<strong>有 const 修饰的成员函数（指 const 放在函数参数表的后面，而不是在函数前面或者参数表内），只能读取数据成员，不能改变数据成员；</strong></p>
+
+<p>没有 const 修饰的成员函数，对数据成员则是可读可写的。除此之外，在类的成员函数后面加 const 还有什么好处呢？<strong>那就是常量（即 const）对象可以调用 const 成员函数，而不能调用非const修饰的函数。</strong></p>
+
+<p><strong>What is the difference between a linked list and an array?(3 Points)</strong> （全选）</p>
+
+<pre><code>A. Search complexity when both are sorted  
+
+B. Dynamically add/remove  
+
+C. Random access efficiency  
+
+D. Data storage type  </code></pre>
+
+<p>【此题D选项存在疑问】</p>
+
+<p><strong>About the Thread and Process in Windows, which description(s) is(are) correct:(3 Points)</strong> C</p>
+
+<pre><code>A. One application in OS must have one Process, but not a necessary to have one Thread  
+
+B. The Process could have its own Stack but the thread only could share the Stack of its parent Process  
+
+C. Thread must belongs to a Process  
+
+D. Thread could change its belonging Process  </code></pre>
+
+<p>解析：A选项，一个程序至少有一个进程，一个进程至少包含一个线程（主线程）</p>
+
+<p>B选项，线程共享父进程的数据空间，也可以拥有自己的栈空间</p>
+
+<p>C对，线程不能独立存在，必须属于一个进程</p>
+
+<p>D明显错误</p>
+
+<p><strong>Please choose the right statement about const usage:(3 Points)</strong> ABC</p>
+
+<pre><code>A. const int a; //const integer  
+
+B. int const a; //const integer  
+
+C. int const *a; //a pointer which point to const integer  
+
+D. const int *a; //a const pointer which point to integer  
+
+E. int const *a; // a const pointer which point to integer  </code></pre>
+
+<p>解析：这里注意一下A、B的写法均可，两者意思一样</p>
+
+<p><strong>1 of 1000 bottles of water is poisoned which will kill a rat in 1 week if the rat drunk any amout of the water. Given the bottles of water have no visual difference, how many rats are needed at least to find the poisoned one in 1 week?(5 Points)</strong> B</p>
+
+<pre><code>A. 9  
+
+B. 10  
+
+C. 32  
+
+D. None of the above  </code></pre>
+
+<p>解析：2的10次方=1024，大于1000，用二进制的思维思考问题</p>
+
+<p><strong>Which of the following statement(s) equal(s) value 1 in C programming language?(5 Points)</strong> BCD</p>
+
+<pre><code>A. the return value of main function if program ends normally
+
+B. return (7&amp;1)  
+
+C. char *str=&quot;microsoft&quot;; return str==&quot;microsoft&quot;  
+
+D. return &quot;microsoft&quot;==&quot;microsoft&quot;  
+
+E. None of the above  </code></pre>
+
+<p>解析：A选项，C程序正常退出，return 0；</p>
+
+<p>B选项，计算即可得</p>
+
+<p>C选项，因为C语言中是没有bool类型的（1个字节，只有0,1），所以返回1</p>
+
+<p>D选项，同C</p>
+
+<p><strong>How many rectangles you can find from 3X4 grid?(5 Points)</strong> D</p>
+
+<pre><code>A. 18  
+
+B. 20  
+
+C. 40  
+
+D. 60 
+
+E. None of above is correct  </code></pre>
+
+<p>解析：智力题 整不了</p>
+
+<p><strong>Which of the following sorting algorithm(s) is(are) stable sorting?(5 Points)</strong> A</p>
+
+<pre><code>A. bubble sort  
+
+B. quick sort  
+
+C. heap sort  
+
+D. merge sort  
+
+E. Selection sort  </code></pre>
+
+<p>解析：不稳定排序：“快选希堆”，原地排序：“快选希堆冒”</p>
+
+<p><strong>Model-View-Controller(MVC) is an architectural pattern that frequently used in web applications. Which of the following statement(s) is(are) correct:(5 Points)</strong> AB</p>
+
+<pre><code>A. Models often represent data and the business logics needed to manipulate the data in the application  
+
+B. A view is a (visual) representation of its model. It renders the model into a form suitable for interaction, typically a user interface element  
+
+C. A controller is the link between a user and the system. It accepts input from the user and instructs the model and a view to perform actions based on that input  
+
+D. The common practice of MVC in web applications is, the model receives GET or POST input from user and decides what to do with it, handing over to controller and which hand control to views(HTML-generating components)  
+
+E. None of the above  </code></pre>
+
+<p>解析：不是很清楚，关于MVC，请看这篇blog，写得挺直白的http://www.ruanyifeng.com/blog/2007/11/mvc.html</p>
+
+<p><strong>Given a set of N balls and one of which is defective (weighs less than others), you are allowed to weigh with a balance 3 times to find the defective. Which of the following are possible N?(13 Points)</strong> ABCD</p>
+
+<pre><code>A. 12  
+
+B. 16  
+
+C. 20  
+
+D. 24  
+
+E. 28  </code></pre>
+
+<p>解析：A选项：第一次：4,4,4 第二次：2,2，第三次：1,1, B选项：第一次：5,5,6，第二次：若在某一个5中，2,2,1；若在6中，2,2,2,；第三次1,1, C选项：第一次：7,7,6,；第二次：若在某一个7中，2,2,3；若在6中，2,2,2；第三次，1,1 D选项：第一次：8,8,8；第二次：2,3,3；第三次1,1</p></div>
     </article>
   </section>
   
   
-  <section id="algorithm20120515heap-sort">
+  <section id="linux20130501fluentd">
     <article>
       <header>
-      <h1><a href="/algorithm/2012/05/15/heap-sort">堆排序C语言实现</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-05-15</span></div>
+      <h1><a href="/linux/2013/05/01/fluentd">fluentd插件开发</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-05-01</span></div>
     </header>
-    <div class="content"><p>堆的概念这里不再描述，这里主要实现堆排序，堆排序主要分为两步：<br />1.堆化数组（最小堆）；<br />2.交换首尾元素，（则最后一个元素为最小），调整前n-1个元素，使前n-1个元素仍为为最小堆，循环，直到还剩一个元素；这样排序下来，数组为倒序。<br />代码如下：</p>
+    <div class="content"><p>fluentd默认支持了一些插件，如apache，但是最近做项目对squid日志进行分析时，发现fluentd没有这个默认插件，需要自己开发，方法如下 自己编写一个ruby脚本，比如:<code>in_mytail.rb</code>,将他放到<code>/etc/td-agent/plugin</code> 即可</p>
 
-<pre><code>void swap(int *a,int *b)
-{
-    int temp=*a;
-    *a=*b;
-    *b=temp;
-}
-void FixdownMinHeap(int a[],int index,int len)   //向下调整堆
-{
-    int father_index=index;
-    int left_child_index=2*father_index+1;
-    int right_child_index=2*father_index+2;
-    int min=0;
-    int min_index=0;
-    while(left_child_index&lt;len)   //重要  判断father_index不是叶子节点  
-    {
+<p>修改<code>/etc/td-agent/td-agent.conf</code></p>
 
-        if(a[left_child_index]&gt;a[right_child_index]&amp;&amp;right_child_index&lt;len) //右节点存在且最小
-        {
-            min=a[right_child_index];
-            min_index=right_child_index;
-        }
-        else
-        {
-            min=a[left_child_index];
-            min_index=left_child_index;
-        }
+<pre><code>&lt;source&gt;
+	type mytail
+	path /path/to/myformat_file
+	tag myapp.mytail
+&lt;source&gt;  </code></pre>
 
-        if(a[father_index]&gt;min)
-        {
-            swap(&amp;a[father_index],&amp;a[min_index]);
-        }
+<p>标签里面是日志来源，type表示input插件类型，这里是自己编写的类型，path是源日志文件，tag是标签，用于区分其他插件.</p>
 
-        father_index=left_child_index;
-        left_child_index=2*father_index+1;
-        right_child_index=2*father_index+2;
-    }
-}
-void createMinHeap(int a[],int n)//堆化数组
-{
-    int i=(n-1-1)/2; //因为n是数组长度，（n-1-1）/2表示最大父节点index
-    while(i&gt;=0)
-    {
-        FixdownMinHeap(a,i,n);
-        i--;
-    }
-}
-void MinHeapSort(int a[],int n)
-{
-    createMinHeap(a,n);
-    int i=0;
-    for(i=n-1;i&gt;0;i--)
-    {
-        swap(&amp;a[i],&amp;a[0]);  //交换首尾元素
-        FixdownMinHeap(a,0,i);  //调整堆
-    }
-}</code></pre></div>
+<pre><code>&lt;match **&gt;
+	type stdout
+&lt;/match&gt;  </code></pre>
+
+<p>用于输出，这里输出到stdout，可以是file，mongodb等，看自己需要. 调试模式：td-agent -vv</p>
+
+<p>ruby脚本如下</p>
+
+<pre><code>class MyTailInput &lt; Fluent::TailInput  
+  Fluent::Plugin.register_input(&#39;mytail&#39;, self)  
+  
+  # Override &#39;configure_parser(conf)&#39; method.  
+  # You can get config parameters in this method.  
+  def configure_parser(conf)  
+    @time_format = conf[&#39;time_format&#39;] || &#39;%Y-%M-%d %H:%M:%S&#39;  
+  end  
+    
+  # Override &#39;parse_line(line)&#39; method that returns time and record.  
+  # This example method assumes following log format:  
+  #   %Y-%m-%d %H:%M:%S\tkey1\tvalue1\tkey2\tvalue2...  
+  #   %Y-%m-%d %H:%M:%S\tkey1\tvalue1\tkey2\tvalue2...  
+  #   ...  
+  def parse_line(line)  
+    elements = line.split(&quot;\t&quot;)  
+    time=&quot;2012-11-11 11:11:11&quot;  #why unknow  
+    t_time = Time.strptime(time, @time_format).to_i  
+    record = {}  
+    record[&#39;logtime&#39;]=elements[0]  
+    record[&#39;logcontent&#39;]=elements[1]  
+    return t_time, record  
+  end  
+end  </code></pre></div>
     </article>
   </section>
   
   
-  <section id="algorithm20120502bubble-sort">
+  <section id="linux20130423mongodb">
     <article>
       <header>
-      <h1><a href="/algorithm/2012/05/02/bubble-sort">冒泡排序C语言实现</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-05-02</span></div>
+      <h1><a href="/linux/2013/04/23/mongodb">Mongodb的备份与恢复</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-04-23</span></div>
     </header>
-    <div class="content"><p>最近打算将各种常用的算法（排序，查找等）复习一遍，都是用C语言实现，代码均在codeblocks下编译通过。<br />第一篇：冒泡排序</p>
+    <div class="content"><p>坑爹的保密检查需要擦除硬盘，所有环境都需要重新安装，Mongodb数据库需要进行备份，还好Mongodb为我们提供了<code>mongodump</code>和<code>mongorestore</code>两种方法，非常方便。</p>
 
-<pre><code>void swap(int *a,int *b)
-{
-    int temp=*a;
-    *a=*b;
-    *b=temp;
-}
+<p>进到mongodb的bin目录下：</p>
 
-void bubble_sort(int input[],int length)
-{
-    int i,j,flag=1;
-    for(i=0;i&lt;length&amp;&amp;flag;i++)
-    {
-        flag=0;             //若flag为0 表示这一趟没有交换，则已经排序完成，无需再扫描，即使扫描 也不会发生交换
-        for(j=length-1;j&gt;i;j--)
-        {
-            if(input[j]&lt;input[j-1])
-            {
-                 swap(&amp;input[j],&amp;input[j-1]);
-                 flag=1;
-            }
-        }
-    }
-}</code></pre></div>
+<p>备份：</p>
+
+<pre><code>mongodump -d Injection   //Injection 就是你要备份的数据库</code></pre>
+
+<p>执行之后会生成dump文件夹，里面子目录Injection就是备份的数据</p>
+
+<p>恢复：</p>
+
+<pre><code>mongorestore -d Injection dump/Injection</code></pre>
+
+<p>这样就完成的备份与恢复，是不是十分方便呢~随后送上其他环境配置日志，坑爹的保密检查。</p></div>
     </article>
   </section>
   
   
-  <section id="blog20120401blog">
+  <section id="linux20130305tplink">
     <article>
       <header>
-      <h1><a href="/blog/2012/04/01/blog">github 搭建博客</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-04-01</span></div>
+      <h1><a href="/linux/2013/03/05/tplink">TL-WN822N TL-WN722N linux安装驱动</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-03-05</span></div>
     </header>
-    <div class="content"><h2 id='github'>注册github帐号</h2>
+    <div class="content"><p>这两款的芯片都是AR系列的芯片，所以只要安装这款芯片的驱动：</p>
 
-<p>在github上注册帐号,如果你的帐号为tinyfisher 创建tinyfisher.github.com这个项目.</p>
+<p><code>ath9k_htc</code>即可,只需要两步</p>
 
-<h2 id='jekyll'>安装jekyll</h2>
+<p>(1)安装<a href='https://www.kernel.org/pub/linux/kernel/projects/backports/stable/v3.7.9/'>compat-drivers-3.7.9-1.tar.gz</a>,这类似于万能驱动，里面包含了很多芯片的驱动，很好用，编译时间有点长，耐心等待</p>
 
-<p>安装jekyll到github上, 这里我用的是 Jekyll-Bootstrap<br />执行以下命令 <pre class='prettyprint linenums lang-clj'>
-git clone https://github.com/plusjade/jekyll-bootstrap.git tinyfisher.github.com
-cd tinyfisher.github.com
-git remote set-url origin git@github.com:tinyfisher/tinyfisher.github.com.git
-git push origin master
-</pre></p>
+<p>下载完成之后，将压缩包解压，从命令行终端进入到解压的文件夹中，输入命令<code>sudo make</code>，等待时间较长，再输入命令 <code>make install</code>,等待时间也较长，便完成了安装</p>
 
-<h2 id='jekyll'>配置jekyll</h2>
+<p>(2)安装<a href='http://nl.archive.ubuntu.com/ubuntu/pool/main/l/linux-firmware/linux-firmware_1.60_all.deb'>linux-firmware</a></p>
 
-<p>修改 <code>_config.yml</code>文件 将着一些基础信息配置成你的个性化设置</p>
+<p>下载完成之后，直接双击文件包，即可自动安装</p>
 
-<h3 id='id1'>配置首页</h3>
-
-<p>jekyllbootstrap默认的首页是<code>index.md</code><br />但是如果需要分页效果的话需要使用的是<code>index.html</code>, 并且修改<code>_config.yml</code>, 添加一个配置项<code>paginate: 5</code><br />详细的配置可以clone我的<a href='https://github.com/tinyfisher/tinyfisher.github.com'>博客项目</a>进行查看</p>
-
-<h2 id='id2'>添加文章</h2>
-
-<p>在<code>_posts</code>目录下新建一个<code>markdown(*.md)</code>文件, 文件命名规范是<code>yyyy-mm-dd-url</code>, 例如该文章的文件为<code>2012-05-18-github-blog-jekyll-bootstrap.md</code><br />得到的访问路径却是<a href=''>/javascript/2012/05/18/github-blog-jekyll-bootstrap/</a>其中/javascript是在markdown文件中配置的.</p>
-
-<p>markdown文件头需要几个配置, 以下是该文章的头配置</p>
-<pre class='prettyprint linenums lang-clj'>
----
-layout: post
-title: 在github上搭建博客
-category: javascript
-tags: [github, bootstrap, jekyll, javascript]
----
-</pre>
-<p>每个markdown必须在头部加上这段. 然后下面直接写markdown代码就行了.</p>
-
-<h2 id='id3'>遇到的问题</h2>
-
-<h3 id='1gbk'>1.打开浏览器出现GBK编码错误</h3>
-
-<p>打开Git Bash后运行 jekyll server在本地测试时出现一下错误<br /><pre>
-Liquid error: invalid byte sequence in GBK
-</pre> 这个问题是在 Windows 下出现的，英文博文没问题，中文博文就会报错，原因是你所使用的控制台并不能工作 UTF-8。</p>
-
-<p>临时方案：在执行 jekyll 命令前，将当前控制台的代码格式转为 UTF-8: <pre>
-$export LC_ALL=en_US.UTF-8
-$export LANG=en_US.UTF-8
-$jekyll --server --auto
-</pre> 永久方案：添加两对用户自定义的环境变量，<code>LC_ALL=en_US.UTF-8</code> 和 <code>LANG=en_US.UTF-8</code>在git安装目录<code>Git\etc\profile</code>文件里加入以下内容 <pre>
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
-</pre></p>
-
-<p>参考文献：<a href='http://jekyllbootstrap.com/'>3min搭建jekyll博客</a></p></div>
+<p>重新启动 ，插上usb无线网卡，命令行输入<code>ifconfig -a</code> ，如果出现<code>wlan0</code>，<code>wlan1</code> 等信息，则驱动成功</p></div>
     </article>
   </section>
   
   <div class="pagination">
       <ul>
         <li><a href="/archive.html">归档</a></li>
+        <li class="prev"><a href='/page2'>下一页 &rarr;</a></li>
       </ul>
   </div>
   </div>
@@ -346,19 +463,34 @@ export LANG=en_US.UTF-8
     <h4>最近发表</h4>
     <ul id="recent_posts">
       <li class="post">
-        <a href="/algorithm/2012/06/03/merge-sort">归并排序C语言实现</a>
+        <a href="/linux/2013/06/23/hostapd">利用Hostapd搭建无线wifi</a>
       </li>
       <li class="post">
-        <a href="/algorithm/2012/05/24/quick-sort">快速排序C语言实现</a>
+        <a href="/blog/2013/05/23/microsoft_test">2013微软暑期实习笔试错题、疑题整理</a>
       </li>
       <li class="post">
-        <a href="/algorithm/2012/05/15/heap-sort">堆排序C语言实现</a>
+        <a href="/linux/2013/05/01/fluentd">fluentd插件开发</a>
       </li>
       <li class="post">
-        <a href="/algorithm/2012/05/02/bubble-sort">冒泡排序C语言实现</a>
+        <a href="/linux/2013/04/23/mongodb">Mongodb的备份与恢复</a>
       </li>
       <li class="post">
-        <a href="/blog/2012/04/01/blog">github 搭建博客</a>
+        <a href="/linux/2013/03/05/tplink">TL-WN822N TL-WN722N linux安装驱动</a>
+      </li>
+      <li class="post">
+        <a href="/linux/2013/02/07/loadbalance">使用ip route命令实现多链路负载均衡</a>
+      </li>
+      <li class="post">
+        <a href="/linux/2013/01/29/ppp">pppd拨号与默认网关</a>
+      </li>
+      <li class="post">
+        <a href="/algorithm/2013/01/23/LIS">DP实例之最长上升子序列LIS</a>
+      </li>
+      <li class="post">
+        <a href="/algorithm/2012/12/12/LCS">DP实例之最长公共子序列LCS</a>
+      </li>
+      <li class="post">
+        <a href="/linux/2012/12/05/iptables">iptables配置笔记</a>
       </li>
     </ul>
     </section>
@@ -373,11 +505,31 @@ export LANG=en_US.UTF-8
   
      
     	<li><a href="/categories.html#blog-ref">
-    		blog <span>1</span>
+    		blog <span>2</span>
     	</a></li>
      
     	<li><a href="/categories.html#algorithm-ref">
-    		algorithm <span>4</span>
+    		algorithm <span>8</span>
+    	</a></li>
+     
+    	<li><a href="/categories.html#link-ref">
+    		link <span>2</span>
+    	</a></li>
+     
+    	<li><a href="/categories.html#btree-ref">
+    		btree <span>3</span>
+    	</a></li>
+     
+    	<li><a href="/categories.html#vim-ref">
+    		vim <span>1</span>
+    	</a></li>
+     
+    	<li><a href="/categories.html#linux-ref">
+    		linux <span>8</span>
+    	</a></li>
+     
+    	<li><a href="/categories.html#c-ref">
+    		c <span>2</span>
     	</a></li>
     
   
