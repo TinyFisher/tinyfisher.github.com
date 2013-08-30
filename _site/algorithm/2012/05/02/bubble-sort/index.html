@@ -3,9 +3,9 @@
 <html lang="zh-CN">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>github 搭建博客 - tinyfisher blog</title>
-    <meta name="keywords" content="linux,github,jekyll" />
-    <meta name="description" content="在github上搭建博客" />
+    <title>冒泡排序C语言实现 - tinyfisher blog</title>
+    <meta name="keywords" content="C,algorithm,sort" />
+    <meta name="description" content="冒泡排序C语言实现" />
     <meta name="author" content="tinyfisher">
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -47,75 +47,46 @@
         
 
 <div class="page-header">
-  <h1>github 搭建博客 </h1>
+  <h1>冒泡排序C语言实现 </h1>
 </div>
 
 
 <div class="row">
   <div class="span8">
-    <h2 id='github'>注册github帐号</h2>
+    <p>最近打算将各种常用的算法（排序，查找等）复习一遍，都是用C语言实现，代码均在codeblocks下编译通过。<br />第一篇：冒泡排序</p>
 
-<p>在github上注册帐号,如果你的帐号为tinyfisher 创建tinyfisher.github.com这个项目.</p>
+<pre><code>void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
 
-<h2 id='jekyll'>安装jekyll</h2>
-
-<p>安装jekyll到github上, 这里我用的是 Jekyll-Bootstrap<br />执行以下命令 <pre class='prettyprint linenums lang-clj'>
-git clone https://github.com/plusjade/jekyll-bootstrap.git tinyfisher.github.com
-cd tinyfisher.github.com
-git remote set-url origin git@github.com:tinyfisher/tinyfisher.github.com.git
-git push origin master
-</pre></p>
-
-<h2 id='jekyll'>配置jekyll</h2>
-
-<p>修改 <code>_config.yml</code>文件 将着一些基础信息配置成你的个性化设置</p>
-
-<h3 id='id1'>配置首页</h3>
-
-<p>jekyllbootstrap默认的首页是<code>index.md</code><br />但是如果需要分页效果的话需要使用的是<code>index.html</code>, 并且修改<code>_config.yml</code>, 添加一个配置项<code>paginate: 5</code><br />详细的配置可以clone我的<a href='https://github.com/tinyfisher/tinyfisher.github.com'>博客项目</a>进行查看</p>
-
-<h2 id='id2'>添加文章</h2>
-
-<p>在<code>_posts</code>目录下新建一个<code>markdown(*.md)</code>文件, 文件命名规范是<code>yyyy-mm-dd-url</code>, 例如该文章的文件为<code>2012-05-18-github-blog-jekyll-bootstrap.md</code><br />得到的访问路径却是<a href=''>/javascript/2012/05/18/github-blog-jekyll-bootstrap/</a>其中/javascript是在markdown文件中配置的.</p>
-
-<p>markdown文件头需要几个配置, 以下是该文章的头配置</p>
-<pre class='prettyprint linenums lang-clj'>
----
-layout: post
-title: 在github上搭建博客
-category: javascript
-tags: [github, bootstrap, jekyll, javascript]
----
-</pre>
-<p>每个markdown必须在头部加上这段. 然后下面直接写markdown代码就行了.</p>
-
-<h2 id='id3'>遇到的问题</h2>
-
-<h3 id='1gbk'>1.打开浏览器出现GBK编码错误</h3>
-
-<p>打开Git Bash后运行 jekyll server在本地测试时出现一下错误<br /><pre>
-Liquid error: invalid byte sequence in GBK
-</pre> 这个问题是在 Windows 下出现的，英文博文没问题，中文博文就会报错，原因是你所使用的控制台并不能工作 UTF-8。</p>
-
-<p>临时方案：在执行 jekyll 命令前，将当前控制台的代码格式转为 UTF-8: <pre>
-$export LC_ALL=en_US.UTF-8
-$export LANG=en_US.UTF-8
-$jekyll --server --auto
-</pre> 永久方案：添加两对用户自定义的环境变量，<code>LC_ALL=en_US.UTF-8</code> 和 <code>LANG=en_US.UTF-8</code>在git安装目录<code>Git\etc\profile</code>文件里加入以下内容 <pre>
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
-</pre></p>
-
-<p>参考文献：<a href='http://jekyllbootstrap.com/'>3min搭建jekyll博客</a></p>
+void bubble_sort(int input[],int length)
+{
+    int i,j,flag=1;
+    for(i=0;i&lt;length&amp;&amp;flag;i++)
+    {
+        flag=0;             //若flag为0 表示这一趟没有交换，则已经排序完成，无需再扫描，即使扫描 也不会发生交换
+        for(j=length-1;j&gt;i;j--)
+        {
+            if(input[j]&lt;input[j-1])
+            {
+                 swap(&amp;input[j],&amp;input[j-1]);
+                 flag=1;
+            }
+        }
+    }
+}</code></pre>
     <hr>
     <div class="pagination">
       <ul>
       
-        <li class="prev disabled"><a>&larr; 上一篇</a></li>
+        <li class="prev"><a href="/blog/2012/04/01/blog" title="github 搭建博客">&larr; 上一篇</a></li>
       
         <li><a href="/archive.html">归档</a></li>
       
-        <li class="next"><a href="/algorithm/2012/05/02/bubble-sort" title="冒泡排序C语言实现">下一篇 &rarr;</a></li>
+        <li class="next"><a href="/algorithm/2012/05/15/heap-sort" title="堆排序C语言实现">下一篇 &rarr;</a></li>
       
       </ul>
     </div>
@@ -145,7 +116,7 @@ export LANG=en_US.UTF-8
   
   <div class="span4">
     <h4>发布日期</h4>
-    <div class="date"><span>2012-04-01</span></div>
+    <div class="date"><span>2012-05-02</span></div>
 
   
     <h4>标签</h4>
@@ -156,11 +127,11 @@ export LANG=en_US.UTF-8
 
   
      
-    	<li><a href="/tags.html#github-ref">github <span>1</span></a></li>
+    	<li><a href="/tags.html#C-ref">C <span>4</span></a></li>
      
-    	<li><a href="/tags.html#blog-ref">blog <span>1</span></a></li>
+    	<li><a href="/tags.html#algorithm-ref">algorithm <span>4</span></a></li>
      
-    	<li><a href="/tags.html#jekyll-ref">jekyll <span>1</span></a></li>
+    	<li><a href="/tags.html#sort-ref">sort <span>4</span></a></li>
     
   
 

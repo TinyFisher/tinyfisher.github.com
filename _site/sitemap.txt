@@ -10,4 +10,8 @@ http://tinyfisher.github.com/sitemap.txt
 http://tinyfisher.github.com/sitemap.xml
 http://tinyfisher.github.com/tags.html
 
+http://tinyfisher.github.com/algorithm/2012/06/03/merge-sort
+http://tinyfisher.github.com/algorithm/2012/05/24/quick-sort
+http://tinyfisher.github.com/algorithm/2012/05/15/heap-sort
+http://tinyfisher.github.com/algorithm/2012/05/02/bubble-sort
 http://tinyfisher.github.com/blog/2012/04/01/blog

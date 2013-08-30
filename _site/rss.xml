@@ -5,16 +5,260 @@
         <description>tinyfisher blog - tinyfisher</description>
         <link>http://tinyfisher.github.com</link>
         <link>http://tinyfisher.github.com</link>
-        <lastBuildDate>2013-08-29T21:22:28+08:00</lastBuildDate>
-        <pubDate>2013-08-29T21:22:28+08:00</pubDate>
+        <lastBuildDate>2013-08-30T10:26:55+08:00</lastBuildDate>
+        <pubDate>2013-08-30T10:26:55+08:00</pubDate>
         <ttl>1800</ttl>
 
 
         <item>
-                <title>github 搭建博客</title>
-                <description>&lt;p&gt;注册github帐号 在github上注册帐号, 如果你的帐号为tinyfisher 创建tinyfisher.github.com这个项目.&lt;/p&gt;
+                <title>归并排序C语言实现</title>
+                <description>&lt;p&gt;话不多说，直接上代码&lt;/p&gt;
 
-&lt;p&gt;安装jekyll 安装jekyll到github上, 这里我用的是 Jekyll-Bootstrap&lt;/p&gt;</description>
+&lt;pre&gt;&lt;code&gt;void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+void merge_array(int a[],int low,int mid,int high,int result[])
+{
+    int i,j,k;
+    i=low;
+    j=mid+1;
+    k=0;
+    while(i&amp;lt;=mid&amp;amp;&amp;amp;j&amp;lt;=high)
+    {
+        if(a[i]&amp;lt;a[j])
+        {
+            result[k]=a[i];
+            i++;
+            k++;
+        }
+        else
+        {
+            result[k]=a[j];
+            k++;
+            j++;
+        }
+    }
+    while(i&amp;lt;=mid)
+    {
+        result[k]=a[i];
+        i++;
+        k++;
+    }
+    while(j&amp;lt;=high)
+    {
+        result[k]=a[j];
+        j++;
+        k++;
+    }
+    for(i=0;i&amp;lt;k;i++)    //注意 需要这一步
+    {
+        a[low+i]=result[i];  //low+i
+    }
+}&lt;/code&gt;&lt;/pre&gt;</description>
+                <link>http://tinyfisher.github.com/algorithm/2012/06/03/merge-sort</link>
+                <guid>http://tinyfisher.github.com/algorithm/2012/06/03/merge-sort</guid>
+                <pubDate>2012-06-03T00:00:00+08:00</pubDate>
+        </item>
+
+        <item>
+                <title>快速排序C语言实现</title>
+                <description>&lt;p&gt;快速排序，经典必须掌握&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+int partition (int input[],int low,int high)
+{
+    int position=low-1;
+    int key=input[high];
+    while(low&amp;lt;high)
+    {
+        if(input[low]&amp;lt;key)
+        {
+            position++;
+            swap(&amp;amp;input[position],&amp;amp;input[low]);
+        }
+        low++;
+    }
+    position++;
+    swap(&amp;amp;input[position],&amp;amp;input[high]);
+    return position;
+
+}
+void q_sort(int a[],int low,int high)
+{
+    if(low &amp;lt; high)               //不是while，因为是递归调用
+    {
+        int p;
+        p=partition(a,low,high);
+        q_sort(a,low,p-1);
+        q_sort(a,p+1,high);
+     }
+}&lt;/code&gt;&lt;/pre&gt;</description>
+                <link>http://tinyfisher.github.com/algorithm/2012/05/24/quick-sort</link>
+                <guid>http://tinyfisher.github.com/algorithm/2012/05/24/quick-sort</guid>
+                <pubDate>2012-05-24T00:00:00+08:00</pubDate>
+        </item>
+
+        <item>
+                <title>堆排序C语言实现</title>
+                <description>&lt;p&gt;堆的概念这里不再描述，这里主要实现堆排序，堆排序主要分为两步：&lt;br /&gt;1.堆化数组（最小堆）；&lt;br /&gt;2.交换首尾元素，（则最后一个元素为最小），调整前n-1个元素，使前n-1个元素仍为为最小堆，循环，直到还剩一个元素；这样排序下来，数组为倒序。&lt;br /&gt;代码如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+void FixdownMinHeap(int a[],int index,int len)   //向下调整堆
+{
+    int father_index=index;
+    int left_child_index=2*father_index+1;
+    int right_child_index=2*father_index+2;
+    int min=0;
+    int min_index=0;
+    while(left_child_index&amp;lt;len)   //重要  判断father_index不是叶子节点  
+    {
+
+        if(a[left_child_index]&amp;gt;a[right_child_index]&amp;amp;&amp;amp;right_child_index&amp;lt;len) //右节点存在且最小
+        {
+            min=a[right_child_index];
+            min_index=right_child_index;
+        }
+        else
+        {
+            min=a[left_child_index];
+            min_index=left_child_index;
+        }
+
+        if(a[father_index]&amp;gt;min)
+        {
+            swap(&amp;amp;a[father_index],&amp;amp;a[min_index]);
+        }
+
+        father_index=left_child_index;
+        left_child_index=2*father_index+1;
+        right_child_index=2*father_index+2;
+    }
+}
+void createMinHeap(int a[],int n)//堆化数组
+{
+    int i=(n-1-1)/2; //因为n是数组长度，（n-1-1）/2表示最大父节点index
+    while(i&amp;gt;=0)
+    {
+        FixdownMinHeap(a,i,n);
+        i--;
+    }
+}
+void MinHeapSort(int a[],int n)
+{
+    createMinHeap(a,n);
+    int i=0;
+    for(i=n-1;i&amp;gt;0;i--)
+    {
+        swap(&amp;amp;a[i],&amp;amp;a[0]);  //交换首尾元素
+        FixdownMinHeap(a,0,i);  //调整堆
+    }
+}&lt;/code&gt;&lt;/pre&gt;</description>
+                <link>http://tinyfisher.github.com/algorithm/2012/05/15/heap-sort</link>
+                <guid>http://tinyfisher.github.com/algorithm/2012/05/15/heap-sort</guid>
+                <pubDate>2012-05-15T00:00:00+08:00</pubDate>
+        </item>
+
+        <item>
+                <title>冒泡排序C语言实现</title>
+                <description>&lt;p&gt;最近打算将各种常用的算法（排序，查找等）复习一遍，都是用C语言实现，代码均在codeblocks下编译通过。&lt;br /&gt;第一篇：冒泡排序&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+
+void bubble_sort(int input[],int length)
+{
+    int i,j,flag=1;
+    for(i=0;i&amp;lt;length&amp;amp;&amp;amp;flag;i++)
+    {
+        flag=0;             //若flag为0 表示这一趟没有交换，则已经排序完成，无需再扫描，即使扫描 也不会发生交换
+        for(j=length-1;j&amp;gt;i;j--)
+        {
+            if(input[j]&amp;lt;input[j-1])
+            {
+                 swap(&amp;amp;input[j],&amp;amp;input[j-1]);
+                 flag=1;
+            }
+        }
+    }
+}&lt;/code&gt;&lt;/pre&gt;</description>
+                <link>http://tinyfisher.github.com/algorithm/2012/05/02/bubble-sort</link>
+                <guid>http://tinyfisher.github.com/algorithm/2012/05/02/bubble-sort</guid>
+                <pubDate>2012-05-02T00:00:00+08:00</pubDate>
+        </item>
+
+        <item>
+                <title>github 搭建博客</title>
+                <description>&lt;h2 id='github'&gt;注册github帐号&lt;/h2&gt;
+
+&lt;p&gt;在github上注册帐号,如果你的帐号为tinyfisher 创建tinyfisher.github.com这个项目.&lt;/p&gt;
+
+&lt;h2 id='jekyll'&gt;安装jekyll&lt;/h2&gt;
+
+&lt;p&gt;安装jekyll到github上, 这里我用的是 Jekyll-Bootstrap&lt;br /&gt;执行以下命令 &lt;pre class='prettyprint linenums lang-clj'&gt;
+git clone https://github.com/plusjade/jekyll-bootstrap.git tinyfisher.github.com
+cd tinyfisher.github.com
+git remote set-url origin git@github.com:tinyfisher/tinyfisher.github.com.git
+git push origin master
+&lt;/pre&gt;&lt;/p&gt;
+
+&lt;h2 id='jekyll'&gt;配置jekyll&lt;/h2&gt;
+
+&lt;p&gt;修改 &lt;code&gt;_config.yml&lt;/code&gt;文件 将着一些基础信息配置成你的个性化设置&lt;/p&gt;
+
+&lt;h3 id='id1'&gt;配置首页&lt;/h3&gt;
+
+&lt;p&gt;jekyllbootstrap默认的首页是&lt;code&gt;index.md&lt;/code&gt;&lt;br /&gt;但是如果需要分页效果的话需要使用的是&lt;code&gt;index.html&lt;/code&gt;, 并且修改&lt;code&gt;_config.yml&lt;/code&gt;, 添加一个配置项&lt;code&gt;paginate: 5&lt;/code&gt;&lt;br /&gt;详细的配置可以clone我的&lt;a href='https://github.com/tinyfisher/tinyfisher.github.com'&gt;博客项目&lt;/a&gt;进行查看&lt;/p&gt;
+
+&lt;h2 id='id2'&gt;添加文章&lt;/h2&gt;
+
+&lt;p&gt;在&lt;code&gt;_posts&lt;/code&gt;目录下新建一个&lt;code&gt;markdown(*.md)&lt;/code&gt;文件, 文件命名规范是&lt;code&gt;yyyy-mm-dd-url&lt;/code&gt;, 例如该文章的文件为&lt;code&gt;2012-05-18-github-blog-jekyll-bootstrap.md&lt;/code&gt;&lt;br /&gt;得到的访问路径却是&lt;a href=''&gt;/javascript/2012/05/18/github-blog-jekyll-bootstrap/&lt;/a&gt;其中/javascript是在markdown文件中配置的.&lt;/p&gt;
+
+&lt;p&gt;markdown文件头需要几个配置, 以下是该文章的头配置&lt;/p&gt;
+&lt;pre class='prettyprint linenums lang-clj'&gt;
+---
+layout: post
+title: 在github上搭建博客
+category: javascript
+tags: [github, bootstrap, jekyll, javascript]
+---
+&lt;/pre&gt;
+&lt;p&gt;每个markdown必须在头部加上这段. 然后下面直接写markdown代码就行了.&lt;/p&gt;
+
+&lt;h2 id='id3'&gt;遇到的问题&lt;/h2&gt;
+
+&lt;h3 id='1gbk'&gt;1.打开浏览器出现GBK编码错误&lt;/h3&gt;
+
+&lt;p&gt;打开Git Bash后运行 jekyll server在本地测试时出现一下错误&lt;br /&gt;&lt;pre&gt;
+Liquid error: invalid byte sequence in GBK
+&lt;/pre&gt; 这个问题是在 Windows 下出现的，英文博文没问题，中文博文就会报错，原因是你所使用的控制台并不能工作 UTF-8。&lt;/p&gt;
+
+&lt;p&gt;临时方案：在执行 jekyll 命令前，将当前控制台的代码格式转为 UTF-8: &lt;pre&gt;
+$export LC_ALL=en_US.UTF-8
+$export LANG=en_US.UTF-8
+$jekyll --server --auto
+&lt;/pre&gt; 永久方案：添加两对用户自定义的环境变量，&lt;code&gt;LC_ALL=en_US.UTF-8&lt;/code&gt; 和 &lt;code&gt;LANG=en_US.UTF-8&lt;/code&gt;在git安装目录&lt;code&gt;Git\etc\profile&lt;/code&gt;文件里加入以下内容 &lt;pre&gt;
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+&lt;/pre&gt;&lt;/p&gt;
+
+&lt;p&gt;参考文献：&lt;a href='http://jekyllbootstrap.com/'&gt;3min搭建jekyll博客&lt;/a&gt;&lt;/p&gt;</description>
                 <link>http://tinyfisher.github.com/blog/2012/04/01/blog</link>
                 <guid>http://tinyfisher.github.com/blog/2012/04/01/blog</guid>
                 <pubDate>2012-04-01T00:00:00+08:00</pubDate>
