@@ -59,7 +59,7 @@
 
 <ol>
 <li>
-<p>分别将两个网卡拨号上网，方法不再具体描述，拨号成功后会多出两条链路<code>ppp0</code>和<code>ppp1</code>，注意拨号脚本里不要添加默认网关，（具体请参见《pppd拨号与默认网关》），而是手动添加两条默认路由。</p>
+<p>分别将两个网卡拨号上网，方法不再具体描述，拨号成功后会多出两条链路<code>ppp0</code>和<code>ppp1</code>，注意拨号脚本里不要添加默认网关，（具体请参见<a href='http://tinyfisher.github.io/linux/2013/01/29/ppp/'>《pppd拨号与默认网关》</a>），而是手动添加两条默认路由。</p>
 </li>
 
 <li>
@@ -79,9 +79,7 @@
 
 <p>分别查看两条链路的流量，发现基本流量是按照1:1的比率的。</p>
 
-<ol>
-<li>问题：内网的机器通过多链路网关访问外网速度比单链路得到提升，但是网关本身访问外网的速度比单链路要慢得多，甚至不能访问网站，原因不详，猜想是http数据包从不同的链路进出，不能很好的拼凑给网关。总之现在这个项目不需要网关访问外网，留待以后再讨论。</li>
-</ol>
+<p><strong>问题</strong>：内网的机器通过多链路网关访问外网速度比单链路得到提升，但是网关本身访问外网的速度比单链路要慢得多，甚至不能访问网站，原因不详，猜想是http数据包从不同的链路进出，不能很好的拼凑给网关。总之现在这个项目不需要网关访问外网，留待以后再讨论。</p>
     <hr>
     <div class="pagination">
       <ul>
@@ -145,6 +143,14 @@
     <ul id="recent_posts">
     
       <li class="post">
+        <a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/07/09/mongodb-introduce">Mongodb 学习整理之介绍</a>
+      </li>
+    
+      <li class="post">
         <a href="/linux/2013/06/23/hostapd">利用Hostapd搭建无线wifi</a>
       </li>
     
@@ -154,14 +160,6 @@
     
       <li class="post">
         <a href="/linux/2013/05/01/fluentd">fluentd插件开发</a>
-      </li>
-    
-      <li class="post">
-        <a href="/linux/2013/04/23/mongodb">Mongodb的备份与恢复</a>
-      </li>
-    
-      <li class="post">
-        <a href="/linux/2013/03/05/tplink">TL-WN822N TL-WN722N linux安装驱动</a>
       </li>
     
     </ul>

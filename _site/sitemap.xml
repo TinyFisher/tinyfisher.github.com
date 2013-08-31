@@ -108,6 +108,20 @@
 
 
 	<url>
+		<loc>http://tinyfisher.github.com/linux/2013/07/15/mongodb-install</loc>
+		<lastmod>2013-07-15</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>1.0</priority>
+	</url>
+
+	<url>
+		<loc>http://tinyfisher.github.com/linux/2013/07/09/mongodb-introduce</loc>
+		<lastmod>2013-07-09</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>1.0</priority>
+	</url>
+
+	<url>
 		<loc>http://tinyfisher.github.com/linux/2013/06/23/hostapd</loc>
 		<lastmod>2013-06-23</lastmod>
 		<changefreq>hourly</changefreq>

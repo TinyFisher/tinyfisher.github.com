@@ -4,13 +4,146 @@
  <title>tinyfisher blog</title>
  <link href="http://tinyfisher.github.com/" rel="self"/>
  <link href="http://tinyfisher.github.com"/>
- <updated>2013-08-30T15:15:07+08:00</updated>
+ <updated>2013-08-31T12:49:05+08:00</updated>
  <id>http://tinyfisher.github.com</id>
  <author>
    <name>tinyfisher</name>
    <email>tinyfisher@foxmail.com</email>
  </author>
 
+ 
+ <entry>
+   <title>Mongodb 学习整理之安装</title>
+   <link href="http://tinyfisher.github.com/linux/2013/07/15/mongodb-install"/>
+   <updated>2013-07-15T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/linux/2013/07/15/mongodb-install</id>
+   <content type="html">&lt;h3 id='id19'&gt;下载&lt;/h3&gt;
+
+&lt;p&gt;下载MongoDB，此处下载的版本是：&lt;a href='http://fastdl.mongodb.org/linux/mongodb-linux-i686-1.8.1.tgz'&gt;mongodb-linux-i686-1.8.1.tgz.tar&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id='id20'&gt;安装&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;step1：&lt;/strong&gt;解压文件到某目录下,然后重命名：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[root@localhost src]# tar -xzvf mongodb-linux-i686-1.8.1.tgz.tar    
+[root@localhost src]# mv mongodb-linux-i686-1.8.1 /usr/local/mongodb/  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;step2：&lt;/strong&gt;查看安装后的文件情况：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[root@localhost src]# cd /usr/local/mongodb/   
+[root@localhost mongodb]# ls   
+bin  GNU-AGPL-3.0  README  THIRD-PARTY-NOTICES   
+[root@localhost mongodb]# cd bin/   
+[root@localhost bin]# ls   
+bsondump  dbbak  mongo  mongod  mongodump  mongoexport  mongofiles  mongoimport  mongorestore mongos  mongosniff  mongostat    &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;bin下的mongod就是MongoDB的服务端进程，mongo就是其客户端，其它的命令用于MongoDB的其它用途如MongoDB文件导出等。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;step3:&lt;/strong&gt;启动MongoDB:&lt;/p&gt;
+
+&lt;p&gt;要先建立好MongoDB 存放数据文件和日志文件的目录，需要手动建立：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;mkdir /data/mongodb_data
+mkdir /data/mongodb_log
+touch /data/mongodb_log/mongodb.log
+[root@localhost etc]# cd /data/   
+[root@localhost data]# ls   
+mongodb_data  mongodb_log    &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在MongoDB安装目录下的bin下使用mongod启动MongoDB&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;./mongod --dbpath=/data/mongodb_data/ --logpath=/data/mongodb_log/mongodb.log --logappend&amp;amp;  &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;等待启动成功后，可查看是否启动成功了，默认端口号是27017，当然在启动时也可以指定未使用的其它端口。先通过查看端口号看MongoDB是否启动了。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[root@localhost data]# netstat -lanp | grep &amp;quot;27017&amp;quot;  
+tcp        0      0 0.0.0.0:27017               0.0.0.0:*                   LISTEN      1573/mongod            
+unix  2      [ ACC ]     STREAM     LISTENING     5874   1573/mongod         /tmp/mongodb-27017.sock    &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;可以看到，已启动成功，现在使用mongo客户端访问一下该数据库。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[root@localhost bin]# cd /usr/local/mongodb/bin/   
+[root@localhost bin]# ./mongo   
+MongoDB shell version: 1.8.1  
+connecting to: test   &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;到这一步说明已经安装成功了。&lt;/p&gt;
+
+&lt;h3 id='id21'&gt;额外工作&lt;/h3&gt;
+
+&lt;p&gt;注意，上述我们启动MongoDB都是手动使用mongod来启动，这样关闭计算机后，下次再进来它又没启动了，所以还得手动启动，因此，为避免这种繁琐的工作，可以把mongod放到服务自启动项中，这样计算机一开启mongod服务也就启动了。编辑/etc/rc.local，加入下述代码然后再保存即可。 (也可以写一个脚本，然后开机自动运行)&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#add mongonDB service   
+/usr/local/mongodb/bin/mongod --dbpath=/data/mongodb_data/ --logpath=/data/mongodb_log/mongodb.log --logappend&amp;amp;    &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;或者编写开机自启动脚本start_mongodb.sh&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd /usr/local/mongodb-linux-i686-2.2.1/bin  //具体版本具体变化
+./mongod --dbpath=/data/mongodb_data/ --logpath=/data/mongodb_log/mongodb.log --logappend&amp;amp;   &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;路径和你设置mongodb的datapath，logpath一致 我们重启计算机再看MongoDB是否启动，重启后可以直接使用 mongo命令登录，最终发现是可以成功的。&lt;/p&gt;
+
+&lt;p&gt;另外，我们使用mongo命令登录 MongoDB还要转到mongo命令所在目录再执行./mongo，这样是不是有些麻烦？因此，我们可以简化这点，将该命令文件copy到/usr/bin下，这样就可以在任何目录下使用mongo命令了。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[root@localhost bin]# ls   
+bsondump  dbbak  mongo  mongod  mongodump  mongoexport  mongofiles  mongoimport  mongorestore mongos  mongosniff  mongostat   
+[root@localhost bin]# cp mongo /usr/bin/    &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;转到任一目录试下mongo命令：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[root@localhost bin]# cd /   
+[root@localhost /]# mongo   
+MongoDB shell version: 1.8.1  
+connecting to: test   &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;可以看到登录成功了，说明我们可以像使用ls命令一样使用mongo命令了。&lt;/p&gt;
+
+&lt;h3 id='id22'&gt;安装图形化界面&lt;/h3&gt;
+
+&lt;p&gt;mongoDB有许多图形化操作软件，我使用的是UMongo：&lt;/p&gt;
+
+&lt;p&gt;下载&lt;a href='https://github.com/agirbal/umongo/downloads'&gt;Umongo&lt;/a&gt;,解压文件，在终端运行&lt;code&gt;launch-umongo.sh&lt;/code&gt;脚本文件即可&lt;/p&gt;
+
+&lt;p&gt;ok,至此我们已经安装好了MongoDB~&lt;/p&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>Mongodb 学习整理之介绍</title>
+   <link href="http://tinyfisher.github.com/linux/2013/07/09/mongodb-introduce"/>
+   <updated>2013-07-09T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/linux/2013/07/09/mongodb-introduce</id>
+   <content type="html">&lt;h2 id='what_is_mongodb'&gt;What is Mongodb?&lt;/h2&gt;
+
+&lt;p&gt;MongoDB是一个高性能，开源，无模式的文档型数据库，是当前&lt;strong&gt;NoSQL&lt;/strong&gt;数据库产品中最热门的一种。它在许多场景下可用于替代传统的关系型数据库或键/值存储方式。那什么是NoSQL呢？&lt;/p&gt;
+
+&lt;h3 id='what_is_nosql'&gt;What is NoSQL?&lt;/h3&gt;
+
+&lt;p&gt;NoSQL，全称是”&lt;strong&gt;Not Only Sql&lt;/strong&gt;”,指的是非关系型的数据库。这类数据库主要有这些特点：非关系型的、分布式的、开源的、水平可扩展的。原始的目的是为了大规模web应用。NoSQL被我们用得最多的当数&lt;strong&gt;key-value&lt;/strong&gt;存储，当然还有其他的文档型的、列存储、图型数据库、xml数据库等。&lt;/p&gt;
+
+&lt;h3 id='why_nosql'&gt;Why NoSQL?&lt;/h3&gt;
+
+&lt;p&gt;随着互联网web2.0网站的兴起，传统的关系型数据库在应付web2.0网站，特别是超大规模和高并发的SNS类型的web2.0纯动态网站已经显得力不从心，暴露了很多难以克服的问题，例如：&lt;/p&gt;
+
+&lt;h4 id='id15'&gt;对数据库高并发读写的需求&lt;/h4&gt;
+
+&lt;p&gt;web2.0网站要根据用户个性化信息来实时生成动态页面和提供动态信息，所以基本上无法使用动态页面静态化技术，因此数据库并发负载非常高，往往要达到每秒上万次读写请求。&lt;strong&gt;关系型数据库应付上万次SQL查询还勉强顶得住，但是应付上万次SQL写数据请求，硬盘IO 就已经无法承受了&lt;/strong&gt;，其实对于普通的BBS网站，往往也存在对高并发写请求的需求。&lt;/p&gt;
+
+&lt;h4 id='id16'&gt;对海量数据的高效率存储和访问的需求&lt;/h4&gt;
+
+&lt;p&gt;对于大型的SNS网站，每天用户产生海量的用户动态信息，以国外的Friend feed为例，一个月就达到了2.5亿条用户动态，&lt;strong&gt;对于关系数据库来说，在一张2.5亿条记录的表里面进行SQL查询，效率是极其低下乃至不可忍受的&lt;/strong&gt;。再例如大型web网站的用户登录系统，例如腾讯，盛大，动辄数以亿计的帐号，关系数据库也很难应付。&lt;/p&gt;
+
+&lt;h4 id='id17'&gt;对数据库的高可扩展性和高可用性的需求&lt;/h4&gt;
+
+&lt;p&gt;在基于web的架构当中，数据库是最难进行横向扩展的，当一个应用系统的用户量和访问量与日俱增的时候，你的数据库却没有办法像web server和app server那样简单的通过添加更多的硬件和服务节点来扩展性能和负载能力。对于很多需要提供24小时不间断服务的网站来说，对数据库系统进行升级和扩展是非常痛苦的事情，往往需要停机维护和数据迁移，可是停机维护随之带来的就是公司收入的减少&lt;/p&gt;
+
+&lt;p&gt;基于以上三点，NoSQL在现在越来越流行。&lt;/p&gt;
+
+&lt;h2 id='why_mongodb'&gt;Why Mongodb?&lt;/h2&gt;
+
+&lt;p&gt;MongoDB是一个介于关系数据库和非关系数据库之间的产品，是非关系数据库当中功能最丰富，最像关系数据库的。&lt;strong&gt;他支持的数据结构非常松散，是类似json 的bjson格式，因此可以存储比较复杂的数据类型&lt;/strong&gt;。MongoDB最大的特点是他&lt;strong&gt;支持的查询语言非常强大，其语法有点类似于面向对象的查询语言，几乎可以实现类似关系数据库单表查询的绝大部分功能，而且还支持对数据建立索引&lt;/strong&gt;。它是一个面向集合的,模式自由的文档型数据库。&lt;/p&gt;
+
+&lt;p&gt;ok，既然MongoDB如此神奇，那么我们该怎么安装和使用他呢？下篇blog继续介绍。&lt;/p&gt;</content>
+ </entry>
  
  <entry>
    <title>利用Hostapd搭建无线wifi</title>
@@ -31,7 +164,7 @@
 
 &lt;p&gt;ok, 下面介绍如何搭建：&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;step1：&lt;/strong&gt;安装网卡驱动，网卡都不识别的话就gg了，请参见我的博文《TL-WN822N TL-WN722N linux安装驱动》，识别之后&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;step1：&lt;/strong&gt;安装网卡驱动，网卡都不识别的话就gg了，请参见我的博文&lt;a href='http://tinyfisher.github.io/linux/2013/03/05/tplink/'&gt;《TL-WN822N TL-WN722N linux安装驱动》&lt;/a&gt;，识别之后&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;ifconfig wlan1 10.0.0.1  &lt;/code&gt;&lt;/pre&gt;
 
@@ -272,7 +405,7 @@ D. The common practice of MVC in web applications is, the model receives GET or 
 
 E. None of the above  &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;解析：不是很清楚，关于MVC，请看这篇blog，写得挺直白的http://www.ruanyifeng.com/blog/2007/11/mvc.html&lt;/p&gt;
+&lt;p&gt;解析：不是很清楚，关于MVC，请看这篇blog，写得挺直白的&lt;a href='http://www.ruanyifeng.com/blog/2007/11/mvc.html'&gt;http://www.ruanyifeng.com/blog/2007/11/mvc.html&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Given a set of N balls and one of which is defective (weighs less than others), you are allowed to weigh with a balance 3 times to find the defective. Which of the following are possible N?(13 Points)&lt;/strong&gt; ABCD&lt;/p&gt;
 
@@ -310,7 +443,9 @@ E. 28  &lt;/code&gt;&lt;/pre&gt;
 	type stdout
 &amp;lt;/match&amp;gt;  &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;用于输出，这里输出到stdout，可以是file，mongodb等，看自己需要. 调试模式：td-agent -vv&lt;/p&gt;
+&lt;p&gt;用于输出，这里输出到stdout，可以是file，mongodb等，看自己需要. 调试模式：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;td-agent -vv  &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;ruby脚本如下&lt;/p&gt;
 
@@ -393,7 +528,7 @@ end  &lt;/code&gt;&lt;/pre&gt;</content>
 
 &lt;ol&gt;
 &lt;li&gt;
-&lt;p&gt;分别将两个网卡拨号上网，方法不再具体描述，拨号成功后会多出两条链路&lt;code&gt;ppp0&lt;/code&gt;和&lt;code&gt;ppp1&lt;/code&gt;，注意拨号脚本里不要添加默认网关，（具体请参见《pppd拨号与默认网关》），而是手动添加两条默认路由。&lt;/p&gt;
+&lt;p&gt;分别将两个网卡拨号上网，方法不再具体描述，拨号成功后会多出两条链路&lt;code&gt;ppp0&lt;/code&gt;和&lt;code&gt;ppp1&lt;/code&gt;，注意拨号脚本里不要添加默认网关，（具体请参见&lt;a href='http://tinyfisher.github.io/linux/2013/01/29/ppp/'&gt;《pppd拨号与默认网关》&lt;/a&gt;），而是手动添加两条默认路由。&lt;/p&gt;
 &lt;/li&gt;
 
 &lt;li&gt;
@@ -413,9 +548,7 @@ end  &lt;/code&gt;&lt;/pre&gt;</content>
 
 &lt;p&gt;分别查看两条链路的流量，发现基本流量是按照1:1的比率的。&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;问题：内网的机器通过多链路网关访问外网速度比单链路得到提升，但是网关本身访问外网的速度比单链路要慢得多，甚至不能访问网站，原因不详，猜想是http数据包从不同的链路进出，不能很好的拼凑给网关。总之现在这个项目不需要网关访问外网，留待以后再讨论。&lt;/li&gt;
-&lt;/ol&gt;</content>
+&lt;p&gt;&lt;strong&gt;问题&lt;/strong&gt;：内网的机器通过多链路网关访问外网速度比单链路得到提升，但是网关本身访问外网的速度比单链路要慢得多，甚至不能访问网站，原因不详，猜想是http数据包从不同的链路进出，不能很好的拼凑给网关。总之现在这个项目不需要网关访问外网，留待以后再讨论。&lt;/p&gt;</content>
  </entry>
  
  <entry>

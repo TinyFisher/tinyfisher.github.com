@@ -52,6 +52,8 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#algorithm20120515heap-sort" title="堆排序C语言实现">堆排序C语言实现</a></li>
+    <li><a href="#algorithm20120502bubble-sort" title="冒泡排序C语言实现">冒泡排序C语言实现</a></li>
     <li><a href="#blog20120401blog" title="github 搭建博客">github 搭建博客...</a></li>
   </ul>
 </div>
@@ -59,6 +61,109 @@
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="algorithm20120515heap-sort">
+    <article>
+      <header>
+      <h1><a href="/algorithm/2012/05/15/heap-sort">堆排序C语言实现</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-05-15</span></div>
+    </header>
+    <div class="content"><p>堆的概念这里不再描述，这里主要实现堆排序，堆排序主要分为两步：<br />1.堆化数组（最小堆）；<br />2.交换首尾元素，（则最后一个元素为最小），调整前n-1个元素，使前n-1个元素仍为为最小堆，循环，直到还剩一个元素；这样排序下来，数组为倒序。<br />代码如下：</p>
+
+<pre><code>void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+void FixdownMinHeap(int a[],int index,int len)   //向下调整堆
+{
+    int father_index=index;
+    int left_child_index=2*father_index+1;
+    int right_child_index=2*father_index+2;
+    int min=0;
+    int min_index=0;
+    while(left_child_index&lt;len)   //重要  判断father_index不是叶子节点  
+    {
+
+        if(a[left_child_index]&gt;a[right_child_index]&amp;&amp;right_child_index&lt;len) //右节点存在且最小
+        {
+            min=a[right_child_index];
+            min_index=right_child_index;
+        }
+        else
+        {
+            min=a[left_child_index];
+            min_index=left_child_index;
+        }
+
+        if(a[father_index]&gt;min)
+        {
+            swap(&amp;a[father_index],&amp;a[min_index]);
+        }
+
+        father_index=left_child_index;
+        left_child_index=2*father_index+1;
+        right_child_index=2*father_index+2;
+    }
+}
+void createMinHeap(int a[],int n)//堆化数组
+{
+    int i=(n-1-1)/2; //因为n是数组长度，（n-1-1）/2表示最大父节点index
+    while(i&gt;=0)
+    {
+        FixdownMinHeap(a,i,n);
+        i--;
+    }
+}
+void MinHeapSort(int a[],int n)
+{
+    createMinHeap(a,n);
+    int i=0;
+    for(i=n-1;i&gt;0;i--)
+    {
+        swap(&amp;a[i],&amp;a[0]);  //交换首尾元素
+        FixdownMinHeap(a,0,i);  //调整堆
+    }
+}</code></pre></div>
+    </article>
+  </section>
+  
+  
+  <section id="algorithm20120502bubble-sort">
+    <article>
+      <header>
+      <h1><a href="/algorithm/2012/05/02/bubble-sort">冒泡排序C语言实现</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-05-02</span></div>
+    </header>
+    <div class="content"><p>最近打算将各种常用的算法（排序，查找等）复习一遍，都是用C语言实现，代码均在codeblocks下编译通过。<br />第一篇：冒泡排序</p>
+
+<pre><code>void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+
+void bubble_sort(int input[],int length)
+{
+    int i,j,flag=1;
+    for(i=0;i&lt;length&amp;&amp;flag;i++)
+    {
+        flag=0;             //若flag为0 表示这一趟没有交换，则已经排序完成，无需再扫描，即使扫描 也不会发生交换
+        for(j=length-1;j&gt;i;j--)
+        {
+            if(input[j]&lt;input[j-1])
+            {
+                 swap(&amp;input[j],&amp;input[j-1]);
+                 flag=1;
+            }
+        }
+    }
+}</code></pre></div>
+    </article>
+  </section>
   
   
   <section id="blog20120401blog">
@@ -138,6 +243,12 @@ export LANG=en_US.UTF-8
     <h4>最近发表</h4>
     <ul id="recent_posts">
       <li class="post">
+        <a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a>
+      </li>
+      <li class="post">
+        <a href="/linux/2013/07/09/mongodb-introduce">Mongodb 学习整理之介绍</a>
+      </li>
+      <li class="post">
         <a href="/linux/2013/06/23/hostapd">利用Hostapd搭建无线wifi</a>
       </li>
       <li class="post">
@@ -160,12 +271,6 @@ export LANG=en_US.UTF-8
       </li>
       <li class="post">
         <a href="/algorithm/2013/01/23/LIS">DP实例之最长上升子序列LIS</a>
-      </li>
-      <li class="post">
-        <a href="/algorithm/2012/12/12/LCS">DP实例之最长公共子序列LCS</a>
-      </li>
-      <li class="post">
-        <a href="/linux/2012/12/05/iptables">iptables配置笔记</a>
       </li>
     </ul>
     </section>
@@ -200,7 +305,7 @@ export LANG=en_US.UTF-8
     	</a></li>
      
     	<li><a href="/categories.html#linux-ref">
-    		linux <span>8</span>
+    		linux <span>10</span>
     	</a></li>
      
     	<li><a href="/categories.html#c-ref">
