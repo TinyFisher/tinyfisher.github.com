@@ -52,17 +52,44 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#c20121007callback" title="关于回调函数">关于回调函数</a></li>
     <li><a href="#linux20120923OS-memory" title="分段和分页内存管理">分段和分页内存管理</a></li>
     <li><a href="#vim20120901vim" title="vim的备份和还原">vim的备份和还原</a></li>
     <li><a href="#btree20120826btree-back" title="根据二叉树的先序和中序遍历还原二叉树">根据二叉树的先序和中序遍历还原二叉树</a></li>
     <li><a href="#btree20120821btree-getinfo" title="获取二叉树叶子数、高度及左右子树交换">获取二叉树叶子数、高度及左右子树交换</a></li>
-    <li><a href="#btree20120803btree-create-traversal" title="二叉树创建和遍历">二叉树创建和遍历</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="c20121007callback">
+    <article>
+      <header>
+      <h1><a href="/c/2012/10/07/callback">关于回调函数</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-10-07</span></div>
+    </header>
+    <div class="content"><h3 id='id10'>关于回调函数，搜集了一些网上的说法：</h3>
+
+<p><strong>1.形象的例子：</strong></p>
+
+<p>你饿了,想吃饭,就一会去问你妈一声&#8221;开饭没有啊?&#8221;这就正常函数调用. 但是今天你妈包饺子,花的时间比较长,你跑啊跑啊,就烦了.于是你给你妈说,我先出去玩会,开饭的时候打我手机.等过了一阵,你妈给你打电话说&#8221;开饭啦,快回来吃饭吧!&#8221;</p>
+
+<p><em>其中,你告诉你妈打手机找你,就是个你把回调函数句柄保存到你妈的动作.你妈打电话叫你,就是个回调过程.</em></p>
+
+<p><strong>2.为什么使用回调函数</strong></p>
+
+<p>本质上都是“<strong>你想让别人的代码执行你的代码，而别人的代码你又不能动</strong>”这种需求下产生的</p>
+
+<p>别人给你的不是源代码，是一个已经编译好的模块，并且不会给你源代码，那是商业机密，留给你一个接口，你把你要执行的代码以回调函数的形式交给这个接口，由别人编写的模块在需要的时候调用</p>
+
+<p><strong>3.怎么调用回调函数</strong></p>
+
+<p>使用回调函数实际上就是在调用某个函数（通常是API函数）时，将自己的一个函数（这个函数为回调函数）的地址作为参数传递给那个函数。而那个函数在需要的时候，利用传递的地址调用回调函数，这时你可以利用这个机会在回调函数中处理消息或完成一定的操作。至于如何定义回调函数，跟具体使用的API函数有关，一般在帮助中有说明回调函数的参数和返回值等。C++中一般要求在回调函数前加CALLBACK，这主要是说明该函数的调用方式。</p></div>
+    </article>
+  </section>
   
   
   <section id="linux20120923OS-memory">
@@ -263,161 +290,6 @@ int GetLeafeNum(pNode root)
     </article>
   </section>
   
-  
-  <section id="btree20120803btree-create-traversal">
-    <article>
-      <header>
-      <h1><a href="/btree/2012/08/03/btree-create-traversal">二叉树创建和遍历</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-08-03</span></div>
-    </header>
-    <div class="content"><p>二叉树的概念、性质等就不多介绍了，这里用C语言实现了二叉树的建立（1.用户输入，2.给数组参数），前中后序遍历和按层遍历。</p>
-
-<p>1.二叉树的建立</p>
-
-<pre><code>typedef struct BNode
-{
-    char value;  //类型假设为char
-    struct BNode *left;
-    struct BNode *right;
-
-} Node,*pNode,**ppNode;
-
-pNode CreateBTree()  //通过输入建立二叉树，&#39;@&#39;表示空节点，先序顺序，空节点必须输入
-{
-    char ch;
-    pNode q;
-    scanf(&quot; %c&quot;,&amp;ch);  //%c前面的空格 用来清空缓冲区
-   // fflush(stdin);  //或者这样清空缓冲区
-    if(ch==&#39;@&#39;)
-    {
-        return NULL;
-    }
-    else
-    {
-        q=(pNode)malloc(sizeof(Node));
-        if(q==NULL)
-        {
-            printf(&quot;malloc error\n&quot;);
-            return NULL;
-        }
-        q-&gt;value=ch;
-        q-&gt;left=CreateBTree();
-        q-&gt;right=CreateBTree();
-        return q;
-    }
-
-}
-
-pNode CreateBTree_from_array(char a[],int index,int len) //根据数组创建二叉树双链表
-{
-	if(index&gt;=len) //叶子节点
-		return NULL;
-	else
-	{
-	pNode root=(pNode)malloc(sizeof(Node));
-	if(root==NULL)
-	{
-		printf(&quot;malloc error\n&quot;);
-		return NULL;
-	}
-	root-&gt;value=a[index];
-	root-&gt;left=CreateBTree_from_array(a,2*index+1,len);
-	root-&gt;right=CreateBTree_from_array(a,2*index+2,len);
-	return root;
-	}
-}</code></pre>
-
-<p>2.二叉树的前中后序遍历：</p>
-
-<pre><code>void preorder(pNode root)  //先序遍历
-{
-    if(root==NULL)
-        return;
-    else
-    {
-        printf(&quot;%c&quot;,root-&gt;value);
-        preorder(root-&gt;left);
-        preorder(root-&gt;right);
-    }
-}
-
-void midorder(pNode root)  //中序遍历
-{
-    if(root==NULL)
-        return;
-    else
-    {
-        midorder(root-&gt;left);
-        printf(&quot;%c&quot;,root-&gt;value);
-        midorder(root-&gt;right);
-    }
-}
-
-void postorder(pNode root)//后序遍历
-{
-    if(root==NULL)
-        return;
-    else
-    {
-        postorder(root-&gt;left);
-        postorder(root-&gt;right);
-        printf(&quot;%c&quot;,root-&gt;value);
-    }
-}</code></pre>
-
-<p>3.二叉树按层遍历</p>
-
-<pre><code>/*
-    二叉树按层遍历，借助队列，构建一个队列专门用来储存二叉树节点指针，先把根节点入队，假设是A，对A元素进行访问，
-    然后对A的左右孩子依次入队，假设B,C。A出队列，再是对B进行访问，同样将B的左右孩子入队列，B出对列······
-    重复以上，直到队列为空。
-*/
-#define LEN 10
-typedef struct queue  //队列，包含pNode数组，首尾index
-{
-    pNode data[LEN];
-    int front;
-    int rear;
-}BTreeQueue,*pBTreeQueue;
-
-void TransLevel(pNode root)
-{
-    pBTreeQueue pqueue=(pBTreeQueue)malloc(sizeof(BTreeQueue));
-    pNode proot=root;
-    pqueue-&gt;front=0;
-    pqueue-&gt;rear=0;
-    if(proot==NULL)
-    {
-        printf(&quot;tree is null&quot;);
-        return;
-    }
-    else
-    {
-        printf(&quot;%c&quot;,proot-&gt;value);
-        pqueue-&gt;data[pqueue-&gt;front]=proot;  //根节点入队；
-        (pqueue-&gt;rear)++;
-        while((pqueue-&gt;front)&lt;(pqueue-&gt;rear))
-        {
-            proot=pqueue-&gt;data[pqueue-&gt;front];
-            (pqueue-&gt;front)++;  //队列首元素出列，保存为proot
-            if(proot-&gt;left!=NULL)
-            {
-                printf(&quot;%c&quot;,proot-&gt;left-&gt;value);
-                pqueue-&gt;data[pqueue-&gt;rear]=proot-&gt;left; //左子节点入队
-                (pqueue-&gt;rear)++;
-            }
-            if(proot-&gt;right!=NULL)
-            {
-                printf(&quot;%c&quot;,proot-&gt;right-&gt;value);
-                pqueue-&gt;data[pqueue-&gt;rear]=proot-&gt;right; //右子节点入队
-                (pqueue-&gt;rear)++;
-            }
-        }
-    }
-}</code></pre></div>
-    </article>
-  </section>
-  
   <div class="pagination">
       <ul>
         <li class="next"><a href='/page3'>&larr; 上一页</a></li>
@@ -432,6 +304,9 @@ void TransLevel(pNode root)
     <section>
     <h4>最近发表</h4>
     <ul id="recent_posts">
+      <li class="post">
+        <a href="/linux/2013/08/02/mongodb-find">Mongodb 学习整理之查询</a>
+      </li>
       <li class="post">
         <a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a>
       </li>
@@ -458,9 +333,6 @@ void TransLevel(pNode root)
       </li>
       <li class="post">
         <a href="/linux/2013/01/29/ppp">pppd拨号与默认网关</a>
-      </li>
-      <li class="post">
-        <a href="/algorithm/2013/01/23/LIS">DP实例之最长上升子序列LIS</a>
       </li>
     </ul>
     </section>
@@ -495,7 +367,7 @@ void TransLevel(pNode root)
     	</a></li>
      
     	<li><a href="/categories.html#linux-ref">
-    		linux <span>10</span>
+    		linux <span>11</span>
     	</a></li>
      
     	<li><a href="/categories.html#c-ref">

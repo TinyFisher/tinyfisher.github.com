@@ -46,8 +46,8 @@ bin下的mongod就是MongoDB的服务端进程，mongo就是其客户端，其�
 等待启动成功后，可查看是否启动成功了，默认端口号是27017，当然在启动时也可以指定未使用的其它端口。先通过查看端口号看MongoDB是否启动了。   
 
 	[root@localhost data]# netstat -lanp | grep "27017"  
-	tcp        0      0 0.0.0.0:27017               0.0.0.0:*                   LISTEN      1573/mongod            
-	unix  2      [ ACC ]     STREAM     LISTENING     5874   1573/mongod         /tmp/mongodb-27017.sock    
+	tcp   0    0 0.0.0.0:27017      0.0.0.0:*     LISTEN      1573/mongod            
+	unix  2  [ ACC ]    STREAM   LISTENING    5874  1573/mongod   /tmp/mongodb-27017.sock    
 
 可以看到，已启动成功，现在使用mongo客户端访问一下该数据库。  
 

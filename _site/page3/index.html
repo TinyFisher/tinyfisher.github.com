@@ -52,17 +52,64 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#algorithm20130123LIS" title="DP实例之最长上升子序列LIS">DP实例之最长上升子序列LIS</a></li>
     <li><a href="#algorithm20121212LCS" title="DP实例之最长公共子序列LCS">DP实例之最长公共子序列LCS</a></li>
     <li><a href="#linux20121205iptables" title="iptables配置笔记">iptables配置笔记</a></li>
     <li><a href="#c20121123makefile" title="makefile 编写问题记录">makefile 编写问题记录...</a></li>
     <li><a href="#algorithm20121102bag" title="DP实例之01背包问题C语言实现">DP实例之01背包问题C语言实现</a></li>
-    <li><a href="#c20121007callback" title="关于回调函数">关于回调函数</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="algorithm20130123LIS">
+    <article>
+      <header>
+      <h1><a href="/algorithm/2013/01/23/LIS">DP实例之最长上升子序列LIS</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-01-23</span></div>
+    </header>
+    <div class="content"><pre><code>/*
+    LIS:最长递增子序列，例如：23453267，最长递增子序列为：234567
+    lis(i)表示以a[i]结束的递增子序列的长度
+    lis(i)=max{lis(k)+1,1}  k from 0 to i-1
+    最长递增子序列长度为max(lis[]);
+*/
+
+
+int LIS(int a[],int len)
+{
+   int *p=(int *)malloc(sizeof(int)*len);
+   int i=0;
+   int j=0;
+   int result=0;
+   if(p==NULL)
+        return -1;
+   for(i=0;i&lt;len;i++)
+   {
+       p[i]=1;
+       for(j=0;j&lt;i;j++)
+       {
+           if(a[i]&gt;a[j]&amp;&amp;p[j]+1&gt;p[i])
+           {
+               p[i]=p[j]+1;
+           }
+       }
+   }
+   for(i=0;i&lt;len;i++)
+   {
+       if(result&lt;p[i])
+       {
+           result =p[i];
+       }
+   }
+   free(p);
+   return result;
+}</code></pre></div>
+    </article>
+  </section>
   
   
   <section id="algorithm20121212LCS">
@@ -356,33 +403,6 @@ solution.o:solution.c
     </article>
   </section>
   
-  
-  <section id="c20121007callback">
-    <article>
-      <header>
-      <h1><a href="/c/2012/10/07/callback">关于回调函数</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-10-07</span></div>
-    </header>
-    <div class="content"><h3 id='id10'>关于回调函数，搜集了一些网上的说法：</h3>
-
-<p><strong>1.形象的例子：</strong></p>
-
-<p>你饿了,想吃饭,就一会去问你妈一声&#8221;开饭没有啊?&#8221;这就正常函数调用. 但是今天你妈包饺子,花的时间比较长,你跑啊跑啊,就烦了.于是你给你妈说,我先出去玩会,开饭的时候打我手机.等过了一阵,你妈给你打电话说&#8221;开饭啦,快回来吃饭吧!&#8221;</p>
-
-<p><em>其中,你告诉你妈打手机找你,就是个你把回调函数句柄保存到你妈的动作.你妈打电话叫你,就是个回调过程.</em></p>
-
-<p><strong>2.为什么使用回调函数</strong></p>
-
-<p>本质上都是“<strong>你想让别人的代码执行你的代码，而别人的代码你又不能动</strong>”这种需求下产生的</p>
-
-<p>别人给你的不是源代码，是一个已经编译好的模块，并且不会给你源代码，那是商业机密，留给你一个接口，你把你要执行的代码以回调函数的形式交给这个接口，由别人编写的模块在需要的时候调用</p>
-
-<p><strong>3.怎么调用回调函数</strong></p>
-
-<p>使用回调函数实际上就是在调用某个函数（通常是API函数）时，将自己的一个函数（这个函数为回调函数）的地址作为参数传递给那个函数。而那个函数在需要的时候，利用传递的地址调用回调函数，这时你可以利用这个机会在回调函数中处理消息或完成一定的操作。至于如何定义回调函数，跟具体使用的API函数有关，一般在帮助中有说明回调函数的参数和返回值等。C++中一般要求在回调函数前加CALLBACK，这主要是说明该函数的调用方式。</p></div>
-    </article>
-  </section>
-  
   <div class="pagination">
       <ul>
         <li class="next"><a href='/page2'>&larr; 上一页</a></li>
@@ -397,6 +417,9 @@ solution.o:solution.c
     <section>
     <h4>最近发表</h4>
     <ul id="recent_posts">
+      <li class="post">
+        <a href="/linux/2013/08/02/mongodb-find">Mongodb 学习整理之查询</a>
+      </li>
       <li class="post">
         <a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a>
       </li>
@@ -423,9 +446,6 @@ solution.o:solution.c
       </li>
       <li class="post">
         <a href="/linux/2013/01/29/ppp">pppd拨号与默认网关</a>
-      </li>
-      <li class="post">
-        <a href="/algorithm/2013/01/23/LIS">DP实例之最长上升子序列LIS</a>
       </li>
     </ul>
     </section>
@@ -460,7 +480,7 @@ solution.o:solution.c
     	</a></li>
      
     	<li><a href="/categories.html#linux-ref">
-    		linux <span>10</span>
+    		linux <span>11</span>
     	</a></li>
      
     	<li><a href="/categories.html#c-ref">

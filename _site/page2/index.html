@@ -52,17 +52,73 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#linux20130501fluentd" title="fluentd插件开发">fluentd插件开发</a></li>
     <li><a href="#linux20130423mongodb" title="Mongodb的备份与恢复">Mongodb的备份与恢复</a></li>
     <li><a href="#linux20130305tplink" title="TL-WN822N TL-WN722N linux安装驱动">TL-WN822N TL-WN722N...</a></li>
     <li><a href="#linux20130207loadbalance" title="使用ip route命令实现多链路负载均衡">使用ip route命令实现多链路负载均衡...</a></li>
     <li><a href="#linux20130129ppp" title="pppd拨号与默认网关">pppd拨号与默认网关</a></li>
-    <li><a href="#algorithm20130123LIS" title="DP实例之最长上升子序列LIS">DP实例之最长上升子序列LIS</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="linux20130501fluentd">
+    <article>
+      <header>
+      <h1><a href="/linux/2013/05/01/fluentd">fluentd插件开发</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-05-01</span></div>
+    </header>
+    <div class="content"><p>fluentd默认支持了一些插件，如apache，但是最近做项目对squid日志进行分析时，发现fluentd没有这个默认插件，需要自己开发，方法如下 自己编写一个ruby脚本，比如:<code>in_mytail.rb</code>,将他放到<code>/etc/td-agent/plugin</code> 即可</p>
+
+<p>修改<code>/etc/td-agent/td-agent.conf</code></p>
+
+<pre><code>&lt;source&gt;
+	type mytail
+	path /path/to/myformat_file
+	tag myapp.mytail
+&lt;source&gt;  </code></pre>
+
+<p>标签里面是日志来源，type表示input插件类型，这里是自己编写的类型，path是源日志文件，tag是标签，用于区分其他插件.</p>
+
+<pre><code>&lt;match **&gt;
+	type stdout
+&lt;/match&gt;  </code></pre>
+
+<p>用于输出，这里输出到stdout，可以是file，mongodb等，看自己需要. 调试模式：</p>
+
+<pre><code>td-agent -vv  </code></pre>
+
+<p>ruby脚本如下</p>
+
+<pre><code>class MyTailInput &lt; Fluent::TailInput  
+  Fluent::Plugin.register_input(&#39;mytail&#39;, self)  
+  
+  # Override &#39;configure_parser(conf)&#39; method.  
+  # You can get config parameters in this method.  
+  def configure_parser(conf)  
+    @time_format = conf[&#39;time_format&#39;] || &#39;%Y-%M-%d %H:%M:%S&#39;  
+  end  
+    
+  # Override &#39;parse_line(line)&#39; method that returns time and record.  
+  # This example method assumes following log format:  
+  #   %Y-%m-%d %H:%M:%S\tkey1\tvalue1\tkey2\tvalue2...  
+  #   %Y-%m-%d %H:%M:%S\tkey1\tvalue1\tkey2\tvalue2...  
+  #   ...  
+  def parse_line(line)  
+    elements = line.split(&quot;\t&quot;)  
+    time=&quot;2012-11-11 11:11:11&quot;  #why unknow  
+    t_time = Time.strptime(time, @time_format).to_i  
+    record = {}  
+    record[&#39;logtime&#39;]=elements[0]  
+    record[&#39;logcontent&#39;]=elements[1]  
+    return t_time, record  
+  end  
+end  </code></pre></div>
+    </article>
+  </section>
   
   
   <section id="linux20130423mongodb">
@@ -178,53 +234,6 @@ defaultroute</code></pre>
     </article>
   </section>
   
-  
-  <section id="algorithm20130123LIS">
-    <article>
-      <header>
-      <h1><a href="/algorithm/2013/01/23/LIS">DP实例之最长上升子序列LIS</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2013-01-23</span></div>
-    </header>
-    <div class="content"><pre><code>/*
-    LIS:最长递增子序列，例如：23453267，最长递增子序列为：234567
-    lis(i)表示以a[i]结束的递增子序列的长度
-    lis(i)=max{lis(k)+1,1}  k from 0 to i-1
-    最长递增子序列长度为max(lis[]);
-*/
-
-
-int LIS(int a[],int len)
-{
-   int *p=(int *)malloc(sizeof(int)*len);
-   int i=0;
-   int j=0;
-   int result=0;
-   if(p==NULL)
-        return -1;
-   for(i=0;i&lt;len;i++)
-   {
-       p[i]=1;
-       for(j=0;j&lt;i;j++)
-       {
-           if(a[i]&gt;a[j]&amp;&amp;p[j]+1&gt;p[i])
-           {
-               p[i]=p[j]+1;
-           }
-       }
-   }
-   for(i=0;i&lt;len;i++)
-   {
-       if(result&lt;p[i])
-       {
-           result =p[i];
-       }
-   }
-   free(p);
-   return result;
-}</code></pre></div>
-    </article>
-  </section>
-  
   <div class="pagination">
       <ul>
         <li class="next"><a href='/'>&larr; 上一页</a></li>
@@ -239,6 +248,9 @@ int LIS(int a[],int len)
     <section>
     <h4>最近发表</h4>
     <ul id="recent_posts">
+      <li class="post">
+        <a href="/linux/2013/08/02/mongodb-find">Mongodb 学习整理之查询</a>
+      </li>
       <li class="post">
         <a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a>
       </li>
@@ -265,9 +277,6 @@ int LIS(int a[],int len)
       </li>
       <li class="post">
         <a href="/linux/2013/01/29/ppp">pppd拨号与默认网关</a>
-      </li>
-      <li class="post">
-        <a href="/algorithm/2013/01/23/LIS">DP实例之最长上升子序列LIS</a>
       </li>
     </ul>
     </section>
@@ -302,7 +311,7 @@ int LIS(int a[],int len)
     	</a></li>
      
     	<li><a href="/categories.html#linux-ref">
-    		linux <span>10</span>
+    		linux <span>11</span>
     	</a></li>
      
     	<li><a href="/categories.html#c-ref">
