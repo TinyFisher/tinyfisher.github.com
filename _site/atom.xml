@@ -4,7 +4,7 @@
  <title>tinyfisher blog</title>
  <link href="http://tinyfisher.github.com/" rel="self"/>
  <link href="http://tinyfisher.github.com"/>
- <updated>2013-08-31T13:03:46+08:00</updated>
+ <updated>2013-09-20T16:25:00+08:00</updated>
  <id>http://tinyfisher.github.com</id>
  <author>
    <name>tinyfisher</name>
@@ -13,121 +13,85 @@
 
  
  <entry>
-   <title>Mongodb 学习整理之查询</title>
-   <link href="http://tinyfisher.github.com/linux/2013/08/02/mongodb-find"/>
-   <updated>2013-08-02T00:00:00+08:00</updated>
-   <id>http://tinyfisher.github.com/linux/2013/08/02/mongodb-find</id>
-   <content type="html">&lt;h4 id='mongodbfind'&gt;MongoDB的查询使用的是find方法：&lt;/h4&gt;
+   <title>阿里巴巴面试总结</title>
+   <link href="http://tinyfisher.github.com/blog/2013/09/20/alibaba"/>
+   <updated>2013-09-20T00:00:00+08:00</updated>
+   <id>http://tinyfisher.github.com/blog/2013/09/20/alibaba</id>
+   <content type="html">&lt;p&gt;15号接到阿里通知，18号上午去面试，研究生期间第一次面试，颇为激动，准备了一番，18号去了大望路那里。前台签到后，在大厅等了一会，面试官拿着我的简历叫我跟他走，到了一个会议室，里面人很多，面试官的花名叫易统，阿里每个人都有花名，武侠风浓烈，马云的花名叫风清扬。。。易统说欢迎来面试，让我自我介绍，期间点开了我的blog- -&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;db.collection_name.find();&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;后来主要是围绕简历上写得项目的技能，做了一些提问，主要是我在说，面试官如果感兴趣会深入问下去。时间在一个小时左右，易统十分友好，没有什么压力，问的问题待会详细记录。最后易统说今天的面试就到这里，让我回去了，我想完蛋了，因为之前得知如果面的好会直接二面的，看来是面挂了，而我自我感觉还不错，后来细想想，可能某些问题回答的不够深入，要反思了。问题总结如下：&lt;/p&gt;
 
-&lt;h4 id='id23'&gt;查询所有的结果：&lt;/h4&gt;
+&lt;h4 id='tcpip'&gt;tcp/ip三次握手&lt;/h4&gt;
 
-&lt;pre&gt;&lt;code&gt;select * from users;
-db.users.find();  &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;这个基本是滥问题了，答得还不错&lt;/p&gt;
 
-&lt;h4 id='id24'&gt;指定返回那些列（键）：&lt;/h4&gt;
+&lt;h4 id='tcp'&gt;tcp有哪些机制保证了他的可靠性&lt;/h4&gt;
 
-&lt;pre&gt;&lt;code&gt;select name, skills from users;
-db.users.find({}, {&amp;#39;name&amp;#39; : 1, &amp;#39;skills&amp;#39; : 1});&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;这个答得不够好，这里总结下：&lt;/p&gt;
 
-&lt;p&gt;补充说明： 第一个{} 放where条件 第二个{} 指定那些列显示和不显示 （0表示不显示 1表示显示)&lt;/p&gt;
+&lt;h5 id='id23'&gt;可靠性包括以下几个方面：&lt;/h5&gt;
 
-&lt;h4 id='where'&gt;where条件：&lt;/h4&gt;
+&lt;p&gt;1.能够处理数据传输过程中被破坏问题。&lt;/p&gt;
 
-&lt;p&gt;1.简单的等于:&lt;/p&gt;
+&lt;p&gt;2.能够处理重复数据接收问题。&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;select name, age, skills from users where name = &amp;#39;hurry&amp;#39;;
-db.users.find({&amp;#39;name&amp;#39; : &amp;#39;hurry&amp;#39;},{&amp;#39;name&amp;#39; : 1, &amp;#39;age&amp;#39; : 1, &amp;#39;skills&amp;#39; : 1});  &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;3.能够发现数据丢失以及对此进行有效解决。&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;使用and&lt;/p&gt;
+&lt;p&gt;4.能够处理接收端数据乱序到达问题。&lt;/p&gt;
 
-&lt;p&gt;select name, age, skills from users where name = &amp;#8216;hurry&amp;#8217; and age = 18; db.users.find({&amp;#8216;name&amp;#8217; : &amp;#8216;hurry&amp;#8217;, &amp;#8216;age&amp;#8217; : 18},{&amp;#8216;name&amp;#8217; : 1, &amp;#8216;age&amp;#8217; : 1, &amp;#8216;skills&amp;#8217; : 1});&lt;/p&gt;
-&lt;/li&gt;
+&lt;h5 id='id24'&gt;怎么保证解决上述问题？&lt;/h5&gt;
 
-&lt;li&gt;
-&lt;p&gt;使用or&lt;/p&gt;
+&lt;p&gt;TCP协议规范和当前绝大多数TCP 协议实现代码均采用数据重传和数据确认应答机制来完成TCP 协议的可靠性数据传输。数据超时重传和数据应答机制的基本前提是对每个传输的字节进行编号，即我们通常所说的序列号。数据超时重传是发送端在某个数据包发送出去，在一段固定时间后如果没有收到对该数据包的确认应答，则（假定该数据包在传输过程中丢失）重新发送该数据包。而数据确认应答是指接收端在成功接收到一个有效数据包后，发送一个确认应答数据包给发送端主机，该确认应答数据包中所包含的应答序列号即指已接收到的数据中最后一个字节的序列号加1，加1 的目的在于指出此时接收端期望接收的下一个数据包中第一个字节的序列号。&lt;strong&gt;数据超时重传、数据确认应答以及对每个传输的字节分配序列号是TCP 协议提供可靠性数据传输的核心本质。&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;select name, age, skills from users where name = &amp;#8216;hurry&amp;#8217; or age = 18; db.users.find({ &amp;#8216;$or&amp;#8217; : &lt;span&gt;{&amp;#8216;name&amp;#8217; : &amp;#8216;hurry&amp;#8217;}, {&amp;#8216;age&amp;#8217; : 18}&lt;/span&gt; },{&amp;#8216;name&amp;#8217; : 1, &amp;#8216;age&amp;#8217; : 1, &amp;#8216;skills&amp;#8217; : 1});&lt;/p&gt;
-&lt;/li&gt;
+&lt;p&gt;1.解决数据传输中被破坏的问题&lt;/p&gt;
 
-&lt;li&gt;
-&lt;p&gt;&amp;lt;, &amp;lt;=, &amp;gt;, &amp;gt;= ($lt, $lte, $gt, $gte )&lt;/p&gt;
+&lt;p&gt;首先通过对所接收数据包的&lt;strong&gt;CRC校验&lt;/strong&gt;，确认该数据包中数据是否存在错误。如果有，则简单丢弃或者发送一个应答数据包重新对这些数据进行请求。发送端在等待一段时间后，则会重新发送这些数据。本质上，数据传输错误的解决是通过&lt;strong&gt;数据重传机制&lt;/strong&gt;完成的。&lt;/p&gt;
 
-&lt;p&gt;select * from users where age &amp;gt;= 20 and age &amp;lt;= 30; db.users.find({&amp;#8216;age&amp;#8217; : {&amp;#8216;$gte&amp;#8217; : 20, &amp;#8216;$lte&amp;#8217; : 30}});&lt;/p&gt;
-&lt;/li&gt;
+&lt;p&gt;2.解决重复数据接收问题&lt;br /&gt;接到数据包之后，查看序列号，如果数据包已经接收过，则丢弃该数据包，返回确认信息，主要是通过&lt;strong&gt;序列号&lt;/strong&gt;解决这个问题&lt;/p&gt;
 
-&lt;li&gt;
-&lt;p&gt;使用in, not in ($in, $nin)&lt;/p&gt;
+&lt;p&gt;3.解决数据丢失问题&lt;br /&gt;主要依靠tcp的&lt;strong&gt;重传机制&lt;/strong&gt;来解决。TCP通过在发送数据报文时设置一个超时定时器来解决这种问题，如果在定时器溢出时还没有收到来自对端对发送报文的确认，它就重传该数据报文。&lt;/p&gt;
 
-&lt;p&gt;select * from users where age in (10, 22, 26); db.users.find({&amp;#8216;age&amp;#8217; : {&amp;#8216;$in&amp;#8217; : &lt;span&gt;10, 22, 26&lt;/span&gt;}});&lt;/p&gt;
-&lt;/li&gt;
+&lt;p&gt;4.解决乱序问题&lt;br /&gt;如果通信双方存在多条传输路径， 则有可能出现数据乱序问题，即序列号较大的数据先于序列号较小的数据到达，而发送端确实是按序列号由小到大的顺序发送的。数据乱序的本质是数据都成功到达了，但到达的顺序不尽如人意。对于收到的乱序报文并不丢弃，而是缓存下来(这样做是为了减少更多的重传)，立即发送希望接受的报文确认。对这个问题的解决相对比较简单，只需对这些数据进行重新排序即可。本质上，对数据乱序问题的解决是通过&lt;strong&gt;排序数据序列号&lt;/strong&gt;完成的。&lt;/p&gt;
 
-&lt;li&gt;
-&lt;p&gt;匹配null&lt;/p&gt;
+&lt;h4 id='syn_flood_'&gt;syn flood 攻击&lt;/h4&gt;
 
-&lt;p&gt;select * from users where age is null; db.users.find({&amp;#8216;age&amp;#8217; : null);&lt;/p&gt;
-&lt;/li&gt;
+&lt;p&gt;由于是安全专业的，面试官又问了我这个问题，答得一般，总结如下：&lt;/p&gt;
 
-&lt;li&gt;
-&lt;p&gt;like (mongoDB 支持正则表达式)&lt;/p&gt;
+&lt;h5 id='synflood'&gt;什么是synflood？&lt;/h5&gt;
 
-&lt;p&gt;select * from users where name like &amp;#8220;%hurry%&amp;#8221;; db.users.find({name:/hurry/}); select * from users where name like &amp;#8220;hurry%&amp;#8221;; db.users.find({name:/^hurry/});&lt;/p&gt;
-&lt;/li&gt;
+&lt;p&gt;在TCP连接的三次握手中，假设一个用户向服务器发送了SYN报文后突然死机或掉线，那么服务器在发出SYN+ACK应答报文后是无法收到客户端的ACK报文的（第三次握手无法完成），这种情况下服务器端一般会重试（再次发送SYN+ACK给客户端）并等待一段时间后丢弃这个未完成的连接，这段时间的长度我们称为SYN Timeout，一般来说这个时间是分钟的数量级（大约为30秒-2分钟）；一个用户出现异常导致服务器的一个线程等待1分钟并不是什么很大的问题，但如果有一个恶意的攻击者大量模拟这种情况，&lt;strong&gt;服务器端将为了维护一个非常大的半连接列表而消耗非常多的资源&lt;/strong&gt;&amp;#8212;-数以万计的半连接，即使是简单的保存并遍历也会消耗非常多的CPU时间和内存，何况还要不断对这个列表中的IP进行SYN+ACK的重试。实际上如果服务器的TCP/IP栈不够强大，最后的结果往往是堆栈溢出崩溃&amp;#8212;即使服务器端的系统足够强大，服务器端也将忙于处理攻击者伪造的TCP连接请求而无暇理睬客户的正常请求（毕竟客户端的正常请求比率非常之小），此时从正常客户的角度看来，服务器失去响应，这种情况我们称作：服务器端受到了SYN Flood攻击（SYN洪水攻击）。&lt;/p&gt;
 
-&lt;li&gt;
-&lt;p&gt;使用distinct&lt;/p&gt;
+&lt;h5 id='syn_flood'&gt;怎么检测Syn flood？&lt;/h5&gt;
 
-&lt;p&gt;select distinct (name) from users; db.users.distinct(&amp;#8216;name&amp;#8217;);&lt;/p&gt;
-&lt;/li&gt;
+&lt;p&gt;1、服务端无法提供正常的TCP服务。连接请求被拒绝或超时；&lt;/p&gt;
 
-&lt;li&gt;
-&lt;p&gt;使用count&lt;/p&gt;
-&lt;/li&gt;
+&lt;p&gt;2、通过 &lt;code&gt;netstat -an&lt;/code&gt; 命令检查系统，发现有大量的&lt;code&gt;SYN_RECV&lt;/code&gt;连接状态。&lt;/p&gt;
 
-&lt;li&gt;
-&lt;p&gt;数组查询 （mongoDB自己特有的）&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;如果skills是 &lt;span&gt;&amp;#8216;java&amp;#8217;,&amp;#8217;python&amp;#8217;&lt;/span&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;db.users.find({&amp;#39;skills&amp;#39; : &amp;#39;java&amp;#39;}); 该语句可以匹配成功
-$all
-db.users.find({&amp;#39;skills&amp;#39; : {&amp;#39;$all&amp;#39; : [&amp;#39;java&amp;#39;,&amp;#39;python&amp;#39;]}}) skills中必须同时包含java 和 python 
-$size
-db.users.find({&amp;#39;skills&amp;#39; : {&amp;#39;$size&amp;#39; : 2}}) 遗憾的是$size不能与$lt等组合使用
-$slice
-db.users.find({&amp;#39;skills&amp;#39; : {&amp;#39;$slice : [1,1]}})  &lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;两个参数分别是偏移量和返回的数量&lt;/p&gt;
-
-&lt;p&gt;11.查询内嵌文档&lt;/p&gt;
+&lt;h5 id='id25'&gt;如何防范？&lt;/h5&gt;
 
 &lt;ol&gt;
 &lt;li&gt;
-&lt;p&gt;强大的$where查询&lt;/p&gt;
+&lt;p&gt;缩短SYN- Timeout时间&lt;/p&gt;
+&lt;/li&gt;
 
-&lt;p&gt;db.foo.find(); &lt;br /&gt;{ &amp;#8220;_id&amp;#8221; : ObjectId(&amp;#8220;4e17ce0ac39f1afe0ba78ce4&amp;#8221;), &amp;#8220;a&amp;#8221; : 1, &amp;#8220;b&amp;#8221; : 3, &amp;#8220;c&amp;#8221; : 10 } { &amp;#8220;_id&amp;#8221; : ObjectId(&amp;#8220;4e17ce13c39f1afe0ba78ce5&amp;#8221;), &amp;#8220;a&amp;#8221; : 1, &amp;#8220;b&amp;#8221; : 6, &amp;#8220;c&amp;#8221; : 6 }&lt;/p&gt;
+&lt;li&gt;
+&lt;p&gt;设置每秒最多3个syn封包进入&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;如果要查询 b = c 的文档怎么办？&lt;/p&gt;
+&lt;h4 id='linux_cpu'&gt;查看Linux CPU使用率命令&lt;/h4&gt;
 
-&lt;pre&gt;&lt;code&gt;&amp;gt; db.foo.find({&amp;quot;$where&amp;quot;:function(){
-    for(var current in this){
-        for(var other in this){
-            if(current != other &amp;amp;&amp;amp; this[current] == this[other]){
-                return true;    
-            }
-        }
-    }
-    return false;
-}});
- 
-{ &amp;quot;_id&amp;quot; : ObjectId(&amp;quot;4e17ce13c39f1afe0ba78ce5&amp;quot;), &amp;quot;a&amp;quot; : 1, &amp;quot;b&amp;quot; : 6, &amp;quot;c&amp;quot; : 6 }&lt;/code&gt;&lt;/pre&gt;</content>
+&lt;p&gt;&lt;code&gt;top&lt;/code&gt;&lt;/p&gt;
+
+&lt;h4 id='id26'&gt;查看进程信息&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;ps -aux&lt;/code&gt;&lt;/p&gt;
+
+&lt;h4 id='vim100200'&gt;vim从100到200行替换字符串&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;:100,200s/vivian/sky/g&lt;/code&gt;&lt;/p&gt;
+
+&lt;h3 id='fluentdmongodboffer23'&gt;总结：简历上写的尽量往深处了解，面试官可能追问具体的机制，例如我用到的几个工具，fluentd，mongodb，我只是简单的使用，不清楚里面的实现机制，往往不能令面试官满意。面试失败的还有一个原因是简历上写的一定是自己非常了解的，不是很懂的还是不要往上写了，或者写了赶紧去补功课，路漫漫其修远兮，找工作是一个虐心的过程，相信经过不断的积攒经验，一定能够拿到满意的offer，下一站：创新工场23号面试，加油！&lt;/h3&gt;</content>
  </entry>
  
  <entry>
@@ -175,8 +139,8 @@ mongodb_data  mongodb_log    &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;等待启动成功后，可查看是否启动成功了，默认端口号是27017，当然在启动时也可以指定未使用的其它端口。先通过查看端口号看MongoDB是否启动了。&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;[root@localhost data]# netstat -lanp | grep &amp;quot;27017&amp;quot;  
-tcp        0      0 0.0.0.0:27017               0.0.0.0:*                   LISTEN      1573/mongod            
-unix  2      [ ACC ]     STREAM     LISTENING     5874   1573/mongod         /tmp/mongodb-27017.sock    &lt;/code&gt;&lt;/pre&gt;
+tcp   0    0 0.0.0.0:27017      0.0.0.0:*     LISTEN      1573/mongod            
+unix  2  [ ACC ]    STREAM   LISTENING    5874  1573/mongod   /tmp/mongodb-27017.sock    &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;可以看到，已启动成功，现在使用mongo客户端访问一下该数据库。&lt;/p&gt;
 

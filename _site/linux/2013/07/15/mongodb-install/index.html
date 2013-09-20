@@ -93,8 +93,8 @@ mongodb_data  mongodb_log    </code></pre>
 <p>等待启动成功后，可查看是否启动成功了，默认端口号是27017，当然在启动时也可以指定未使用的其它端口。先通过查看端口号看MongoDB是否启动了。</p>
 
 <pre><code>[root@localhost data]# netstat -lanp | grep &quot;27017&quot;  
-tcp        0      0 0.0.0.0:27017               0.0.0.0:*                   LISTEN      1573/mongod            
-unix  2      [ ACC ]     STREAM     LISTENING     5874   1573/mongod         /tmp/mongodb-27017.sock    </code></pre>
+tcp   0    0 0.0.0.0:27017      0.0.0.0:*     LISTEN      1573/mongod            
+unix  2  [ ACC ]    STREAM   LISTENING    5874  1573/mongod   /tmp/mongodb-27017.sock    </code></pre>
 
 <p>可以看到，已启动成功，现在使用mongo客户端访问一下该数据库。</p>
 
@@ -149,7 +149,7 @@ connecting to: test   </code></pre>
       
         <li><a href="/archive.html">归档</a></li>
       
-        <li class="next"><a href="/linux/2013/08/02/mongodb-find" title="Mongodb 学习整理之查询">下一篇 &rarr;</a></li>
+        <li class="next"><a href="/blog/2013/09/20/alibaba" title="阿里巴巴面试总结">下一篇 &rarr;</a></li>
       
       </ul>
     </div>
@@ -190,9 +190,9 @@ connecting to: test   </code></pre>
 
   
      
-    	<li><a href="/tags.html#Linux-ref">Linux <span>4</span></a></li>
+    	<li><a href="/tags.html#Linux-ref">Linux <span>3</span></a></li>
      
-    	<li><a href="/tags.html#MongoDB-ref">MongoDB <span>3</span></a></li>
+    	<li><a href="/tags.html#MongoDB-ref">MongoDB <span>2</span></a></li>
     
   
 
@@ -206,7 +206,7 @@ connecting to: test   </code></pre>
     <ul id="recent_posts">
     
       <li class="post">
-        <a href="/linux/2013/08/02/mongodb-find">Mongodb 学习整理之查询</a>
+        <a href="/blog/2013/09/20/alibaba">阿里巴巴面试总结</a>
       </li>
     
       <li class="post">
