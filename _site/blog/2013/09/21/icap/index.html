@@ -1,0 +1,255 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>ICAP RFC3507 部分章节翻译 - tinyfisher blog</title>
+    <meta name="keywords" content="面试" />
+    <meta name="description" content="ICAP RFC3507 部分章节翻译" />
+    <meta name="author" content="tinyfisher">
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!-- <link href="http://lib.sinaapp.com/js/bootstrap/latest/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all"> -->
+    <link href="http://lib.sinaapp.com/js/bootstrap/2.0.3/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/google-code-prettify/prettify.css" rel="stylesheet" type="text/css" media="all">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <!-- <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/latest/js/bootstrap.min.js"></script> -->
+    <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/2.0.3/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/google-code-prettify/prettify.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/js/application.js"></script>
+  </head>
+
+  <body data-spy="scroll" data-target=".subnav" data-offset="100">
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="/">tinyfisher blog</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+
+
+              <li><a href="/archive.html">归档</a></li>
+              <li><a href="/categories.html">目录</a></li>
+              <li><a href="/pages.html">页面</a></li>
+              <li><a href="/tags.html">标签</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="content">
+        
+
+<div class="page-header">
+  <h1>ICAP RFC3507 部分章节翻译 </h1>
+</div>
+
+
+<div class="row">
+  <div class="span8">
+    <h4 id='icaphttprfc3507okicap'>之前项目中用到了icap协议，成功实现了对http数据包的内容修改，增加等功能，现将一些协议中一些字段进行总结，参考了RFC3507，ok，让我们首先看一个icap报文</h4>
+<pre class='prettyprint linenums lang-clj'>
+REQMOD  icap://127.0.0.1:1344/greasyspoon_req ICAP/1.0\r\n       
+Host:127.0.0.1:1344\r\n                                     
+Date:Wed, 08 May 2013 15:47:28 GMT\r\n                         
+Encapsulated:req-hdr=0, null-body=336\r\n                                                      
+Preview:0\r\n                                                    
+Allow:204\r\n                               
+\r\n                                     
+GET   http://202.168.1.13/1.html HTTP/1.1\r\n                  
+Host:   202.168.1.13\r\n                          
+User-Agent:  Mozilla/5.0 (Windows NT 6.1; WOW64; rv:17.0) Gecko/20100101 
+Firefox/17.0\r\n                        
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n  
+Accept-Language:   en-US,en;q=0.5\r\n                  
+Accept-Encoding:   gzip, deflate\r\n                    
+Referer:  http://202.168.1.13/support.html\r\n                    
+\r\n
+</pre>
+<p>其中1到7行为icap头，剩下的是我们常见的http头，我们一条一条看一下：<br />第一行中<code>REQMOD</code>表示icap工作在请求模式，icap还有一种模式叫<code>RESPMOD</code>，意思是工作在响应模式，<strong>简单的说，请求模式主要针对http请求报文进行匹配修改增值，响应模式主要针对http响应报文进行匹配修改增值</strong>；<code>icap://127.0.0.1:1344/greasyspoon_req ICAP/1.0</code>说的是资源url和版本号1.0，其中<code>greasyspoon</code>是指icap服务器的具体名称，icap服务器还有c-icap等。<br /><code>host</code>和<code>date</code>这里就不详细说了<br /><code>Encapsulated:req-hdr=0, null-body=336\r\n </code>说的是封装了http请求包，http头偏移量为0，这个请求包只有头，没有body，所以<code>null-body=336</code>，336是指body的偏移量；如果有请求包的body的话,例如post消息，会出现下面的情况：<br /><code>Encapsulated: req-hdr=0, req-body=412</code>,意思是头偏移长度0，bdoy偏移长度为412，通过这个可以得到http头和消息体的开始位置，<strong>总结一下，<code>Encapsulated</code>这个字段主要用来定位http消息的header和body。</strong></p>
+
+<p>再来看<code>preview</code>字段的用途，首先看一下RFC3507中对他的描述：</p>
+
+<pre><code>ICAP REQMOD or RESPMOD requests sent by the ICAP client to the ICAP server may include a &quot;preview&quot;. This feature allows an ICAP server to see the beginning of a transaction, then decide if it wants to opt-out of the transaction early instead of receiving the remainder of the request message.   </code></pre>
+
+<p>翻译如下：icap客户端发送给服务端的REQMOD或者RESPMOD请求可能包含“preview” 字段，它能让icap服务端看到事务的最开始的一些信息，从而决定是否直接退出这个事务，而不是等到将所有的请求信息接收完毕再做判断。<strong>说白了就是预览icap封装消息body的前n个字节，来判断是否对这个消息进行处理，而不是接收完所有消息再判断。</strong>举个例子（RFC上的）：</p>
+
+<pre><code>If an ICAP server wants to transcode all GIF87 files into GIF89 files, then the GIF87 files could quickly be detected by looking at the first few body bytes of the file.  </code></pre>
+
+<p>翻译：如果icap服务器想要把所有gif87的文件转码成gif89文件，gif87的文件可以通过body的前几行检测出来。</p>
+
+<p>这里由于我们的包里只有http header，没有http body，所以preview为0</p>
+
+<p>最后<code>Allow:204</code>,我们先看看RFC上怎么说：<br /> An ICAP client MAY include &#8220;Allow: 204&#8221; in its request headers,indicating that the server MAY reply to the message with a &#8220;204 NoContent&#8221; response if the object does not need modification.</p>
+
+<pre><code>If an ICAP server receives a request that does not have &quot;Allow: 204&quot;,it MUST NOT reply with a 204. In this case, an ICAP server MUST return the entire message back to the client, even though it is identical to the message it received.</code></pre>
+
+<p>翻译：&#8221;Allow: 204&#8221;是可选的，加上这个选项表示：如果这个包不需要处理，则服务器返回&#8221;204 NoContent&#8221;给客户端，如果不加这个选项，服务器绝不会返回204，而是将整个消息返回给客户端<br /><strong>总结一下：这个allow：204主要是真针对不需要处理的数据包进行简单返回状态码204，从而减少了icap服务器和客户端的工作量</strong></p>
+
+<h4 id='okicapicap'>ok，到这里我们基本分析了icap的请求包，再来看看，icap服务器的返回包：</h4>
+<pre class='prettyprint linenums lang-clj'>
+ICAP/1.0 200 OK\r\n 
+ISTag:"GreasySpoon-1.0.8-01"\r\n                   
+Host:0.0.0.0:1344\r\n                         
+Encapsulated:req-hdr=0, null-body=333\r\n                 
+Connection:close\r\n                          
+\r\n                                     
+GET http://202.168.2.34/2.html HTTP/1.1\r\n                 
+Host:202.168.2.34\r\n                          
+User-Agent:  Mozilla/5.0 (Windows NT 6.1; WOW64; rv:17.0) Gecko/20100101 
+Firefox/17.0\r\n                         
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n     
+Accept-Language:   en-US,en;q=0.5\r\n                   
+Accept-Encoding:   gzip, deflate\r\n                     
+Referer:http://202.168.1.13/support.html\r\n                   
+\r\n                                     
+</pre>
+<p>前6行为icap响应包头，下面的是修改后的http请求，可以看到<code>GET http://202.168.2.34/1.html HTTP/1.1\r\n</code>改成了<code>GET http://202.168.2.34/2.html HTTP/1.1\r\n</code>,我们成功修改了http请求。下面具体看一下响应包的各个字段：</p>
+
+<p><code>ICAP/1.0 200 OK\r\n </code>说的是icap的返回状态码200，表示http请求已经被成功修改，类似于http状态码200</p>
+
+<p><code>ISTag</code>（ICAP Service Tag）说的是我们用的icap service的具体名称和版本号，我们这里用的是greasyspoon</p>
+
+<p><code>host</code>和<code>Encapsulated</code>不再赘述了</p>
+
+<p><code>Connection</code>字段和http协议的connection一样，含义是当client和server通信时对于长链接如何进行处理。在http1.1中，client和server都是默认对方支持长链接的， 如果client使用http1.1协议，但又不希望使用长链接，则需要在header中指明connection的值为close；如果server方也不想支持长链接，则在response中也需要明确说明connection的值为close.</p>
+
+<p>不论request还是response的header中包含了值为close的connection，都表明当前正在使用的tcp链接在当天请求处理完毕后会被断掉。以后client再进行新的请求时就必须创建新的tcp链接了。</p>
+
+<h4 id='http'>顺便再复习一下http报文里的各个字段的含义：</h4>
+
+<p>1、 Accept：告诉WEB服务器自己接受什么介质类型，<em>/</em> 表示任何类型，type/* 表示该类型下的所有子类型，type/sub-type。</p>
+
+<p>2、 Accept-Charset： 浏览器申明自己接收的字符集</p>
+
+<p>Accept-Encoding： 浏览器申明自己接收的编码方法，通常指定压缩方法，是否支持压缩，支持什么压缩方法（gzip，deflate）</p>
+
+<p>Accept-Language：：浏览器申明自己接收的语言</p>
+
+<p>语言跟字符集的区别：中文是语言，中文有多种字符集，比如big5，gb2312，gbk等等。</p>
+
+<p>3、 Connection：请求：close（告诉WEB服务器或者代理服务器，在完成本次请求的响应后，断开连接，不要等待本次连接的后续请求了）。</p>
+
+<p>keepalive（告诉WEB服务器或者代理服务器，在完成本次请求的响应后，保持连接，等待本次连接的后续请求）。</p>
+
+<p>响应：close（连接已经关闭）。</p>
+
+<p>keepalive（连接保持着，在等待本次连接的后续请求）。</p>
+
+<p>Keep-Alive：如果浏览器请求保持连接，则该头部表明希望 WEB 服务器保持连接多长时间（秒）。例如：Keep-Alive：300</p>
+
+<p>4、 Host：客户端指定自己想访问的WEB服务器的域名/IP 地址和端口号。例如：Host：rss.sina.com.cn</p>
+
+<p>5、 Referer：浏览器向 WEB 服务器表明自己是从哪个 网页/URL 获得/点击 当前请求中的网址/URL。例如：Referer：http://www.sina.com/</p>
+
+<p>6、 Server: WEB 服务器表明自己是什么软件及版本等信息。例如：Server：Apache/2.0.61 (Unix) 7、 User-Agent: 浏览器表明自己的身份（是哪种浏览器）。例如：User-Agent：Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.8.1.14) Gecko/20080404 Firefox/2、0、0、14</p>
+    <hr>
+    <div class="pagination">
+      <ul>
+      
+        <li class="prev"><a href="/blog/2013/09/20/alibaba" title="阿里巴巴面试总结">&larr; 上一篇</a></li>
+      
+        <li><a href="/archive.html">归档</a></li>
+      
+        <li class="next disabled"><a>下一篇 &rarr;</a>
+      
+      </ul>
+    </div>
+    <hr>
+    
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'tinyfisher'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+  </div>
+  
+  <div class="span4">
+    <h4>发布日期</h4>
+    <div class="date"><span>2013-09-21</span></div>
+
+  
+    <h4>标签</h4>
+    <ul class="tag_box">
+    
+    
+
+
+  
+     
+    	<li><a href="/tags.html#blog-ref">blog <span>3</span></a></li>
+     
+    	<li><a href="/tags.html#面试-ref">面试 <span>2</span></a></li>
+    
+  
+
+
+
+    </ul>
+    
+
+  <section>
+    <h4>最近发表</h4>
+    <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/09/21/icap">ICAP RFC3507 部分章节翻译</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/20/alibaba">阿里巴巴面试总结</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/07/09/mongodb-introduce">Mongodb 学习整理之介绍</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/06/23/hostapd">利用Hostapd搭建无线wifi</a>
+      </li>
+    
+    </ul>
+  </section>
+  </div>
+</div>
+
+
+      </div>
+
+      <footer>
+        <p>&copy; tinyfisher 2013 
+          基于 <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          和 <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a> 构建
+        </p>
+      </footer>
+
+    </div> <!-- /container -->
+    
+  </body>
+</html>
+

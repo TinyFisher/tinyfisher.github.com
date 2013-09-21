@@ -52,17 +52,212 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#blog20130523microsoft_test" title="2013微软暑期实习笔试错题、疑题整理">2013微软暑期实习笔试错题、疑题整理</a></li>
     <li><a href="#linux20130501fluentd" title="fluentd插件开发">fluentd插件开发</a></li>
     <li><a href="#linux20130423mongodb" title="Mongodb的备份与恢复">Mongodb的备份与恢复</a></li>
     <li><a href="#linux20130305tplink" title="TL-WN822N TL-WN722N linux安装驱动">TL-WN822N TL-WN722N...</a></li>
     <li><a href="#linux20130207loadbalance" title="使用ip route命令实现多链路负载均衡">使用ip route命令实现多链路负载均衡...</a></li>
-    <li><a href="#linux20130129ppp" title="pppd拨号与默认网关">pppd拨号与默认网关</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="blog20130523microsoft_test">
+    <article>
+      <header>
+      <h1><a href="/blog/2013/05/23/microsoft_test">2013微软暑期实习笔试错题、疑题整理</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-05-23</span></div>
+    </header>
+    <div class="content"><h3 id='id14'>参加了微软“智在未来”暑期实习笔试，跪了，将错题、疑题整理如下，方便后面复习整理。</h3>
+
+<p><strong>What&#8217;s the output of the following code?(3 Points)</strong> B</p>
+
+<pre><code>class A  
+{  
+public:  
+    virtual void f()  
+    {  
+        cout&lt;&lt;&quot;A::f()&quot;&lt;&lt;endl;  
+    }  
+    void f() const  
+    {  
+        cout&lt;&lt;&quot;A::f() const&quot;&lt;&lt;endl;  
+    }  
+};  
+  
+class B: public A  
+{  
+public:  
+    void f()  
+    {  
+        cout&lt;&lt;&quot;B::f()&quot;&lt;&lt;endl;  
+    }  
+    void f() const  
+    {  
+        cout&lt;&lt;&quot;B::f() const&quot;&lt;&lt;endl;  
+    }  
+};  
+  
+void g(const A* a)  
+{  
+    a-&gt;f();  
+}  
+  
+int main()  
+{  
+    A* a = new B();  
+    a-&gt;f();  
+    g(a);  
+    delete a ;  
+}  
+
+A. B::f()B::f()const    
+B. B::f()A::f()const  
+C. A::f()B::f()const    
+D. A::f()A::f()const  </code></pre>
+
+<p>解析：类的成员函数后面加 const，<strong>表明这个函数不会对这个类对象的数据成员（准确地说是非静态数据成员）作任何改</strong>变。</p>
+
+<p>在设计类的时候，一个原则就是对于不改变数据成员的成员函数都要在后面加 const，而对于改变数据成员的成员函数不能加 const。所以 const 关键字对成员函数的行为作了更加明确的限定：<strong>有 const 修饰的成员函数（指 const 放在函数参数表的后面，而不是在函数前面或者参数表内），只能读取数据成员，不能改变数据成员；</strong></p>
+
+<p>没有 const 修饰的成员函数，对数据成员则是可读可写的。除此之外，在类的成员函数后面加 const 还有什么好处呢？<strong>那就是常量（即 const）对象可以调用 const 成员函数，而不能调用非const修饰的函数。</strong></p>
+
+<p><strong>What is the difference between a linked list and an array?(3 Points)</strong> （全选）</p>
+
+<pre><code>A. Search complexity when both are sorted  
+
+B. Dynamically add/remove  
+
+C. Random access efficiency  
+
+D. Data storage type  </code></pre>
+
+<p>【此题D选项存在疑问】</p>
+
+<p><strong>About the Thread and Process in Windows, which description(s) is(are) correct:(3 Points)</strong> C</p>
+
+<pre><code>A. One application in OS must have one Process, but not a necessary to have one Thread  
+
+B. The Process could have its own Stack but the thread only could share the Stack of its parent Process  
+
+C. Thread must belongs to a Process  
+
+D. Thread could change its belonging Process  </code></pre>
+
+<p>解析：A选项，一个程序至少有一个进程，一个进程至少包含一个线程（主线程）</p>
+
+<p>B选项，线程共享父进程的数据空间，也可以拥有自己的栈空间</p>
+
+<p>C对，线程不能独立存在，必须属于一个进程</p>
+
+<p>D明显错误</p>
+
+<p><strong>Please choose the right statement about const usage:(3 Points)</strong> ABC</p>
+
+<pre><code>A. const int a; //const integer  
+
+B. int const a; //const integer  
+
+C. int const *a; //a pointer which point to const integer  
+
+D. const int *a; //a const pointer which point to integer  
+
+E. int const *a; // a const pointer which point to integer  </code></pre>
+
+<p>解析：这里注意一下A、B的写法均可，两者意思一样</p>
+
+<p><strong>1 of 1000 bottles of water is poisoned which will kill a rat in 1 week if the rat drunk any amout of the water. Given the bottles of water have no visual difference, how many rats are needed at least to find the poisoned one in 1 week?(5 Points)</strong> B</p>
+
+<pre><code>A. 9  
+
+B. 10  
+
+C. 32  
+
+D. None of the above  </code></pre>
+
+<p>解析：2的10次方=1024，大于1000，用二进制的思维思考问题</p>
+
+<p><strong>Which of the following statement(s) equal(s) value 1 in C programming language?(5 Points)</strong> BCD</p>
+
+<pre><code>A. the return value of main function if program ends normally
+
+B. return (7&amp;1)  
+
+C. char *str=&quot;microsoft&quot;; return str==&quot;microsoft&quot;  
+
+D. return &quot;microsoft&quot;==&quot;microsoft&quot;  
+
+E. None of the above  </code></pre>
+
+<p>解析：A选项，C程序正常退出，return 0；</p>
+
+<p>B选项，计算即可得</p>
+
+<p>C选项，因为C语言中是没有bool类型的（1个字节，只有0,1），所以返回1</p>
+
+<p>D选项，同C</p>
+
+<p><strong>How many rectangles you can find from 3X4 grid?(5 Points)</strong> D</p>
+
+<pre><code>A. 18  
+
+B. 20  
+
+C. 40  
+
+D. 60 
+
+E. None of above is correct  </code></pre>
+
+<p>解析：智力题 整不了</p>
+
+<p><strong>Which of the following sorting algorithm(s) is(are) stable sorting?(5 Points)</strong> A</p>
+
+<pre><code>A. bubble sort  
+
+B. quick sort  
+
+C. heap sort  
+
+D. merge sort  
+
+E. Selection sort  </code></pre>
+
+<p>解析：不稳定排序：“快选希堆”，原地排序：“快选希堆冒”</p>
+
+<p><strong>Model-View-Controller(MVC) is an architectural pattern that frequently used in web applications. Which of the following statement(s) is(are) correct:(5 Points)</strong> AB</p>
+
+<pre><code>A. Models often represent data and the business logics needed to manipulate the data in the application  
+
+B. A view is a (visual) representation of its model. It renders the model into a form suitable for interaction, typically a user interface element  
+
+C. A controller is the link between a user and the system. It accepts input from the user and instructs the model and a view to perform actions based on that input  
+
+D. The common practice of MVC in web applications is, the model receives GET or POST input from user and decides what to do with it, handing over to controller and which hand control to views(HTML-generating components)  
+
+E. None of the above  </code></pre>
+
+<p>解析：不是很清楚，关于MVC，请看这篇blog，写得挺直白的<a href='http://www.ruanyifeng.com/blog/2007/11/mvc.html'>http://www.ruanyifeng.com/blog/2007/11/mvc.html</a></p>
+
+<p><strong>Given a set of N balls and one of which is defective (weighs less than others), you are allowed to weigh with a balance 3 times to find the defective. Which of the following are possible N?(13 Points)</strong> ABCD</p>
+
+<pre><code>A. 12  
+
+B. 16  
+
+C. 20  
+
+D. 24  
+
+E. 28  </code></pre>
+
+<p>解析：A选项：第一次：4,4,4 第二次：2,2，第三次：1,1, B选项：第一次：5,5,6，第二次：若在某一个5中，2,2,1；若在6中，2,2,2,；第三次1,1, C选项：第一次：7,7,6,；第二次：若在某一个7中，2,2,3；若在6中，2,2,2；第三次，1,1 D选项：第一次：8,8,8；第二次：2,3,3；第三次1,1</p></div>
+    </article>
+  </section>
   
   
   <section id="linux20130501fluentd">
@@ -205,35 +400,6 @@ end  </code></pre></div>
     </article>
   </section>
   
-  
-  <section id="linux20130129ppp">
-    <article>
-      <header>
-      <h1><a href="/linux/2013/01/29/ppp">pppd拨号与默认网关</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2013-01-29</span></div>
-    </header>
-    <div class="content"><p>在linux下使用3G网卡上网，使用pppd工具进行拨号，拨号脚本如下：</p>
-
-<pre><code>nodetach
-/dev/ttyUSB0
-19200
-nocrtscts
-connect &#39;/usr/sbin/chat -v -f /etc/ppp/peers/chat_script_unicom&#39;
-debug
-user &quot;card&quot;
-password &quot;card&quot;
-ipcp-accept-local
-ipcp-accept-remote
-defaultroute</code></pre>
-
-<p>其中<code>defaultroute</code>表示拨号成功后，自动添加一条默认路由，如果只使用一个网卡拨号，当然很方便;</p>
-
-<p>但是我发现如果使用两个以上的网卡进行拨号，会产生多条默认路由，这当然也没有问题，只是当其中一条断开后，所有的默认路由都消失了，即使其他的网卡工作正常，也不能上网，所以当有多个网卡拨号的时侯，不建议使用<code>defaultroute</code>这个选项，可以手动添加默认路由：</p>
-
-<pre><code>route add default gw x.x.x.x</code></pre></div>
-    </article>
-  </section>
-  
   <div class="pagination">
       <ul>
         <li class="next"><a href='/'>&larr; 上一页</a></li>
@@ -248,6 +414,9 @@ defaultroute</code></pre>
     <section>
     <h4>最近发表</h4>
     <ul id="recent_posts">
+      <li class="post">
+        <a href="/blog/2013/09/21/icap">ICAP RFC3507 部分章节翻译</a>
+      </li>
       <li class="post">
         <a href="/blog/2013/09/20/alibaba">阿里巴巴面试总结</a>
       </li>
@@ -275,9 +444,6 @@ defaultroute</code></pre>
       <li class="post">
         <a href="/linux/2013/02/07/loadbalance">使用ip route命令实现多链路负载均衡</a>
       </li>
-      <li class="post">
-        <a href="/linux/2013/01/29/ppp">pppd拨号与默认网关</a>
-      </li>
     </ul>
     </section>
     
@@ -291,7 +457,7 @@ defaultroute</code></pre>
   
      
     	<li><a href="/categories.html#blog-ref">
-    		blog <span>3</span>
+    		blog <span>4</span>
     	</a></li>
      
     	<li><a href="/categories.html#algorithm-ref">

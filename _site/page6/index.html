@@ -52,6 +52,7 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#algorithm20120603merge-sort" title="归并排序C语言实现">归并排序C语言实现</a></li>
     <li><a href="#algorithm20120524quick-sort" title="快速排序C语言实现">快速排序C语言实现</a></li>
     <li><a href="#algorithm20120515heap-sort" title="堆排序C语言实现">堆排序C语言实现</a></li>
     <li><a href="#algorithm20120502bubble-sort" title="冒泡排序C语言实现">冒泡排序C语言实现</a></li>
@@ -62,6 +63,62 @@
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="algorithm20120603merge-sort">
+    <article>
+      <header>
+      <h1><a href="/algorithm/2012/06/03/merge-sort">归并排序C语言实现</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-06-03</span></div>
+    </header>
+    <div class="content"><p>话不多说，直接上代码</p>
+
+<pre><code>void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+void merge_array(int a[],int low,int mid,int high,int result[])
+{
+    int i,j,k;
+    i=low;
+    j=mid+1;
+    k=0;
+    while(i&lt;=mid&amp;&amp;j&lt;=high)
+    {
+        if(a[i]&lt;a[j])
+        {
+            result[k]=a[i];
+            i++;
+            k++;
+        }
+        else
+        {
+            result[k]=a[j];
+            k++;
+            j++;
+        }
+    }
+    while(i&lt;=mid)
+    {
+        result[k]=a[i];
+        i++;
+        k++;
+    }
+    while(j&lt;=high)
+    {
+        result[k]=a[j];
+        j++;
+        k++;
+    }
+    for(i=0;i&lt;k;i++)    //注意 需要这一步
+    {
+        a[low+i]=result[i];  //low+i
+    }
+}</code></pre></div>
+    </article>
+  </section>
   
   
   <section id="algorithm20120524quick-sort">
@@ -290,6 +347,9 @@ export LANG=en_US.UTF-8
     <h4>最近发表</h4>
     <ul id="recent_posts">
       <li class="post">
+        <a href="/blog/2013/09/21/icap">ICAP RFC3507 部分章节翻译</a>
+      </li>
+      <li class="post">
         <a href="/blog/2013/09/20/alibaba">阿里巴巴面试总结</a>
       </li>
       <li class="post">
@@ -316,9 +376,6 @@ export LANG=en_US.UTF-8
       <li class="post">
         <a href="/linux/2013/02/07/loadbalance">使用ip route命令实现多链路负载均衡</a>
       </li>
-      <li class="post">
-        <a href="/linux/2013/01/29/ppp">pppd拨号与默认网关</a>
-      </li>
     </ul>
     </section>
     
@@ -332,7 +389,7 @@ export LANG=en_US.UTF-8
   
      
     	<li><a href="/categories.html#blog-ref">
-    		blog <span>3</span>
+    		blog <span>4</span>
     	</a></li>
      
     	<li><a href="/categories.html#algorithm-ref">
