@@ -5,8 +5,8 @@
         <description>tinyfisher blog - tinyfisher</description>
         <link>http://tinyfisher.github.com</link>
         <link>http://tinyfisher.github.com</link>
-        <lastBuildDate>2013-09-22T11:27:41+08:00</lastBuildDate>
-        <pubDate>2013-09-22T11:27:41+08:00</pubDate>
+        <lastBuildDate>2013-09-22T11:36:08+08:00</lastBuildDate>
+        <pubDate>2013-09-22T11:36:08+08:00</pubDate>
         <ttl>1800</ttl>
 
 
@@ -42,7 +42,7 @@
 
 &lt;h4 id='id28'&gt;我的理解：&lt;/h4&gt;
 
-&lt;p&gt;首先，“映射”这个词，就和数学课上说的“一一映射”是一个意思，就是建立一种一一对应关系，在这里主要是只&lt;em&gt;硬盘上文件&lt;/em&gt;的位置与进程&lt;em&gt;逻辑地址空间&lt;/em&gt;中一块大小相同的区域之间的一一对应（按字节对应），如过程1所示。这种对应关系纯属是逻辑上的概念，物理上是不存在的，原因是进程的逻辑地址空间本身就是不存在的。在内存映射的过程中，&lt;strong&gt;并没有实际的数据拷贝，文件没有被载入内存，只是逻辑上被放入了内存&lt;/strong&gt;，这个过程由系统调用mmap()实现，所以建立内存映射的效率很高。&lt;br /&gt;&lt;img alt='alt text' src='../../assets/themes/images/0_1284702135HcPp.gif' /&gt;&lt;/p&gt;
+&lt;p&gt;首先，“映射”这个词，就和数学课上说的“一一映射”是一个意思，就是建立一种一一对应关系，在这里主要是只&lt;em&gt;硬盘上文件&lt;/em&gt;的位置与进程&lt;em&gt;逻辑地址空间&lt;/em&gt;中一块大小相同的区域之间的一一对应（按字节对应），如过程1所示。这种对应关系纯属是逻辑上的概念，物理上是不存在的，原因是进程的逻辑地址空间本身就是不存在的。在内存映射的过程中，&lt;strong&gt;并没有实际的数据拷贝，文件没有被载入内存，只是逻辑上被放入了内存&lt;/strong&gt;，这个过程由系统调用mmap()实现，所以建立内存映射的效率很高。&lt;br /&gt;&lt;img alt='alt text' src='../../assets/themes/images/yxh.gif' /&gt;&lt;/p&gt;
 
 &lt;p&gt;既然建立内存映射没有进行实际的数据拷贝，那么进程又怎么能最终直接通过内存操作访问到硬盘上的文件呢？那就要看内存映射之后的几个相关的过程了。&lt;/p&gt;
 
