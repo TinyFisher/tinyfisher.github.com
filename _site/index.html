@@ -52,7 +52,7 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
-    <li><a href="#linux20130922mongodb-mmp" title="Mongodb 学习整理之内存映射机制">Mongodb 学习整理之内存映射机制...</a></li>
+    <li><a href="#linux20130921mongodb-mmp" title="Mongodb学习整理之内存映射机制">Mongodb学习整理之内存映射机制</a></li>
     <li><a href="#blog20130921icap" title="ICAP RFC3507 部分章节翻译">ICAP RFC3507...</a></li>
     <li><a href="#blog20130920alibaba" title="阿里巴巴面试总结">阿里巴巴面试总结</a></li>
     <li><a href="#linux20130715mongodb-install" title="Mongodb 学习整理之安装">Mongodb 学习整理之安装...</a></li>
@@ -65,11 +65,11 @@
   <div class="span8">
   
   
-  <section id="linux20130922mongodb-mmp">
+  <section id="linux20130921mongodb-mmp">
     <article>
       <header>
-      <h1><a href="/linux/2013/09/22/mongodb-mmp">Mongodb 学习整理之内存映射机制</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2013-09-22</span></div>
+      <h1><a href="/linux/2013/09/21/mongodb-mmp">Mongodb学习整理之内存映射机制</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-09-21</span></div>
     </header>
     <div class="content"><p>sql数据库在数据量达到百万级的时候性能直线下降，在建立索引的表上做一个条件查询甚至达到分钟级别查询时间，这是无法忍受的，瓶颈在于大量的磁盘i/o操作，而这些i/o操作无疑使很耗费时间的。mongodb之所以对海量数据的查询如此高效，是因为他使用了内存映射机制，避免了大量的磁盘i/o，从而大大提高了查询效率，但相应的对内存要求也比较高。ok，下面我们来看看什么是内存映射机制</p>
 
@@ -101,9 +101,9 @@
 
 <h4 id='id28'>我的理解：</h4>
 
-<p>首先，“映射”这个词，就和数学课上说的“一一映射”是一个意思，就是建立一种一一对应关系，在这里主要是只<em>硬盘上文件</em>的位置与进程<em>逻辑地址空间</em>中一块大小相同的区域之间的一一对应（按字节对应），如过程1所示。这种对应关系纯属是逻辑上的概念，物理上是不存在的，原因是进程的逻辑地址空间本身就是不存在的。在内存映射的过程中，<strong>并没有实际的数据拷贝，文件没有被载入内存，只是逻辑上被放入了内存</strong>，这个过程由系统调用mmap()实现，所以建立内存映射的效率很高。<br /><img alt='alt text' src='../../assets/themes/images/yxh.gif' /></p>
+<p>首先，“映射”这个词，就和数学课上说的“一一映射”是一个意思，就是建立一种一一对应关系，在这里主要是只<em>硬盘上文件</em>的位置与进程<em>逻辑地址空间</em>中一块大小相同的区域之间的一一对应（按字节对应），如过程1所示。这种对应关系纯属是逻辑上的概念，物理上是不存在的，原因是进程的逻辑地址空间本身就是不存在的。在内存映射的过程中，<strong>并没有实际的数据拷贝，文件没有被载入内存，只是逻辑上被放入了内存</strong>，这个过程由系统调用mmap()实现，所以建立内存映射的效率很高。</p>
 
-<p>既然建立内存映射没有进行实际的数据拷贝，那么进程又怎么能最终直接通过内存操作访问到硬盘上的文件呢？那就要看内存映射之后的几个相关的过程了。</p>
+<p><img alt='alt text' src='../../assets/themes/images/yxh.gif' /><br />既然建立内存映射没有进行实际的数据拷贝，那么进程又怎么能最终直接通过内存操作访问到硬盘上的文件呢？那就要看内存映射之后的几个相关的过程了。</p>
 
 <p>mmap()会返回一个指针ptr，它指向进程逻辑地址空间中的一个地址，这样以后，进程无需再调用read或write对文件进行读写，而只需要通过ptr就能够操作文件。但是ptr所指向的是一个逻辑地址，要操作其中的数据，必须通过内存管理单元MMU将逻辑地址转换成物理地址，如图1中过程2所示。这个过程与内存映射无关。</p>
 
@@ -459,7 +459,7 @@ connecting to: test   </code></pre>
     <h4>最近发表</h4>
     <ul id="recent_posts">
       <li class="post">
-        <a href="/linux/2013/09/22/mongodb-mmp">Mongodb 学习整理之内存映射机制</a>
+        <a href="/linux/2013/09/21/mongodb-mmp">Mongodb学习整理之内存映射机制</a>
       </li>
       <li class="post">
         <a href="/blog/2013/09/21/icap">ICAP RFC3507 部分章节翻译</a>
