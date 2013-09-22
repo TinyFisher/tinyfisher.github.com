@@ -106,6 +106,20 @@
 		<priority>1.0</priority>
 	</url>
 
+	<url>
+		<loc>http://tinyfisher.github.com/page7/index.html</loc>
+		<lastmod></lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>1.0</priority>
+	</url>
+
+
+	<url>
+		<loc>http://tinyfisher.github.com/linux/2013/09/22/mongodb-mmp</loc>
+		<lastmod>2013-09-22</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>1.0</priority>
+	</url>
 
 	<url>
 		<loc>http://tinyfisher.github.com/blog/2013/09/21/icap</loc>

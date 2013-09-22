@@ -52,17 +52,68 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#linux20130922mongodb-mmp" title="Mongodb 学习整理之内存映射机制">Mongodb 学习整理之内存映射机制...</a></li>
     <li><a href="#blog20130921icap" title="ICAP RFC3507 部分章节翻译">ICAP RFC3507...</a></li>
     <li><a href="#blog20130920alibaba" title="阿里巴巴面试总结">阿里巴巴面试总结</a></li>
     <li><a href="#linux20130715mongodb-install" title="Mongodb 学习整理之安装">Mongodb 学习整理之安装...</a></li>
     <li><a href="#linux20130709mongodb-introduce" title="Mongodb 学习整理之介绍">Mongodb 学习整理之介绍...</a></li>
-    <li><a href="#linux20130623hostapd" title="利用Hostapd搭建无线wifi">利用Hostapd搭建无线wifi</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="linux20130922mongodb-mmp">
+    <article>
+      <header>
+      <h1><a href="/linux/2013/09/22/mongodb-mmp">Mongodb 学习整理之内存映射机制</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-09-22</span></div>
+    </header>
+    <div class="content"><p>sql数据库在数据量达到百万级的时候性能直线下降，在建立索引的表上做一个条件查询甚至达到分钟级别查询时间，这是无法忍受的，瓶颈在于大量的磁盘i/o操作，而这些i/o操作无疑使很耗费时间的。mongodb之所以对海量数据的查询如此高效，是因为他使用了内存映射机制，避免了大量的磁盘i/o，从而大大提高了查询效率，但相应的对内存要求也比较高。ok，下面我们来看看什么是内存映射机制</p>
+
+<h4 id='id27'>官网的说法：</h4>
+
+<p><strong>What are memory mapped files?</strong></p>
+
+<p>A memory-mapped file is a file with data that the operating system places in memory by way of the mmap() system call. mmap() thus maps the file to a region of virtual memory. Memory-mapped files are the critical piece of the storage engine in MongoDB. By using memory mapped files MongoDB can treat the contents of its data files as if they were in memory. This provides MongoDB with an extremely fast and simple method for accessing and manipulating data.</p>
+
+<p><strong>How do memory mapped files work?</strong></p>
+
+<p>Memory mapping assigns files to a block of virtual memory with a direct byte-for-byte correlation. Once mapped, the relationship between file and memory allows MongoDB to interact with the data in the file as if it were memory.</p>
+
+<p><strong>How does MongoDB work with memory mapped files?</strong></p>
+
+<p>MongoDB uses memory mapped files for managing and interacting with all data. MongoDB memory maps data files to memory as it accesses documents. Data that isn’t accessed is not mapped to memory.</p>
+
+<p><strong>What are page faults?</strong></p>
+
+<p>Page faults will occur if you’re attempting to access part of a memory-mapped file that isn’t in memory.</p>
+
+<p>If there is free memory, then the operating system can find the page on disk and load it to memory directly. However, if there is no free memory, the operating system must:</p>
+
+<p>find a page in memory that is stale or no longer needed, and write the page to disk.</p>
+
+<p>read the requested page from disk and load it into memory.</p>
+
+<p>This process, particularly on an active system can take a long time, particularly in comparison to reading a page that is already in memory.</p>
+
+<h4 id='id28'>我的理解：</h4>
+
+<p>首先，“映射”这个词，就和数学课上说的“一一映射”是一个意思，就是建立一种一一对应关系，在这里主要是只<em>硬盘上文件</em>的位置与进程<em>逻辑地址空间</em>中一块大小相同的区域之间的一一对应（按字节对应），如过程1所示。这种对应关系纯属是逻辑上的概念，物理上是不存在的，原因是进程的逻辑地址空间本身就是不存在的。在内存映射的过程中，<strong>并没有实际的数据拷贝，文件没有被载入内存，只是逻辑上被放入了内存</strong>，这个过程由系统调用mmap()实现，所以建立内存映射的效率很高。<br /><img alt='alt text' src='../../assets/themes/images/0_1284702135HcPp.gif' /></p>
+
+<p>既然建立内存映射没有进行实际的数据拷贝，那么进程又怎么能最终直接通过内存操作访问到硬盘上的文件呢？那就要看内存映射之后的几个相关的过程了。</p>
+
+<p>mmap()会返回一个指针ptr，它指向进程逻辑地址空间中的一个地址，这样以后，进程无需再调用read或write对文件进行读写，而只需要通过ptr就能够操作文件。但是ptr所指向的是一个逻辑地址，要操作其中的数据，必须通过内存管理单元MMU将逻辑地址转换成物理地址，如图1中过程2所示。这个过程与内存映射无关。</p>
+
+<p>前面讲过，建立内存映射并没有实际拷贝数据，这时，MMU在地址映射表中是无法找到与ptr相对应的物理地址的，也就是MMU失败，将产生一个缺页中断，缺页中断的中断响应函数会在swap中寻找相对应的页面，如果找不到（也就是该文件从来没有被读入内存的情况），则会通过mmap()建立的映射关系，从硬盘上将文件读取到物理内存中，如图1中过程3所示。这个过程与内存映射无关。</p>
+
+<p>如果在拷贝数据时，发现物理内存不够用，则会通过虚拟内存机制（swap）将暂时不用的物理页面交换到硬盘上，如图1中过程4所示。这个过程也与内存映射无关。</p>
+
+<p>所以当mongodb读取数据库文件的时候，首先做内存映射，读取文件变成了读取内存操作，所以mongodb的查询效率相当高，当然，如果你的内存不够大，经常发生缺页中断，那么效率会大打折扣了</p></div>
+    </article>
+  </section>
   
   
   <section id="blog20130921icap">
@@ -394,94 +445,6 @@ connecting to: test   </code></pre>
     </article>
   </section>
   
-  
-  <section id="linux20130623hostapd">
-    <article>
-      <header>
-      <h1><a href="/linux/2013/06/23/hostapd">利用Hostapd搭建无线wifi</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2013-06-23</span></div>
-    </header>
-    <div class="content"><p>网上这类文章一大堆，但都有一些问题，应该是环境不一样，所以在搭建之前，先说下我的环境：</p>
-
-<ol>
-<li>
-<p>Linux系统：<code>ubuntu 10.04</code></p>
-</li>
-
-<li>
-<p>无线网卡：<code>TP-LINK WN822N</code>（需要网卡支持Master模式，其他网卡请自行搜索）</p>
-</li>
-</ol>
-
-<p>ok, 下面介绍如何搭建：</p>
-
-<p><strong>step1：</strong>安装网卡驱动，网卡都不识别的话就gg了，请参见我的博文<a href='http://tinyfisher.github.io/linux/2013/03/05/tplink/'>《TL-WN822N TL-WN722N linux安装驱动》</a>，识别之后</p>
-
-<pre><code>ifconfig wlan1 10.0.0.1  </code></pre>
-
-<p>为网卡设置ip地址。</p>
-
-<p><strong>step2：</strong>下载<a href='http://hostap.epitest.fi/releases/hostapd-1.1.tar.gz'>hostapd</a>，在解压安装之前，先安装libnl和libssl，否则hostapd无法编译通过，命令如下：</p>
-
-<pre><code>sudo apt-get install libnl-dev
-sudo apt-get install libssl-dev  </code></pre>
-
-<p><strong>step3：</strong>安装hostapd，解压压缩包，终端进入到hostapd文件夹，<code>configure</code>，<code>make</code>，<code>make install</code> 常见的三个步骤</p>
-
-<p><strong>step4：</strong>修改配置文件，在hostapd文件夹里的etc目录下，找到<code>hostapd.conf</code>文件，编辑如下</p>
-
-<pre><code>interface=wlan1 // 根据你的无线网卡名修改
-driver=nl80211  //重要
-ssid=tinyfisher  //这是AP名称
-channel=6
-hw_mode=g
-ignore_broadcast_ssid=0
-auth_algs=1
-wpa=3
-wpa_passphrase=xxxxxxxx   //这是你的密码
-wpa_key_mgmt=WPA-PSK
-wpa_pairwise=TKIP
-rsn_pairwise=CCMP  </code></pre>
-
-<p>启动hostapd，命令：</p>
-
-<pre><code>./hostapd -B hostapd.conf  </code></pre>
-
-<p>之后就可以搜索到 tinyfisher的wifi了。</p>
-
-<p>但是此时设备还不能通过wifi上网，还需要搭建dhcp服务器：</p>
-
-<pre><code>sudo apt-get install dnsmasq  </code></pre>
-
-<p>修改<code>/etc/dnsmasq.conf</code></p>
-
-<pre><code>interface=wlan1 #根据你的网卡名称修改
-dhcp-range=10.0.0.10,10.0.0.110,6h     #设置dhcp地址范围，即租借时间6小时
-dhcp-option=3,10.0.0.1 #配置网关
-dhcp-option=6,202.114.128.2  #配置dns，请自己修改为外网的dns地址  </code></pre>
-
-<p>重启</p>
-
-<pre><code>dnsmasq：/etc/init.d/dnsmasq restart  </code></pre>
-
-<p>ok，此时连接到wifi上的设备都能被随机分配到从<code>10.0.0.10~10.0.0.110</code> 的地址</p>
-
-<p>现在就能上网了吗？不行，我们还需要一个外网出口，并且将内网的流量通过这个外网接口连出去，其实就是做一个<code>SNAT</code>，所以我们还需要设置<code>iptables</code>，命令如下：</p>
-
-<pre><code>iptables -F
-iptables -X
-iptables -t nat -F
-iptables -t nat -X
-iptables -t nat -A POSTROUTING -s 10.0.0.0/8 -o eth0 -j MASQUERADE    //其中eth0就是外网接口，请根据你的实际情况修改  </code></pre>
-
-<p>最后一步，开启网卡转发功能：</p>
-
-<pre><code>echo 1 &gt;/proc/sys/net/ipv4/ip_forward  </code></pre>
-
-<p>搞定收工！</p></div>
-    </article>
-  </section>
-  
   <div class="pagination">
       <ul>
         <li><a href="/archive.html">归档</a></li>
@@ -495,6 +458,9 @@ iptables -t nat -A POSTROUTING -s 10.0.0.0/8 -o eth0 -j MASQUERADE    //其中et
     <section>
     <h4>最近发表</h4>
     <ul id="recent_posts">
+      <li class="post">
+        <a href="/linux/2013/09/22/mongodb-mmp">Mongodb 学习整理之内存映射机制</a>
+      </li>
       <li class="post">
         <a href="/blog/2013/09/21/icap">ICAP RFC3507 部分章节翻译</a>
       </li>
@@ -521,9 +487,6 @@ iptables -t nat -A POSTROUTING -s 10.0.0.0/8 -o eth0 -j MASQUERADE    //其中et
       </li>
       <li class="post">
         <a href="/linux/2013/03/05/tplink">TL-WN822N TL-WN722N linux安装驱动</a>
-      </li>
-      <li class="post">
-        <a href="/linux/2013/02/07/loadbalance">使用ip route命令实现多链路负载均衡</a>
       </li>
     </ul>
     </section>
@@ -558,7 +521,7 @@ iptables -t nat -A POSTROUTING -s 10.0.0.0/8 -o eth0 -j MASQUERADE    //其中et
     	</a></li>
      
     	<li><a href="/categories.html#linux-ref">
-    		linux <span>10</span>
+    		linux <span>11</span>
     	</a></li>
      
     	<li><a href="/categories.html#c-ref">

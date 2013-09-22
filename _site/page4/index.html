@@ -52,17 +52,44 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#c20121123makefile" title="makefile 编写问题记录">makefile 编写问题记录...</a></li>
     <li><a href="#algorithm20121102bag" title="DP实例之01背包问题C语言实现">DP实例之01背包问题C语言实现</a></li>
     <li><a href="#c20121007callback" title="关于回调函数">关于回调函数</a></li>
     <li><a href="#linux20120923OS-memory" title="分段和分页内存管理">分段和分页内存管理</a></li>
     <li><a href="#vim20120901vim" title="vim的备份和还原">vim的备份和还原</a></li>
-    <li><a href="#btree20120826btree-back" title="根据二叉树的先序和中序遍历还原二叉树">根据二叉树的先序和中序遍历还原二叉树</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="c20121123makefile">
+    <article>
+      <header>
+      <h1><a href="/c/2012/11/23/makefile">makefile 编写问题记录</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-11-23</span></div>
+    </header>
+    <div class="content"><p>最近写了个小程序，用到了<code>pow()</code>函数，我们都知道需要添加头文件<code>&lt;math.h&gt;</code>，以及在<code>gcc</code>编译的侍侯加上<code>-lm</code>选项，但是这个<code>-lm</code>选项的位值也是有讲究的，我之前的makefile如下：</p>
+
+<pre><code>solution:solution.o
+     gcc  -lm solution.o  -o solution 
+solution.o:solution.c
+     gcc  -c  solution.c</code></pre>
+
+<p>报出错误：<code>undefined reference to pow</code></p>
+
+<p>原因是<code>-lm</code>的位置在<code>solution.o</code>之前，所以编译器链接的时侯先去链接<code>lm</code>库，之后无法解释<code>solution.o</code>里的<code>pow</code>函数</p>
+
+<p>所以正确的makefile如下：</p>
+
+<pre><code>solution:solution.o
+     gcc  solution.o  -o solution  -lm
+solution.o:solution.c
+     gcc  -c  solution.c</code></pre></div>
+    </article>
+  </section>
   
   
   <section id="algorithm20121102bag">
@@ -225,54 +252,6 @@
     </article>
   </section>
   
-  
-  <section id="btree20120826btree-back">
-    <article>
-      <header>
-      <h1><a href="/btree/2012/08/26/btree-back">根据二叉树的先序和中序遍历还原二叉树</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-08-26</span></div>
-    </header>
-    <div class="content"><pre><code>#include&lt;stdio.h&gt;
-#include&lt;stdlib.h&gt;
-typedef struct node
-{
-	int value;
-	struct node *left;
-	struct node *right;
-}Node,*pNode;
-
-/*
- *根据二叉树的先序遍历和中序遍历，还原二叉树
- *先序：1,2,4,7,3,5,6,8;中序：4,7,2,1,5,3,8,6
-*/
-
-pNode BuildTree(int pre[],int mid[],int len)
-{
-	if(len&lt;=0)
-	{
-		return NULL;
-	}
-	pNode root=(pNode)malloc(sizeof(Node));
-	root-&gt;value=pre[0];                    //先序的第一个节点一定是根节点
-	int left_len=0;
-	int right_len=0;
-	int root_value=pre[0];
-	int i=0;
-	while(mid[i]!=root_value)              //获取左子树长度
-	{
-		i++;
-		left_len++;
-	}
-	right_len=len-left_len-1;              //获取右子树长度
-	//printf(&quot;left_len is %d\n&quot;,left_len);
-	//printf(&quot;right_len is %d\n&quot;,right_len);
-	root-&gt;left=BuildTree(pre+1,mid,left_len);     //递归还原左子树
-	root-&gt;right=BuildTree(pre+1+left_len,mid+1+left_len,right_len);  //递归还原右子树
-	return root;
-}</code></pre></div>
-    </article>
-  </section>
-  
   <div class="pagination">
       <ul>
         <li class="next"><a href='/page3'>&larr; 上一页</a></li>
@@ -287,6 +266,9 @@ pNode BuildTree(int pre[],int mid[],int len)
     <section>
     <h4>最近发表</h4>
     <ul id="recent_posts">
+      <li class="post">
+        <a href="/linux/2013/09/22/mongodb-mmp">Mongodb 学习整理之内存映射机制</a>
+      </li>
       <li class="post">
         <a href="/blog/2013/09/21/icap">ICAP RFC3507 部分章节翻译</a>
       </li>
@@ -313,9 +295,6 @@ pNode BuildTree(int pre[],int mid[],int len)
       </li>
       <li class="post">
         <a href="/linux/2013/03/05/tplink">TL-WN822N TL-WN722N linux安装驱动</a>
-      </li>
-      <li class="post">
-        <a href="/linux/2013/02/07/loadbalance">使用ip route命令实现多链路负载均衡</a>
       </li>
     </ul>
     </section>
@@ -350,7 +329,7 @@ pNode BuildTree(int pre[],int mid[],int len)
     	</a></li>
      
     	<li><a href="/categories.html#linux-ref">
-    		linux <span>10</span>
+    		linux <span>11</span>
     	</a></li>
      
     	<li><a href="/categories.html#c-ref">

@@ -52,17 +52,54 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#linux20130207loadbalance" title="使用ip route命令实现多链路负载均衡">使用ip route命令实现多链路负载均衡...</a></li>
     <li><a href="#linux20130129ppp" title="pppd拨号与默认网关">pppd拨号与默认网关</a></li>
     <li><a href="#algorithm20130123LIS" title="DP实例之最长上升子序列LIS">DP实例之最长上升子序列LIS</a></li>
     <li><a href="#algorithm20121212LCS" title="DP实例之最长公共子序列LCS">DP实例之最长公共子序列LCS</a></li>
     <li><a href="#linux20121205iptables" title="iptables配置笔记">iptables配置笔记</a></li>
-    <li><a href="#c20121123makefile" title="makefile 编写问题记录">makefile 编写问题记录...</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="linux20130207loadbalance">
+    <article>
+      <header>
+      <h1><a href="/linux/2013/02/07/loadbalance">使用ip route命令实现多链路负载均衡</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-02-07</span></div>
+    </header>
+    <div class="content"><p>其实在linux下实现多链路负载均衡很简单，只需借助ip route命令即可。</p>
+
+<p>环境：<code>ubuntu 10.04</code> ，两个3G网卡，分别为<code>CDMA2000</code> 和 <code>WCDMA</code></p>
+
+<ol>
+<li>
+<p>分别将两个网卡拨号上网，方法不再具体描述，拨号成功后会多出两条链路<code>ppp0</code>和<code>ppp1</code>，注意拨号脚本里不要添加默认网关，（具体请参见<a href='http://tinyfisher.github.io/linux/2013/01/29/ppp/'>《pppd拨号与默认网关》</a>），而是手动添加两条默认路由。</p>
+</li>
+
+<li>
+<p>利用<code>iptables</code>进行<code>nat</code>转换，不再赘述。</p>
+</li>
+</ol>
+
+<p>3.此时路由表里会有两条默认路由，其实只有第一个起作用，所有的流量都会从这条链路出去，没有实现负载均衡的效果，只需使用如下命令：</p>
+
+<pre><code>ip route replace default equalize nexthop dev ppp0 weight 1 nexthop dev ppp1 weight 1   </code></pre>
+
+<p>其中weight表示权重，根据链路的实际情况设置相应数值。</p>
+
+<p>4.测试：内网机器进行网络活动，在网关利用命令</p>
+
+<pre><code>tc -s qdisc ls dev ppp0,tc -s qdisc ls dev ppp1  </code></pre>
+
+<p>分别查看两条链路的流量，发现基本流量是按照1:1的比率的。</p>
+
+<p><strong>问题</strong>：内网的机器通过多链路网关访问外网速度比单链路得到提升，但是网关本身访问外网的速度比单链路要慢得多，甚至不能访问网站，原因不详，猜想是http数据包从不同的链路进出，不能很好的拼凑给网关。总之现在这个项目不需要网关访问外网，留待以后再讨论。</p></div>
+    </article>
+  </section>
   
   
   <section id="linux20130129ppp">
@@ -361,33 +398,6 @@ void print_lcs(int **r,char *a,int i,int j)
     </article>
   </section>
   
-  
-  <section id="c20121123makefile">
-    <article>
-      <header>
-      <h1><a href="/c/2012/11/23/makefile">makefile 编写问题记录</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-11-23</span></div>
-    </header>
-    <div class="content"><p>最近写了个小程序，用到了<code>pow()</code>函数，我们都知道需要添加头文件<code>&lt;math.h&gt;</code>，以及在<code>gcc</code>编译的侍侯加上<code>-lm</code>选项，但是这个<code>-lm</code>选项的位值也是有讲究的，我之前的makefile如下：</p>
-
-<pre><code>solution:solution.o
-     gcc  -lm solution.o  -o solution 
-solution.o:solution.c
-     gcc  -c  solution.c</code></pre>
-
-<p>报出错误：<code>undefined reference to pow</code></p>
-
-<p>原因是<code>-lm</code>的位置在<code>solution.o</code>之前，所以编译器链接的时侯先去链接<code>lm</code>库，之后无法解释<code>solution.o</code>里的<code>pow</code>函数</p>
-
-<p>所以正确的makefile如下：</p>
-
-<pre><code>solution:solution.o
-     gcc  solution.o  -o solution  -lm
-solution.o:solution.c
-     gcc  -c  solution.c</code></pre></div>
-    </article>
-  </section>
-  
   <div class="pagination">
       <ul>
         <li class="next"><a href='/page2'>&larr; 上一页</a></li>
@@ -402,6 +412,9 @@ solution.o:solution.c
     <section>
     <h4>最近发表</h4>
     <ul id="recent_posts">
+      <li class="post">
+        <a href="/linux/2013/09/22/mongodb-mmp">Mongodb 学习整理之内存映射机制</a>
+      </li>
       <li class="post">
         <a href="/blog/2013/09/21/icap">ICAP RFC3507 部分章节翻译</a>
       </li>
@@ -428,9 +441,6 @@ solution.o:solution.c
       </li>
       <li class="post">
         <a href="/linux/2013/03/05/tplink">TL-WN822N TL-WN722N linux安装驱动</a>
-      </li>
-      <li class="post">
-        <a href="/linux/2013/02/07/loadbalance">使用ip route命令实现多链路负载均衡</a>
       </li>
     </ul>
     </section>
@@ -465,7 +475,7 @@ solution.o:solution.c
     	</a></li>
      
     	<li><a href="/categories.html#linux-ref">
-    		linux <span>10</span>
+    		linux <span>11</span>
     	</a></li>
      
     	<li><a href="/categories.html#c-ref">

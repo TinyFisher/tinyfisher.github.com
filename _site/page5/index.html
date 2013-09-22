@@ -52,17 +52,65 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#btree20120826btree-back" title="根据二叉树的先序和中序遍历还原二叉树">根据二叉树的先序和中序遍历还原二叉树</a></li>
     <li><a href="#btree20120821btree-getinfo" title="获取二叉树叶子数、高度及左右子树交换">获取二叉树叶子数、高度及左右子树交换</a></li>
     <li><a href="#btree20120803btree-create-traversal" title="二叉树创建和遍历">二叉树创建和遍历</a></li>
     <li><a href="#link20120801doublelink" title="双链表操作大全">双链表操作大全</a></li>
     <li><a href="#link20120722link" title="单链表操作大全">单链表操作大全</a></li>
-    <li><a href="#algorithm20120622bin-search" title="二分查找C语言实现">二分查找C语言实现</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="btree20120826btree-back">
+    <article>
+      <header>
+      <h1><a href="/btree/2012/08/26/btree-back">根据二叉树的先序和中序遍历还原二叉树</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-08-26</span></div>
+    </header>
+    <div class="content"><pre><code>#include&lt;stdio.h&gt;
+#include&lt;stdlib.h&gt;
+typedef struct node
+{
+	int value;
+	struct node *left;
+	struct node *right;
+}Node,*pNode;
+
+/*
+ *根据二叉树的先序遍历和中序遍历，还原二叉树
+ *先序：1,2,4,7,3,5,6,8;中序：4,7,2,1,5,3,8,6
+*/
+
+pNode BuildTree(int pre[],int mid[],int len)
+{
+	if(len&lt;=0)
+	{
+		return NULL;
+	}
+	pNode root=(pNode)malloc(sizeof(Node));
+	root-&gt;value=pre[0];                    //先序的第一个节点一定是根节点
+	int left_len=0;
+	int right_len=0;
+	int root_value=pre[0];
+	int i=0;
+	while(mid[i]!=root_value)              //获取左子树长度
+	{
+		i++;
+		left_len++;
+	}
+	right_len=len-left_len-1;              //获取右子树长度
+	//printf(&quot;left_len is %d\n&quot;,left_len);
+	//printf(&quot;right_len is %d\n&quot;,right_len);
+	root-&gt;left=BuildTree(pre+1,mid,left_len);     //递归还原左子树
+	root-&gt;right=BuildTree(pre+1+left_len,mid+1+left_len,right_len);  //递归还原右子树
+	return root;
+}</code></pre></div>
+    </article>
+  </section>
   
   
   <section id="btree20120821btree-getinfo">
@@ -595,55 +643,6 @@ return head;
     </article>
   </section>
   
-  
-  <section id="algorithm20120622bin-search">
-    <article>
-      <header>
-      <h1><a href="/algorithm/2012/06/22/bin-search">二分查找C语言实现</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-06-22</span></div>
-    </header>
-    <div class="content"><p>据说90%的程序员都无法正确的写出二分搜索，试了下果然如此，需要注意的地方挺多（边界条件），所以讲递归与非递归的写法记录下来，以便于复习</p>
-
-<pre><code>int binary_search(int array[],int n,int key)  //非递归
-{
-    int low=0;
-    int high=n-1;
-    while(low&lt;=high)    //请注意=
-    {
-        if(array[low+(high-low)/2]==key)
-        {
-            return low+(high-low)/2;   //请注意 low+
-        }
-        else if(array[low+(high-low)/2]&gt;key)
-        {
-            high=low+(high-low)/2 -1;    //请注意-1
-        }
-        else
-        {
-            low=low+(high-low)/2 +1 ;  //请注意+1
-        }
-    }
-    return -1;
-}
-int binary_search(int array[],int low,int high,int key)  //递归 ,需要参数 low high
-{
-    if(low&lt;=high)
-    {
-        if(key==array[low+(high-low)/2])
-            return (low+(high-low)/2);
-        else if(key&gt;array[low+(high-low)/2])
-            return binary_search(array,low+(high-low)/2+1,high,key);
-        else
-            return binary_search(array,low,low+(high-low)/2-1,key);
-    }
-    else
-    {
-        return -1;
-    }
-}</code></pre></div>
-    </article>
-  </section>
-  
   <div class="pagination">
       <ul>
         <li class="next"><a href='/page4'>&larr; 上一页</a></li>
@@ -658,6 +657,9 @@ int binary_search(int array[],int low,int high,int key)  //递归 ,需要参数 
     <section>
     <h4>最近发表</h4>
     <ul id="recent_posts">
+      <li class="post">
+        <a href="/linux/2013/09/22/mongodb-mmp">Mongodb 学习整理之内存映射机制</a>
+      </li>
       <li class="post">
         <a href="/blog/2013/09/21/icap">ICAP RFC3507 部分章节翻译</a>
       </li>
@@ -684,9 +686,6 @@ int binary_search(int array[],int low,int high,int key)  //递归 ,需要参数 
       </li>
       <li class="post">
         <a href="/linux/2013/03/05/tplink">TL-WN822N TL-WN722N linux安装驱动</a>
-      </li>
-      <li class="post">
-        <a href="/linux/2013/02/07/loadbalance">使用ip route命令实现多链路负载均衡</a>
       </li>
     </ul>
     </section>
@@ -721,7 +720,7 @@ int binary_search(int array[],int low,int high,int key)  //递归 ,需要参数 
     	</a></li>
      
     	<li><a href="/categories.html#linux-ref">
-    		linux <span>10</span>
+    		linux <span>11</span>
     	</a></li>
      
     	<li><a href="/categories.html#c-ref">

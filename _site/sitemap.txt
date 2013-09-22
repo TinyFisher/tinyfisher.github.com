@@ -14,7 +14,9 @@ http://tinyfisher.github.com/page3/index.html
 http://tinyfisher.github.com/page4/index.html
 http://tinyfisher.github.com/page5/index.html
 http://tinyfisher.github.com/page6/index.html
+http://tinyfisher.github.com/page7/index.html
 
+http://tinyfisher.github.com/linux/2013/09/22/mongodb-mmp
 http://tinyfisher.github.com/blog/2013/09/21/icap
 http://tinyfisher.github.com/blog/2013/09/20/alibaba
 http://tinyfisher.github.com/linux/2013/07/15/mongodb-install
