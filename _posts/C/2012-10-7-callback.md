@@ -2,8 +2,8 @@
 layout: post
 title: 关于回调函数
 category: C
-tags: [C，C++，callback]
-keywords: C，C++，callback
+tags: [C,C++,callback]
+keywords: C,C++,callback
 description: 关于回调函数
 ---
 ###关于回调函数，搜集了一些网上的说法：

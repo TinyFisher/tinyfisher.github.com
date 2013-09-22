@@ -2,8 +2,8 @@
 layout: post
 title: 2013微软暑期实习笔试错题、疑题整理
 category: blog
-tags: [Linux，C，C++，Math，CS]
-keywords: Linux，C，C++，Math，CS 
+tags: [Linux,C,C++,Math,CS]
+keywords: Linux,C,C++,Math,CS 
 description: 2013微软暑期实习笔试错题、疑题整理
 ---
 

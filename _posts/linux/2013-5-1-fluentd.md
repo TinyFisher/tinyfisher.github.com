@@ -2,8 +2,8 @@
 layout: post
 title: fluentd插件开发
 category: linux
-tags: [Linux，fluentd，ruby]
-keywords: Linux，fluentd，ruby
+tags: [Linux,fluentd,ruby]
+keywords: Linux,fluentd,ruby
 description: fluentd插件开发
 ---
 

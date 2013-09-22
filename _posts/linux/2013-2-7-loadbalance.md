@@ -2,8 +2,8 @@
 layout: post
 title: 使用ip route命令实现多链路负载均衡
 category: linux
-tags: [Linux，负载均衡，iproute]
-keywords: Linux，负载均衡，iproute
+tags: [Linux,负载均衡,iproute]
+keywords: Linux,负载均衡,iproute
 description: 使用ip route命令实现多链路负载均衡
 ---
 其实在linux下实现多链路负载均衡很简单，只需借助ip route命令即可。  
