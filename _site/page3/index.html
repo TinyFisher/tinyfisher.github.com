@@ -52,17 +52,40 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#linux20130305tplink" title="TL-WN822N TL-WN722N linux安装驱动">TL-WN822N TL-WN722N...</a></li>
     <li><a href="#linux20130207loadbalance" title="使用ip route命令实现多链路负载均衡">使用ip route命令实现多链路负载均衡...</a></li>
     <li><a href="#linux20130129ppp" title="pppd拨号与默认网关">pppd拨号与默认网关</a></li>
     <li><a href="#algorithm20130123LIS" title="DP实例之最长上升子序列LIS">DP实例之最长上升子序列LIS</a></li>
     <li><a href="#algorithm20121212LCS" title="DP实例之最长公共子序列LCS">DP实例之最长公共子序列LCS</a></li>
-    <li><a href="#linux20121205iptables" title="iptables配置笔记">iptables配置笔记</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="linux20130305tplink">
+    <article>
+      <header>
+      <h1><a href="/linux/2013/03/05/tplink">TL-WN822N TL-WN722N linux安装驱动</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-03-05</span></div>
+    </header>
+    <div class="content"><p>这两款的芯片都是AR系列的芯片，所以只要安装这款芯片的驱动：</p>
+
+<p><code>ath9k_htc</code>即可,只需要两步</p>
+
+<p>(1)安装<a href='https://www.kernel.org/pub/linux/kernel/projects/backports/stable/v3.7.9/'>compat-drivers-3.7.9-1.tar.gz</a>,这类似于万能驱动，里面包含了很多芯片的驱动，很好用，编译时间有点长，耐心等待</p>
+
+<p>下载完成之后，将压缩包解压，从命令行终端进入到解压的文件夹中，输入命令<code>sudo make</code>，等待时间较长，再输入命令 <code>make install</code>,等待时间也较长，便完成了安装</p>
+
+<p>(2)安装<a href='http://nl.archive.ubuntu.com/ubuntu/pool/main/l/linux-firmware/linux-firmware_1.60_all.deb'>linux-firmware</a></p>
+
+<p>下载完成之后，直接双击文件包，即可自动安装</p>
+
+<p>重新启动 ，插上usb无线网卡，命令行输入<code>ifconfig -a</code> ，如果出现<code>wlan0</code>，<code>wlan1</code> 等信息，则驱动成功</p></div>
+    </article>
+  </section>
   
   
   <section id="linux20130207loadbalance">
@@ -265,136 +288,7 @@ void print_lcs(int **r,char *a,int i,int j)
         print_lcs(r,a,i-1,j);
 }</code></pre>
 
-<p><img alt='alt text' src='../../assets/themes/images/20130613111911031.png' /></p></div>
-    </article>
-  </section>
-  
-  
-  <section id="linux20121205iptables">
-    <article>
-      <header>
-      <h1><a href="/linux/2012/12/05/iptables">iptables配置笔记</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-12-05</span></div>
-    </header>
-    <div class="content"><pre><code>1.配置准备
-＃iptables -F //清除原有规则
-＃iptables -X //清除自定义链
- 
-2.定义策略
-＃iptables -P INPUT DROP //默认丢弃，即丢弃所有的包
-＃iptables -P OUTPUT DROP
-＃iptables -P FORWARD DROP
- 
-3.典型的规则配置实例
-# iptables -A INPUT|OUTPUT|FORWARD -s 源IP -d 目的IP -p tcp|udp|icmp --sport 源端口--dport 目的端口 -j ACCEPT|DROP
- 
-4.添加规则
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃开放HTTP
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃iptables -A INPUT -p tcp --sport 80 -j ACCEPT //针对本机,若本机不需要，可省略
-＃iptables -A OUTPUT -p tcp --dport 80 -j ACCEPT
-＃iptables -A FORWARD -p tcp --sport 80 -j ACCEPT //允许转发
-＃iptables -A FORWARD -p tcp --dport 80 -j ACCEPT //下面类似
- 
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃开放DNS
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃iptables -A INPUT -p udp --sport 53 -j ACCEPT
-＃iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
-＃iptables -A FORWARD -p udp --sport 53 -j ACCEPT
-＃iptables -A FORWARD -p udp --dport 53 -j ACCEPT
- 
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃开放SMTP和POP3
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃iptables -A INPUT -p tcp --sport 25 -j ACCEPT
-＃iptables -A OUTPUT -p tcp --dport 25 -j ACCEPT
-＃iptables -A INPUT -p tcp --sport 110 -j ACCEPT
-＃iptables -A OUTPUT -p tcp --dport 110 -j ACCEPT
-＃iptables -A FORWARD -p tcp --sport 25 -j ACCEPT
-＃iptables -A FORWARD -p tcp --dport 25 -j ACCEPT
-＃iptables -A FORWARD -p tcp --sport 110 -j ACCEPT
-＃iptables -A FORWARD -p tcp --dport 110 -j ACCEPT
- 
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃开放SSH
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃iptables -A INPUT -p tcp --sport 22 -j ACCEPT
-＃iptables -A OUTPUT -p tcp --dport 22 -j ACCEPT
-＃iptables -A FORWARD -p tcp --sport 22 -j ACCEPT
-＃iptables -A FORWARD -p tcp --dport 22 -j ACCEPT
- 
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃开放Telnet
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃iptables -A INPUT -p tcp --sport 23 -j ACCEPT
-＃iptables -A OUTPUT -p tcp --dport 23 -j ACCEPT
-＃iptables -A FORWARD -p tcp --sport 23 -j ACCEPT
-＃iptables -A FORWARD -p tcp --dport 23 -j ACCEPT
- 
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃开放FTP
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃iptables -A INPUT -p tcp --sport 21 -j ACCEPT
-＃iptables -A OUTPUT -p tcp --dport 21 -j ACCEPT
-＃iptables -A FORWARD -p tcp --sport 21 -j ACCEPT
-＃iptables -A FORWARD -p tcp --dport 21 -j ACCEPT
-＃iptables -A INPUT -p tcp --sport 20 -j ACCEPT
-＃iptables -A OUTPUT -p tcp --dport 20 -j ACCEPT
-＃iptables -A FORWARD -p tcp --sport 20 -j ACCEPT
-＃iptables -A FORWARD -p tcp --dport 20 -j ACCEPT
- 
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃开放SSL
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃iptables -A INPUT -p tcp --sport 443 -j ACCEPT
-＃iptables -A OUTPUT -p tcp --dport 443 -j ACCEPT
-＃iptables -A FORWARD -p tcp --sport 443 -j ACCEPT
-＃iptables -A FORWARD -p tcp --dport 443 -j ACCEPT
- 
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃开放ICMP
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃iptables -A INPUT -p icmp -j ACCEPT
-＃iptables -A OUTPUT -p icmp -j ACCEPT
-＃iptables -A FORWARD -p icmp -j ACCEPT
-＃iptables -A FORWARD -p icmp -j ACCEPT
- 
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃开放TCP
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃iptables -A INPUT -p tcp -j ACCEPT
-＃iptables -A OUTPUT -p tcp -j ACCEPT
-＃iptables -A FORWARD -p tcp -j ACCEPT
-＃iptables -A FORWARD -p tcp -j ACCEPT
- 
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃开放udp
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃iptables -A INPUT -p udp -j ACCEPT
-＃iptables -A OUTPUT -p udp -j ACCEPT
-＃iptables -A FORWARD -p udp -j ACCEPT
-＃iptables -A FORWARD -p udp -j ACCEPT
- 
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃实现NAT
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth0 -j SNAT --to-source 1.2.3.4
-＃iptables -t nat -A PREROUTING -d 192.168.1.0/24 -i eth1 -j DNAT --to-destination 1.2.3.4
- 
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃规则的保存和重载
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃iptables-save -c &gt; /etc/iptables-save
-＃iptables-restore -c &lt; /etc/iptables-save
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃根据数据出入网卡匹配，假设eth0连接内网，eth1连接外网
-＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
-＃iptables –A INPUT –i eth0 –j ACCEPT  //从eth0流入的数据都接收
-＃iptables – A FORWARD – o eth1 –j ACCEPT //从eth1流出的数据都转发</code></pre>
-
-<p>以上是一些基本配置，可以开放更多的服务，还可以进行更详尽的匹配，如源目地址，出入网卡等，以后可以根据要求进一步设置。</p></div>
+<p><img alt='alt text' src='/assets/themes/images/20130613111911031.png' /></p></div>
     </article>
   </section>
   
@@ -412,6 +306,9 @@ void print_lcs(int **r,char *a,int i,int j)
     <section>
     <h4>最近发表</h4>
     <ul id="recent_posts">
+      <li class="post">
+        <a href="/blog/2013/09/22/ibm">IBM Linux组电面总结</a>
+      </li>
       <li class="post">
         <a href="/linux/2013/09/21/mongodb-mmp">Mongodb学习整理之内存映射机制</a>
       </li>
@@ -439,9 +336,6 @@ void print_lcs(int **r,char *a,int i,int j)
       <li class="post">
         <a href="/linux/2013/04/23/mongodb">Mongodb的备份与恢复</a>
       </li>
-      <li class="post">
-        <a href="/linux/2013/03/05/tplink">TL-WN822N TL-WN722N linux安装驱动</a>
-      </li>
     </ul>
     </section>
     
@@ -455,7 +349,7 @@ void print_lcs(int **r,char *a,int i,int j)
   
      
     	<li><a href="/categories.html#blog-ref">
-    		blog <span>4</span>
+    		blog <span>5</span>
     	</a></li>
      
     	<li><a href="/categories.html#algorithm-ref">

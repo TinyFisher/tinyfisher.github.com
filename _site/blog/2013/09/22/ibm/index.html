@@ -1,0 +1,228 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>IBM Linux组电面总结 - tinyfisher blog</title>
+    <meta name="keywords" content="面试" />
+    <meta name="description" content="IBM Linux组电面总结" />
+    <meta name="author" content="tinyfisher">
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!-- <link href="http://lib.sinaapp.com/js/bootstrap/latest/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all"> -->
+    <link href="http://lib.sinaapp.com/js/bootstrap/2.0.3/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/google-code-prettify/prettify.css" rel="stylesheet" type="text/css" media="all">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <!-- <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/latest/js/bootstrap.min.js"></script> -->
+    <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/2.0.3/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/google-code-prettify/prettify.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/js/application.js"></script>
+  </head>
+
+  <body data-spy="scroll" data-target=".subnav" data-offset="100">
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="/">tinyfisher blog</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+
+
+              <li><a href="/archive.html">归档</a></li>
+              <li><a href="/categories.html">目录</a></li>
+              <li><a href="/pages.html">页面</a></li>
+              <li><a href="/tags.html">标签</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="content">
+        
+
+<div class="page-header">
+  <h1>IBM Linux组电面总结 </h1>
+</div>
+
+
+<div class="row">
+  <div class="span8">
+    <p>下午四点多的突然接到IBM Linux电面，找了个安静的地方开始面试，对面GG比较友好，首先自我介绍，然后说了说项目，面试官还是很互动的，氛围比较轻松，还介绍了Linux组主要是做社区这一块，内核神马的。之后开始技术问题狂轰滥炸：</p>
+
+<h4 id='1'><strong>1.大小端问题</strong></h4>
+
+<p>这个才看过，总结下：小端是指低地址在低字节，正常比较容易理解的就是小端；大端是指高位在低字节，低位在高字节（比较绕）。。。<br />举个例子：0x1234，如果是小端，假设左边是内存高位，右边是内存低位，则小端存储如下：0x12,0x34；反之大端则是：0x34，0x12</p>
+
+<h4 id='2fork'><strong>2.fork特点</strong></h4>
+
+<p>这个回答的还不错，fork会有两个返回值，返回值为0的为子进程，返回值不为0的为父进程，其数值含义是子进程的pid</p>
+
+<h4 id='3'><strong>3.僵尸进程</strong></h4>
+
+<p>这个答错了，面试官问“是这样吗”之后，我就知道答错了，记混淆了。<br /><strong>我的错误回答：父进程比子进程先结束，子进程由init进程管理，子进程成为僵尸进程</strong><br />错误原因：我混淆了孤儿进程和僵尸进程的概念，我说的其实是孤儿进程。那么什么是僵尸进程呢？</p>
+
+<p><strong>关于僵尸进程</strong><br /><strong>1.僵尸进程是怎么产生的？</strong></p>
+
+<p>由于子进程的结束和父进程的运行是一个异步过程,即父进程永远无法预测子进程到底什么时候结束. 那么会不会因为父进程太忙来不及wait子进程,或者说不知道子进程什么时候结束,而丢失子进程结束时的状态信息呢? 不会。因为UNIX提供了一种机制可以保证只要父进程想知道子进程结束时的状态信息，就可以得到。这种机制就是: <strong>在每个进程退出的时候,内核释放该进程所有的资源,包括打开的文件,占用的内存等。 但是仍然为其保留一定的信息(包括进程号the process ID,退出状态the termination status of the process,运行时间the amount of CPU time taken by the process等)。直到父进程通过wait / waitpid来取时才释放</strong>. 但这样就导致了问题,如果进程不调用wait / waitpid的话, 那么保留的那段信息就不会释放,其进程号就会一直被占用,但是系统所能使用的进程号是有限的,如果大量的产生僵死进程,将因为没有可用的进程号而导致系统不能产生新的进程. 此即为僵尸进程的危害,应当避免。<br /><strong>总结一下：一个子进程在其父进程还没有调用wait()或waitpid()的情况下退出。这个子进程就变成僵尸进程。</strong></p>
+
+<p><strong>2.僵尸进程的处理</strong><br />任何一个子进程(init除外)在exit()之后，并非马上就消失掉，而是留下一个称为<strong>僵尸进程(Zombie)的数据结构</strong>，等待父进程处理。这是每个子进程在结束时都要经过的阶段。如果子进程在exit()之后，父进程没有来得及处理，这时用ps命令就能看到子进程的状态是“Z”。如果父进程能及时 处理，可能用ps命令就来不及看到子进程的僵尸状态，但这并不等于子进程不经过僵尸状态。如果父进程在子进程结束之前退出，则子进程将由init接管。init将会以父进程的身份对僵尸状态的子进程进行处理。</p>
+
+<h4 id='4git'>4.git</h4>
+
+<p>面试关看我的博客是在github上写的，于是又问了我git的问题，git rebase是干什么用的？<br />我知道git add，commit，push，pull，checkout，reset，还真没用过rebase。。。</p>
+
+<p><strong>首先回顾一下git基本命令</strong><br />git init 初始化代码仓库<br />git add file 将工作目录里的file文件修改提交到本地暂存区<br />git commit -m “commit” 将暂存区里的文件提交，备注“commit”，同时生成快照，就是一个hash值<br />git checkout file 把file回滚到修改前的状态，注意这个针对还没有提交到本地暂存区的文件，即git add之前的文件 git reset HEAD file 把file从暂存区撤离，即git add 的反操作<br />git revert &lt;$id&gt; 返回到commit id为&lt;$id&gt;的状态，本次也是一个动作，需要commit<br />git reset &#8211;hard HEAD~1 彻底回到倒数第二个commit，倒数第一个的commit会消失，文件内容也回到上个版本 git reset &#8211;soft HEAD~1 将最后一个commit撤销，但文件内容没变，只需要重新commit即可 git diff 查看本地文件和暂存区文件差别 git log 查看commit记录<br />git status 查看git文件暂存区状态 git pull 抓取远程仓库所有分支更新并合并到本地<br />git push push所有分支到远程仓库 git push origin master 将本地主分支推到远程主分支<br />git branch 显示所有分支<br />git branch newbranch 创建分支<br />git checkout branchname 切换到分支</p>
+
+<p><strong>关于git rebase</strong><br />下面这篇<a href='http://gitbook.liuhui998.com/4_2.html'>blog</a>写的比较不错，之前没有多人开发git的经验，还是挺难理解的.</p>
+
+<h4 id='5kmallocvmalloc'><strong>5.kmalloc和vmalloc区别</strong></h4>
+
+<p>没用过，不知道，查了下：<br />kmalloc和vmalloc是分配的是内核的内存,malloc分配的是用户的内存</p>
+
+<p>kmalloc保证分配的内存在物理上是连续的,vmalloc保证的是在虚拟地址空间上的连续</p>
+
+<p>kmalloc能分配的大小有限,vmalloc和malloc能分配的大小相对较大</p>
+
+<p>内存只有在要被DMA访问的时候才需要物理上连续，即kmalloc</p>
+
+<p>kmalloc和 kfree管理内核段内分配的内存，这是真实地址已知的实际物理内存块。vmalloc和vfree是对内核使用的虚拟内存进行分配和释放</p>
+
+<h4 id='6malloc'><strong>6.malloc调用的系统调用</strong></h4>
+
+<p>不知道，查了下是brk，参见这篇<a href='http://edsionte.com/techblog/archives/4174'>blog</a></p>
+
+<h4 id='7fork'><strong>7.fork的优化</strong></h4>
+
+<p>这个依然不知道，fork实现的时候并不是完全复制父进程的数据段和堆栈，而是采用了<strong>写时复制（copy-on-write）COW</strong>技术。数据段和堆栈有父子进程共享，内核将他们的访问权限设为只读，父子进程中的任何一个试图修改这些区域，此时内核只为那些修改的区域的那块内存做一个副本，通常是一个page。</p>
+
+<h4 id='8cc'>8.C/C++遇到的坑</h4>
+
+<p>这个说了我之前遇到的链接错误，参见我的博文<a href='http://tinyfisher.github.io/c/2012/11/23/makefile/'>makefile 编写问题记录</a></p>
+
+<h4 id='9ibmip'>9.从IBM发ip包到北邮要查那些表，子网掩码干什么的？</h4>
+
+<p>这个知道，route表和arp表，子网掩码区分网络号和主机号，若网络号一致，表明在一个网段</p>
+
+<h4 id='10gdb'>10.gdb怎么调试段错误</h4>
+
+<p>没怎么用过，面试官说用backtrace</p>
+
+<h4 id='11cpython'>11.C和Python比较</h4>
+
+<p>水过，python方便，c执行效率高</p>
+
+<h4 id='12'>12.中断的上部和下部（没听过啊）</h4>
+
+<p>真不知道，听都没听过啊</p>
+
+<h5 id='linux'>总结：由于linux组做的都是驱动方面的，所以问的可能比较深，很多都没用过，没听过，估计悲剧，所以还是尽量深的去学习研究吧，不然怎么坑蒙拐骗面试官~</h5>
+    <hr>
+    <div class="pagination">
+      <ul>
+      
+        <li class="prev"><a href="/linux/2013/09/21/mongodb-mmp" title="Mongodb学习整理之内存映射机制">&larr; 上一篇</a></li>
+      
+        <li><a href="/archive.html">归档</a></li>
+      
+        <li class="next disabled"><a>下一篇 &rarr;</a>
+      
+      </ul>
+    </div>
+    <hr>
+    
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'tinyfisher'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+  </div>
+  
+  <div class="span4">
+    <h4>发布日期</h4>
+    <div class="date"><span>2013-09-22</span></div>
+
+  
+    <h4>标签</h4>
+    <ul class="tag_box">
+    
+    
+
+
+  
+     
+    	<li><a href="/tags.html#blog-ref">blog <span>4</span></a></li>
+     
+    	<li><a href="/tags.html#面试-ref">面试 <span>3</span></a></li>
+    
+  
+
+
+
+    </ul>
+    
+
+  <section>
+    <h4>最近发表</h4>
+    <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/09/22/ibm">IBM Linux组电面总结</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/09/21/mongodb-mmp">Mongodb学习整理之内存映射机制</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/21/icap">ICAP RFC3507 部分章节翻译</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/20/alibaba">阿里巴巴面试总结</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a>
+      </li>
+    
+    </ul>
+  </section>
+  </div>
+</div>
+
+
+      </div>
+
+      <footer>
+        <p>&copy; tinyfisher 2013 
+          基于 <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          和 <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a> 构建
+        </p>
+      </footer>
+
+    </div> <!-- /container -->
+    
+  </body>
+</html>
+

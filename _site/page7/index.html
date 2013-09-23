@@ -52,6 +52,7 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#algorithm20120502bubble-sort" title="冒泡排序C语言实现">冒泡排序C语言实现</a></li>
     <li><a href="#blog20120401blog" title="github 搭建博客">github 搭建博客...</a></li>
   </ul>
 </div>
@@ -59,6 +60,41 @@
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="algorithm20120502bubble-sort">
+    <article>
+      <header>
+      <h1><a href="/algorithm/2012/05/02/bubble-sort">冒泡排序C语言实现</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-05-02</span></div>
+    </header>
+    <div class="content"><p>最近打算将各种常用的算法（排序，查找等）复习一遍，都是用C语言实现，代码均在codeblocks下编译通过。<br />第一篇：冒泡排序</p>
+
+<pre><code>void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+
+void bubble_sort(int input[],int length)
+{
+    int i,j,flag=1;
+    for(i=0;i&lt;length&amp;&amp;flag;i++)
+    {
+        flag=0;             //若flag为0 表示这一趟没有交换，则已经排序完成，无需再扫描，即使扫描 也不会发生交换
+        for(j=length-1;j&gt;i;j--)
+        {
+            if(input[j]&lt;input[j-1])
+            {
+                 swap(&amp;input[j],&amp;input[j-1]);
+                 flag=1;
+            }
+        }
+    }
+}</code></pre></div>
+    </article>
+  </section>
   
   
   <section id="blog20120401blog">
@@ -138,6 +174,9 @@ export LANG=en_US.UTF-8
     <h4>最近发表</h4>
     <ul id="recent_posts">
       <li class="post">
+        <a href="/blog/2013/09/22/ibm">IBM Linux组电面总结</a>
+      </li>
+      <li class="post">
         <a href="/linux/2013/09/21/mongodb-mmp">Mongodb学习整理之内存映射机制</a>
       </li>
       <li class="post">
@@ -164,9 +203,6 @@ export LANG=en_US.UTF-8
       <li class="post">
         <a href="/linux/2013/04/23/mongodb">Mongodb的备份与恢复</a>
       </li>
-      <li class="post">
-        <a href="/linux/2013/03/05/tplink">TL-WN822N TL-WN722N linux安装驱动</a>
-      </li>
     </ul>
     </section>
     
@@ -180,7 +216,7 @@ export LANG=en_US.UTF-8
   
      
     	<li><a href="/categories.html#blog-ref">
-    		blog <span>4</span>
+    		blog <span>5</span>
     	</a></li>
      
     	<li><a href="/categories.html#algorithm-ref">
