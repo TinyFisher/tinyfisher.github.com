@@ -5,8 +5,8 @@
         <description>tinyfisher blog - tinyfisher</description>
         <link>http://tinyfisher.github.com</link>
         <link>http://tinyfisher.github.com</link>
-        <lastBuildDate>2013-09-23T22:35:33+08:00</lastBuildDate>
-        <pubDate>2013-09-23T22:35:33+08:00</pubDate>
+        <lastBuildDate>2013-09-24T09:25:43+08:00</lastBuildDate>
+        <pubDate>2013-09-24T09:25:43+08:00</pubDate>
         <ttl>1800</ttl>
 
 
@@ -1230,6 +1230,20 @@ solution.o:solution.c
                 <link>http://tinyfisher.github.com/c/2012/10/07/callback</link>
                 <guid>http://tinyfisher.github.com/c/2012/10/07/callback</guid>
                 <pubDate>2012-10-07T00:00:00+08:00</pubDate>
+        </item>
+
+        <item>
+                <title>创新工场一面总结</title>
+                <description>&lt;p&gt;跟hr约好了9点去面试，早上7点半起来，觉得不出意外能赶到，结果堵车了，急得要死，还好邮件里有hr的联系方式，提前打个电话说明了情况，对方表示没有关系，这下放心了。到了创新工场是大概9:10，迟到了10分钟左右，然后被hr mm带到一个叫手舞的玻璃房里，里面坐着面试官gg，谈吐穿着都非常儒雅，气氛不算很紧张。&lt;br /&gt;首先自我介绍，然后挑一个项目介绍，扯了扯，面试官开始直奔主题，写代码，早闻创新工场的面试就是这个样子，开始进入正题：&lt;br /&gt;&lt;strong&gt;1.快排，时间复杂度，怎么避免最坏情况的出现&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;砍瓜切菜，至于优化在《算法导论》中看到过，partition的时候不是固定取末尾一个数，而是随机取，甚至可以随机取3个数，取这3个数的中位数作为key。面试官比较满意。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;2.一个整型无序数组，要求从中取三个数，要求：这三个数值递增，三个数在原数组中的下标值也递增，说思路&lt;/strong&gt;&lt;br /&gt;这题时间不够，没想出来。我的思路是：&lt;br /&gt;1.既然无序，那我排序试试看，结果发现如果排序势必会打乱下标的顺序，跟没排序其实没区别&lt;br /&gt;2.那么既然下标已经有序了，我就把所有符合下标递增的三元组找出来，看他们的值是否递增，面试官说：这个肯定可以，有没有优化的办法？&lt;br /&gt;卡住了，实在想不出来了，时间也到了，后来我就问面试官，这题怎么做，他告诉了我答案：&lt;br /&gt;举个例子：2,1,4,3,5&lt;br /&gt;面试官说我们只需要找到总共有多少个三元组，而不需要把他们找出来，充分利用数组下标已递增的特点，固定一个数，比如说4，那么以4为中值的三元组只需要从左边找到比4小的和右边找到比4大的即可。 哎，充分感觉智商不够用。不知道还能不能进二面&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;总结：基础要牢，排序神马的基本是送分题，但也要深入研究下各个排序的特点，时间复杂度，最差情况，优化等等；至于算法题，还是搞题海战术吧，我这种智商的实在想不出来&lt;/strong&gt;&lt;/p&gt;</description>
+                <link>http://tinyfisher.github.com/blog/2012/09/23/factory</link>
+                <guid>http://tinyfisher.github.com/blog/2012/09/23/factory</guid>
+                <pubDate>2012-09-23T00:00:00+08:00</pubDate>
         </item>
 
         <item>
