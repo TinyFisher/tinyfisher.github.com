@@ -64,12 +64,16 @@ solution.o:solution.c
 
 <p>原因是<code>-lm</code>的位置在<code>solution.o</code>之前，所以编译器链接的时侯先去链接<code>lm</code>库，之后无法解释<code>solution.o</code>里的<code>pow</code>函数</p>
 
+<p>对于C/C++编译而言，读取编译选项是按照<strong>从左到右的</strong>顺序执行的。那么当编译器遇到源文件的时候，就开始对源文件中用到的函数进行解析，找到相对应的函数的函数体或者说是实现（Definition of Function）。这个过程是按照先遇到不能解析的函数（unresolved function），然后在源文件选项后面的一些选项中寻找可能的函数体的信息，是这样的一个顺序进行的。那么我们可以发现对于 Makefile，由于包含函数体或者函数定义信息的编译选项出现在源文件之前，那么当编译器在源文件中遇到不能解析的函数时，在源文件之后的选项中寻找相关的信息，那么就出现了编译错误，也就是无法找到相关的函数定义。</p>
+
 <p>所以正确的makefile如下：</p>
 
 <pre><code>solution:solution.o
      gcc  solution.o  -o solution  -lm
 solution.o:solution.c
      gcc  -c  solution.c</code></pre>
+
+<p><strong>总结：始终将-l库函数选项放在编译命令的最右边</strong></p>
     <hr>
     <div class="pagination">
       <ul>
@@ -137,7 +141,7 @@ solution.o:solution.c
     <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/09/24/factory">创新工场一面总结</a>
+        <a href="/blog/2013/09/24/factory">创新工场一面总结</a>
       </li>
     
       <li class="post">
@@ -153,7 +157,7 @@ solution.o:solution.c
       </li>
     
       <li class="post">
-        <a href="/blog/2013/09/20/alibaba">阿里巴巴面试总结</a>
+        <a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a>
       </li>
     
     </ul>

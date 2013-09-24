@@ -115,8 +115,8 @@
 
 
 	<url>
-		<loc>http://tinyfisher.github.com/blog/2014/09/24/factory</loc>
-		<lastmod>2014-09-24</lastmod>
+		<loc>http://tinyfisher.github.com/blog/2013/09/24/factory</loc>
+		<lastmod>2013-09-24</lastmod>
 		<changefreq>hourly</changefreq>
 		<priority>1.0</priority>
 	</url>
@@ -138,13 +138,6 @@
 	<url>
 		<loc>http://tinyfisher.github.com/blog/2013/09/21/icap</loc>
 		<lastmod>2013-09-21</lastmod>
-		<changefreq>hourly</changefreq>
-		<priority>1.0</priority>
-	</url>
-
-	<url>
-		<loc>http://tinyfisher.github.com/blog/2013/09/20/alibaba</loc>
-		<lastmod>2013-09-20</lastmod>
 		<changefreq>hourly</changefreq>
 		<priority>1.0</priority>
 	</url>

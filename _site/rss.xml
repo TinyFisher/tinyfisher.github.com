@@ -5,8 +5,8 @@
         <description>tinyfisher blog - tinyfisher</description>
         <link>http://tinyfisher.github.com</link>
         <link>http://tinyfisher.github.com</link>
-        <lastBuildDate>2013-09-24T09:59:06+08:00</lastBuildDate>
-        <pubDate>2013-09-24T09:59:06+08:00</pubDate>
+        <lastBuildDate>2013-09-24T21:01:11+08:00</lastBuildDate>
+        <pubDate>2013-09-24T21:01:11+08:00</pubDate>
         <ttl>1800</ttl>
 
 
@@ -18,10 +18,10 @@
 
 &lt;p&gt;&lt;strong&gt;2.一个整型无序数组，要求从中取三个数，要求：这三个数值递增，三个数在原数组中的下标值也递增，说思路&lt;/strong&gt;&lt;br /&gt;这题时间不够，没想出来。我的思路是：&lt;br /&gt;1.既然无序，那我排序试试看，结果发现如果排序势必会打乱下标的顺序，跟没排序其实没区别&lt;br /&gt;2.那么既然下标已经有序了，我就把所有符合下标递增的三元组找出来，看他们的值是否递增，面试官说：这个肯定可以，有没有优化的办法？&lt;br /&gt;卡住了，实在想不出来了，时间也到了，后来我就问面试官，这题怎么做，他告诉了我答案：&lt;br /&gt;举个例子：2,1,4,3,5&lt;br /&gt;面试官说我们只需要找到总共有多少个三元组，而不需要把他们找出来，充分利用数组下标已递增的特点，固定一个数，比如说4，那么以4为中值的三元组只需要从左边找到比4小的和右边找到比4大的即可。 哎，充分感觉智商不够用。不知道还能不能进二面&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;总结：基础要牢，排序神马的基本是送分题，但也要深入研究下各个排序的特点，时间复杂度，最差情况，优化等等；至于算法题，还是搞题海战术吧，我这种智商的实在想不出来&lt;/strong&gt;&lt;/p&gt;</description>
-                <link>http://tinyfisher.github.com/blog/2014/09/24/factory</link>
-                <guid>http://tinyfisher.github.com/blog/2014/09/24/factory</guid>
-                <pubDate>2014-09-24T00:00:00+08:00</pubDate>
+&lt;p&gt;&lt;strong&gt;总结：基础要牢，排序神马的基本是送分题，但也要深入研究下各个排序的特点，时间复杂度，最差情况，优化等等；至于算法题，还是搞题海战术吧，我这种智商的实在想不出来&lt;/strong&gt;&lt;br /&gt;今天收到二面通知，开心！&lt;/p&gt;</description>
+                <link>http://tinyfisher.github.com/blog/2013/09/24/factory</link>
+                <guid>http://tinyfisher.github.com/blog/2013/09/24/factory</guid>
+                <pubDate>2013-09-24T00:00:00+08:00</pubDate>
         </item>
 
         <item>
@@ -104,7 +104,7 @@
                 <title>Mongodb学习整理之内存映射机制</title>
                 <description>&lt;p&gt;sql数据库在数据量达到百万级的时候性能直线下降，在建立索引的表上做一个条件查询甚至达到分钟级别查询时间，这是无法忍受的，瓶颈在于大量的磁盘i/o操作，而这些i/o操作无疑使很耗费时间的。mongodb之所以对海量数据的查询如此高效，是因为他使用了内存映射机制，避免了大量的磁盘i/o，从而大大提高了查询效率，但相应的对内存要求也比较高。ok，下面我们来看看什么是内存映射机制&lt;/p&gt;
 
-&lt;h4 id='id27'&gt;官网的说法：&lt;/h4&gt;
+&lt;h4 id='id23'&gt;官网的说法：&lt;/h4&gt;
 
 &lt;p&gt;&lt;strong&gt;What are memory mapped files?&lt;/strong&gt;&lt;/p&gt;
 
@@ -130,7 +130,7 @@
 
 &lt;p&gt;This process, particularly on an active system can take a long time, particularly in comparison to reading a page that is already in memory.&lt;/p&gt;
 
-&lt;h4 id='id28'&gt;我的理解：&lt;/h4&gt;
+&lt;h4 id='id24'&gt;我的理解：&lt;/h4&gt;
 
 &lt;p&gt;首先，“映射”这个词，就和数学课上说的“一一映射”是一个意思，就是建立一种一一对应关系，在这里主要是只&lt;em&gt;硬盘上文件&lt;/em&gt;的位置与进程&lt;em&gt;逻辑地址空间&lt;/em&gt;中一块大小相同的区域之间的一一对应（按字节对应），如过程1所示。这种对应关系纯属是逻辑上的概念，物理上是不存在的，原因是进程的逻辑地址空间本身就是不存在的。在内存映射的过程中，&lt;strong&gt;并没有实际的数据拷贝，文件没有被载入内存，只是逻辑上被放入了内存&lt;/strong&gt;，这个过程由系统调用mmap()实现，所以建立内存映射的效率很高。&lt;/p&gt;
 
@@ -249,88 +249,6 @@ Referer:http://202.168.1.13/support.html\r\n
                 <link>http://tinyfisher.github.com/blog/2013/09/21/icap</link>
                 <guid>http://tinyfisher.github.com/blog/2013/09/21/icap</guid>
                 <pubDate>2013-09-21T00:00:00+08:00</pubDate>
-        </item>
-
-        <item>
-                <title>阿里巴巴面试总结</title>
-                <description>&lt;p&gt;15号接到阿里通知，18号上午去面试，研究生期间第一次面试，颇为激动，准备了一番，18号去了大望路那里。前台签到后，在大厅等了一会，面试官拿着我的简历叫我跟他走，到了一个会议室，里面人很多，面试官的花名叫易统，阿里每个人都有花名，武侠风浓烈，马云的花名叫风清扬。。。易统说欢迎来面试，让我自我介绍，期间点开了我的blog- -&lt;/p&gt;
-
-&lt;p&gt;后来主要是围绕简历上写得项目的技能，做了一些提问，主要是我在说，面试官如果感兴趣会深入问下去。时间在一个小时左右，易统十分友好，没有什么压力，问的问题待会详细记录。最后易统说今天的面试就到这里，让我回去了，我想完蛋了，因为之前得知如果面的好会直接二面的，看来是面挂了，而我自我感觉还不错，后来细想想，可能某些问题回答的不够深入，要反思了。问题总结如下：&lt;/p&gt;
-
-&lt;h4 id='tcpip'&gt;tcp/ip三次握手&lt;/h4&gt;
-
-&lt;p&gt;这个基本是滥问题了，答得还不错&lt;/p&gt;
-
-&lt;h4 id='tcp'&gt;tcp有哪些机制保证了他的可靠性&lt;/h4&gt;
-
-&lt;p&gt;这个答得不够好，这里总结下：&lt;/p&gt;
-
-&lt;h5 id='id23'&gt;可靠性包括以下几个方面：&lt;/h5&gt;
-
-&lt;p&gt;1.能够处理数据传输过程中被破坏问题。&lt;/p&gt;
-
-&lt;p&gt;2.能够处理重复数据接收问题。&lt;/p&gt;
-
-&lt;p&gt;3.能够发现数据丢失以及对此进行有效解决。&lt;/p&gt;
-
-&lt;p&gt;4.能够处理接收端数据乱序到达问题。&lt;/p&gt;
-
-&lt;h5 id='id24'&gt;怎么保证解决上述问题？&lt;/h5&gt;
-
-&lt;p&gt;TCP协议规范和当前绝大多数TCP 协议实现代码均采用数据重传和数据确认应答机制来完成TCP 协议的可靠性数据传输。数据超时重传和数据应答机制的基本前提是对每个传输的字节进行编号，即我们通常所说的序列号。数据超时重传是发送端在某个数据包发送出去，在一段固定时间后如果没有收到对该数据包的确认应答，则（假定该数据包在传输过程中丢失）重新发送该数据包。而数据确认应答是指接收端在成功接收到一个有效数据包后，发送一个确认应答数据包给发送端主机，该确认应答数据包中所包含的应答序列号即指已接收到的数据中最后一个字节的序列号加1，加1 的目的在于指出此时接收端期望接收的下一个数据包中第一个字节的序列号。&lt;strong&gt;数据超时重传、数据确认应答以及对每个传输的字节分配序列号是TCP 协议提供可靠性数据传输的核心本质。&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;1.解决数据传输中被破坏的问题&lt;/p&gt;
-
-&lt;p&gt;首先通过对所接收数据包的&lt;strong&gt;CRC校验&lt;/strong&gt;，确认该数据包中数据是否存在错误。如果有，则简单丢弃或者发送一个应答数据包重新对这些数据进行请求。发送端在等待一段时间后，则会重新发送这些数据。本质上，数据传输错误的解决是通过&lt;strong&gt;数据重传机制&lt;/strong&gt;完成的。&lt;/p&gt;
-
-&lt;p&gt;2.解决重复数据接收问题&lt;br /&gt;接到数据包之后，查看序列号，如果数据包已经接收过，则丢弃该数据包，返回确认信息，主要是通过&lt;strong&gt;序列号&lt;/strong&gt;解决这个问题&lt;/p&gt;
-
-&lt;p&gt;3.解决数据丢失问题&lt;br /&gt;主要依靠tcp的&lt;strong&gt;重传机制&lt;/strong&gt;来解决。TCP通过在发送数据报文时设置一个超时定时器来解决这种问题，如果在定时器溢出时还没有收到来自对端对发送报文的确认，它就重传该数据报文。&lt;/p&gt;
-
-&lt;p&gt;4.解决乱序问题&lt;br /&gt;如果通信双方存在多条传输路径， 则有可能出现数据乱序问题，即序列号较大的数据先于序列号较小的数据到达，而发送端确实是按序列号由小到大的顺序发送的。数据乱序的本质是数据都成功到达了，但到达的顺序不尽如人意。对于收到的乱序报文并不丢弃，而是缓存下来(这样做是为了减少更多的重传)，立即发送希望接受的报文确认。对这个问题的解决相对比较简单，只需对这些数据进行重新排序即可。本质上，对数据乱序问题的解决是通过&lt;strong&gt;排序数据序列号&lt;/strong&gt;完成的。&lt;/p&gt;
-
-&lt;h4 id='syn_flood_'&gt;syn flood 攻击&lt;/h4&gt;
-
-&lt;p&gt;由于是安全专业的，面试官又问了我这个问题，答得一般，总结如下：&lt;/p&gt;
-
-&lt;h5 id='synflood'&gt;什么是synflood？&lt;/h5&gt;
-
-&lt;p&gt;在TCP连接的三次握手中，假设一个用户向服务器发送了SYN报文后突然死机或掉线，那么服务器在发出SYN+ACK应答报文后是无法收到客户端的ACK报文的（第三次握手无法完成），这种情况下服务器端一般会重试（再次发送SYN+ACK给客户端）并等待一段时间后丢弃这个未完成的连接，这段时间的长度我们称为SYN Timeout，一般来说这个时间是分钟的数量级（大约为30秒-2分钟）；一个用户出现异常导致服务器的一个线程等待1分钟并不是什么很大的问题，但如果有一个恶意的攻击者大量模拟这种情况，&lt;strong&gt;服务器端将为了维护一个非常大的半连接列表而消耗非常多的资源&lt;/strong&gt;&amp;#8212;-数以万计的半连接，即使是简单的保存并遍历也会消耗非常多的CPU时间和内存，何况还要不断对这个列表中的IP进行SYN+ACK的重试。实际上如果服务器的TCP/IP栈不够强大，最后的结果往往是堆栈溢出崩溃&amp;#8212;即使服务器端的系统足够强大，服务器端也将忙于处理攻击者伪造的TCP连接请求而无暇理睬客户的正常请求（毕竟客户端的正常请求比率非常之小），此时从正常客户的角度看来，服务器失去响应，这种情况我们称作：服务器端受到了SYN Flood攻击（SYN洪水攻击）。&lt;/p&gt;
-
-&lt;h5 id='syn_flood'&gt;怎么检测Syn flood？&lt;/h5&gt;
-
-&lt;p&gt;1、服务端无法提供正常的TCP服务。连接请求被拒绝或超时；&lt;/p&gt;
-
-&lt;p&gt;2、通过 &lt;code&gt;netstat -an&lt;/code&gt; 命令检查系统，发现有大量的&lt;code&gt;SYN_RECV&lt;/code&gt;连接状态。&lt;/p&gt;
-
-&lt;h5 id='id25'&gt;如何防范？&lt;/h5&gt;
-
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;缩短SYN- Timeout时间&lt;/p&gt;
-&lt;/li&gt;
-
-&lt;li&gt;
-&lt;p&gt;设置每秒最多3个syn封包进入&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h4 id='linux_cpu'&gt;查看Linux CPU使用率命令&lt;/h4&gt;
-
-&lt;p&gt;&lt;code&gt;top&lt;/code&gt;&lt;/p&gt;
-
-&lt;h4 id='id26'&gt;查看进程信息&lt;/h4&gt;
-
-&lt;p&gt;&lt;code&gt;ps -aux&lt;/code&gt;&lt;/p&gt;
-
-&lt;h4 id='vim100200'&gt;vim从100到200行替换字符串&lt;/h4&gt;
-
-&lt;p&gt;&lt;code&gt;:100,200s/vivian/sky/g&lt;/code&gt;&lt;/p&gt;
-
-&lt;h4 id='fluentdmongodboffer23'&gt;总结：简历上写的尽量往深处了解，面试官可能追问具体的机制，例如我用到的几个工具，fluentd，mongodb，我只是简单的使用，不清楚里面的实现机制，往往不能令面试官满意。面试失败的还有一个原因是简历上写的一定是自己非常了解的，不是很懂的还是不要往上写了，或者写了赶紧去补功课，路漫漫其修远兮，找工作是一个虐心的过程，相信经过不断的积攒经验，一定能够拿到满意的offer，下一站：创新工场23号面试，加油！&lt;/h4&gt;</description>
-                <link>http://tinyfisher.github.com/blog/2013/09/20/alibaba</link>
-                <guid>http://tinyfisher.github.com/blog/2013/09/20/alibaba</guid>
-                <pubDate>2013-09-20T00:00:00+08:00</pubDate>
         </item>
 
         <item>
@@ -1170,12 +1088,16 @@ solution.o:solution.c
 
 &lt;p&gt;原因是&lt;code&gt;-lm&lt;/code&gt;的位置在&lt;code&gt;solution.o&lt;/code&gt;之前，所以编译器链接的时侯先去链接&lt;code&gt;lm&lt;/code&gt;库，之后无法解释&lt;code&gt;solution.o&lt;/code&gt;里的&lt;code&gt;pow&lt;/code&gt;函数&lt;/p&gt;
 
+&lt;p&gt;对于C/C++编译而言，读取编译选项是按照&lt;strong&gt;从左到右的&lt;/strong&gt;顺序执行的。那么当编译器遇到源文件的时候，就开始对源文件中用到的函数进行解析，找到相对应的函数的函数体或者说是实现（Definition of Function）。这个过程是按照先遇到不能解析的函数（unresolved function），然后在源文件选项后面的一些选项中寻找可能的函数体的信息，是这样的一个顺序进行的。那么我们可以发现对于 Makefile，由于包含函数体或者函数定义信息的编译选项出现在源文件之前，那么当编译器在源文件中遇到不能解析的函数时，在源文件之后的选项中寻找相关的信息，那么就出现了编译错误，也就是无法找到相关的函数定义。&lt;/p&gt;
+
 &lt;p&gt;所以正确的makefile如下：&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;solution:solution.o
      gcc  solution.o  -o solution  -lm
 solution.o:solution.c
-     gcc  -c  solution.c&lt;/code&gt;&lt;/pre&gt;</description>
+     gcc  -c  solution.c&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;总结：始终将-l库函数选项放在编译命令的最右边&lt;/strong&gt;&lt;/p&gt;</description>
                 <link>http://tinyfisher.github.com/c/2012/11/23/makefile</link>
                 <guid>http://tinyfisher.github.com/c/2012/11/23/makefile</guid>
                 <pubDate>2012-11-23T00:00:00+08:00</pubDate>

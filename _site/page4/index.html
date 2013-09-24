@@ -52,109 +52,17 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
-    <li><a href="#algorithm20121212LCS" title="DP实例之最长公共子序列LCS">DP实例之最长公共子序列LCS</a></li>
     <li><a href="#linux20121205iptables" title="iptables配置笔记">iptables配置笔记</a></li>
     <li><a href="#c20121123makefile" title="makefile 编写问题记录">makefile 编写问题记录...</a></li>
     <li><a href="#algorithm20121102bag" title="DP实例之01背包问题C语言实现">DP实例之01背包问题C语言实现</a></li>
     <li><a href="#c20121007callback" title="关于回调函数">关于回调函数</a></li>
+    <li><a href="#linux20120923OS-memory" title="分段和分页内存管理">分段和分页内存管理</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
-  
-  
-  <section id="algorithm20121212LCS">
-    <article>
-      <header>
-      <h1><a href="/algorithm/2012/12/12/LCS">DP实例之最长公共子序列LCS</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-12-12</span></div>
-    </header>
-    <div class="content"><pre><code>/*
-    LCS：求最长公共子序列
-    例如：s1=&quot;abdrge&quot;,s2=&quot;adreg&quot;,则LCS=&quot;adre&quot;
-    状态方程：lcs(i,j)=lcs(i-1,j-1)+1,其中s1[i]=s2[j]
-    或者 lcs(i,j)=max{lcs(i,j-1),lcs(i-1,j)}
-*/
-int LCS(char *a,char *b)
-{
-    int len_a=strlen(a);   //行
-    int len_b=strlen(b);   //列
-    int **len=NULL;
-    int **r=NULL;
-    int i=0;
-    int j=0;
-    int lcs_len=0;
-    len=(int **)malloc(sizeof(int *)*(len_a+1));       //申请二维数组空间
-    r=(int **)malloc(sizeof(int *)*(len_a+1));
-    if (len==NULL||r==NULL)
-        return -1;
-    for(;i&lt;=len_a;i++)
-    {
-        *(len+i)=(int *)malloc(sizeof(int)*(len_b+1));
-        *(r+i)=(int *)malloc(sizeof(int)*(len_b+1));
-        if (*(len+i)==NULL||*(r+i)==NULL)
-            return -1;
-    }
-
-    //LCS状态方程
-    for(i=0;i&lt;=len_a;i++)     //初始化
-    {
-        for(j=0;j&lt;=len_b;j++)
-        {
-            len[i][j]=0;
-            r[i][j]=0;
-        }
-    }
-    for(i=1;i&lt;=len_a;i++)
-    {
-        for(j=1;j&lt;=len_b;j++)
-        {
-            if(a[i-1]==b[j-1])
-            {
-                len[i][j]=len[i-1][j-1]+1;
-                r[i][j]=1;
-            }
-            else if(len[i][j-1]&gt;=len[i-1][j])  //左边的大于等于上边的
-            {
-                len[i][j]=len[i][j-1];
-                r[i][j]=2;
-            }
-            else
-            {
-                 len[i][j]=len[i-1][j];
-                 r[i][j]=3;
-            }
-        }
-    }
-
-    //打印公共子序列
-    print_lcs(r,a,len_a,len_b);
-    free(r);
-    lcs_len= len[len_a][len_b];
-    free(len);
-    return lcs_len;
-}
-
-void print_lcs(int **r,char *a,int i,int j)
-{
-    if(i==0||j==0)
-        return ;
-    else if(r[i][j]==1)
-    {
-        print_lcs(r,a,i-1,j-1);
-        printf(&quot;%c&quot;,*(a+i-1));
-    }
-    else if(r[i][j]==2)
-        print_lcs(r,a,i,j-1);
-    else
-        print_lcs(r,a,i-1,j);
-}</code></pre>
-
-<p><img alt='alt text' src='/assets/themes/images/20130613111911031.png' /></p></div>
-    </article>
-  </section>
   
   
   <section id="linux20121205iptables">
@@ -303,12 +211,16 @@ solution.o:solution.c
 
 <p>原因是<code>-lm</code>的位置在<code>solution.o</code>之前，所以编译器链接的时侯先去链接<code>lm</code>库，之后无法解释<code>solution.o</code>里的<code>pow</code>函数</p>
 
+<p>对于C/C++编译而言，读取编译选项是按照<strong>从左到右的</strong>顺序执行的。那么当编译器遇到源文件的时候，就开始对源文件中用到的函数进行解析，找到相对应的函数的函数体或者说是实现（Definition of Function）。这个过程是按照先遇到不能解析的函数（unresolved function），然后在源文件选项后面的一些选项中寻找可能的函数体的信息，是这样的一个顺序进行的。那么我们可以发现对于 Makefile，由于包含函数体或者函数定义信息的编译选项出现在源文件之前，那么当编译器在源文件中遇到不能解析的函数时，在源文件之后的选项中寻找相关的信息，那么就出现了编译错误，也就是无法找到相关的函数定义。</p>
+
 <p>所以正确的makefile如下：</p>
 
 <pre><code>solution:solution.o
      gcc  solution.o  -o solution  -lm
 solution.o:solution.c
-     gcc  -c  solution.c</code></pre></div>
+     gcc  -c  solution.c</code></pre>
+
+<p><strong>总结：始终将-l库函数选项放在编译命令的最右边</strong></p></div>
     </article>
   </section>
   
@@ -383,6 +295,73 @@ solution.o:solution.c
     </article>
   </section>
   
+  
+  <section id="linux20120923OS-memory">
+    <article>
+      <header>
+      <h1><a href="/linux/2012/09/23/OS-memory">分段和分页内存管理</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-09-23</span></div>
+    </header>
+    <div class="content"><h3 id='id5'><strong>两者描述</strong></h3>
+
+<p>打个比方，比如说你去听课，带了一个纸质笔记本做笔记。笔记本有100张纸，课程有语文、数学、英语三门，对于这个笔记本的使用，为了便于以后复习方便，你可以有两种选择。</p>
+
+<p>第一种是，你从本子的第一张纸开始用，并且事先在本子上做划分：第2张到第30张纸记语文笔记，第31到60张纸记数学笔记，第61到100张纸记英语笔记，最后在第一张纸做个列表，记录着三门笔记各自的范围。这就是分段管理，第一张纸叫段表。</p>
+
+<p>第二种是，你从第二张纸开始做笔记，各种课的笔记是连在一起的：第2张纸是数学，第3张是语文，第4张英语……最后呢，你在第一张纸做了一个目录，记录着语文笔记在第3、7、14、15张纸……，数学笔记在第2、6、8、9、11……，英语笔记在第4、5、12……。这就是分页管理，第一张纸叫页表。你要复习哪一门课，就到页表里查寻相关的纸的编号，然后翻到那一页去复习</p>
+
+<h3 id='id6'><strong>两者的优缺点：</strong></h3>
+
+<p>在段式存储管理中，将程序的地址空间划分为若干段（segment），如代码段，数据段，堆栈段；这样每个进程有一个二维地址空间，相互独立，互不干扰。<em>段式管理的优点是：没有内碎片（因为段大小可变，改变段大小来消除内碎片）。但段换入换出时，会产生外碎片（比如4k的段换5k的段，会产生1k的外碎片）</em></p>
+
+<p>在页式存储管理中，将程序的逻辑地址划分为固定大小的页（page），而物理内存划分为同样大小的页框，程序加载时，可以将任意一页放入内存中任意一个页框，这些页框不必连续，从而实现了离散分离。<em>页式存储管理的优点是：没有外碎片（因为页的大小固定），但会产生内碎片（一个页可能填充不满）</em></p>
+
+<h3 id='id7'><strong>两者的不同点：</strong></h3>
+
+<p>(1) 分页仅仅是由于系统管理的需要而不是用户的需要。段则是信息的逻辑单位，它含有一组其意义相对完整的信息。分段的目的是为了能更好地满足用户的需要。</p>
+
+<p>(2) 页的大小固定且由系统决定，由系统把逻辑地址划分为页号和页内地址两部分，是由机器硬件实现的，因而在系统中只能有一种大小的页面；而段的长度却不固定，决定于用户所编写的程序，通常由编译程序在对源程序进行编译时，根据信息的性质来划分。</p>
+
+<p>(3) 分页的作业地址空间是一维的，即单一的线性地址空间，程序员只需利用一个记忆符，即可表示一个地址；而分段的作业地址空间则是二维的，程序员在标识一个地址时，既需给出段名，又需给出段内地址。</p>
+
+<h3 id='id8'><strong>两者结合——段页式存储管理：</strong></h3>
+
+<p>1．基本思想：</p>
+
+<p>分页系统能有效地提高内存的利用率，而分段系统能反映程序的逻辑结构，便于段的共享与保护，将分页与分段两种存储方式结合起来，就形成了段页式存储管理方式。</p>
+
+<p>在段页式存储管理系统中，作业的地址空间首先被分成若干个逻辑分段，每段都有自己的段号，然后再将每段分成若干个大小相等的页。对于主存空间也分成大小相等的页，主存的分配以页为单位。</p>
+
+<p>段页式系统中，作业的地址结构包含三部分的内容：段号，页号，页内位移量</p>
+
+<p>程序员按照分段系统的地址结构将地址分为段号与段内位移量，地址变换机构将段内位移量分解为页号和页内位移量。</p>
+
+<p>为实现段页式存储管理，系统应为每个进程设置一个段表，包括每段的段号，该段的页表始址和页表长度。每个段有自己的页表，记录段中的每一页的页号和存放在主存中的物理块号。</p>
+
+<p>2．地址变换的过程：</p>
+
+<p>（1）程序执行时，从PCB中取出段表始址和段表长度，装入段表寄存器。</p>
+
+<p>（2）由地址变换机构将逻辑地址自动分成段号、页号和页内地址。</p>
+
+<p>（3）将段号与段表长度进行比较，若段号大于或等于段表长度，则表示本次访问的地址已超越进程的地址空间，产生越界中断。</p>
+
+<p>（4）将段表始址与段号和段表项长度的乘积相加，便得到该段表项在段表中的位置。</p>
+
+<p>（5）取出段描述子得到该段的页表始址和页表长度。</p>
+
+<p>（6）将页号与页表长度进行比较，若页号大于或等于页表长度，则表示本次访问的地址已超越进程的地址空间，产生越界中断。</p>
+
+<p>（7）将页表始址与页号和页表项长度的乘积相加，便得到该页表项在页表中的位置。</p>
+
+<p>（8）取出页描述子得到该页的物理块号。</p>
+
+<p>（9）对该页的存取控制进行检查。</p>
+
+<p>（10）将物理块号送入物理地址寄存器中，再将有效地址寄存器中的页内地址直接送入物理地址寄存器的块内地址字段中，拼接得到实际的物理地址。</p></div>
+    </article>
+  </section>
+  
   <div class="pagination">
       <ul>
         <li class="next"><a href='/page3'>&larr; 上一页</a></li>
@@ -398,7 +377,7 @@ solution.o:solution.c
     <h4>最近发表</h4>
     <ul id="recent_posts">
       <li class="post">
-        <a href="/blog/2014/09/24/factory">创新工场一面总结</a>
+        <a href="/blog/2013/09/24/factory">创新工场一面总结</a>
       </li>
       <li class="post">
         <a href="/blog/2013/09/22/ibm">IBM Linux组电面总结</a>
@@ -408,9 +387,6 @@ solution.o:solution.c
       </li>
       <li class="post">
         <a href="/blog/2013/09/21/icap">ICAP RFC3507 部分章节翻译</a>
-      </li>
-      <li class="post">
-        <a href="/blog/2013/09/20/alibaba">阿里巴巴面试总结</a>
       </li>
       <li class="post">
         <a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a>
@@ -427,6 +403,9 @@ solution.o:solution.c
       <li class="post">
         <a href="/linux/2013/05/01/fluentd">fluentd插件开发</a>
       </li>
+      <li class="post">
+        <a href="/linux/2013/04/23/mongodb">Mongodb的备份与恢复</a>
+      </li>
     </ul>
     </section>
     
@@ -440,7 +419,7 @@ solution.o:solution.c
   
      
     	<li><a href="/categories.html#blog-ref">
-    		blog <span>6</span>
+    		blog <span>5</span>
     	</a></li>
      
     	<li><a href="/categories.html#algorithm-ref">

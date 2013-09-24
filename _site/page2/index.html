@@ -52,115 +52,17 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
-    <li><a href="#linux20130715mongodb-install" title="Mongodb 学习整理之安装">Mongodb 学习整理之安装...</a></li>
     <li><a href="#linux20130709mongodb-introduce" title="Mongodb 学习整理之介绍">Mongodb 学习整理之介绍...</a></li>
     <li><a href="#linux20130623hostapd" title="利用Hostapd搭建无线wifi">利用Hostapd搭建无线wifi</a></li>
     <li><a href="#blog20130523microsoft_test" title="2013微软暑期实习笔试错题、疑题整理">2013微软暑期实习笔试错题、疑题整理</a></li>
     <li><a href="#linux20130501fluentd" title="fluentd插件开发">fluentd插件开发</a></li>
+    <li><a href="#linux20130423mongodb" title="Mongodb的备份与恢复">Mongodb的备份与恢复</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
-  
-  
-  <section id="linux20130715mongodb-install">
-    <article>
-      <header>
-      <h1><a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2013-07-15</span></div>
-    </header>
-    <div class="content"><h3 id='id19'>下载</h3>
-
-<p>下载MongoDB，此处下载的版本是：<a href='http://fastdl.mongodb.org/linux/mongodb-linux-i686-1.8.1.tgz'>mongodb-linux-i686-1.8.1.tgz.tar</a></p>
-
-<h3 id='id20'>安装</h3>
-
-<p><strong>step1：</strong>解压文件到某目录下,然后重命名：</p>
-
-<pre><code>[root@localhost src]# tar -xzvf mongodb-linux-i686-1.8.1.tgz.tar    
-[root@localhost src]# mv mongodb-linux-i686-1.8.1 /usr/local/mongodb/  </code></pre>
-
-<p><strong>step2：</strong>查看安装后的文件情况：</p>
-
-<pre><code>[root@localhost src]# cd /usr/local/mongodb/   
-[root@localhost mongodb]# ls   
-bin  GNU-AGPL-3.0  README  THIRD-PARTY-NOTICES   
-[root@localhost mongodb]# cd bin/   
-[root@localhost bin]# ls   
-bsondump  dbbak  mongo  mongod  mongodump  mongoexport  mongofiles  mongoimport  mongorestore mongos  mongosniff  mongostat    </code></pre>
-
-<p>bin下的mongod就是MongoDB的服务端进程，mongo就是其客户端，其它的命令用于MongoDB的其它用途如MongoDB文件导出等。</p>
-
-<p><strong>step3:</strong>启动MongoDB:</p>
-
-<p>要先建立好MongoDB 存放数据文件和日志文件的目录，需要手动建立：</p>
-
-<pre><code>mkdir /data/mongodb_data
-mkdir /data/mongodb_log
-touch /data/mongodb_log/mongodb.log
-[root@localhost etc]# cd /data/   
-[root@localhost data]# ls   
-mongodb_data  mongodb_log    </code></pre>
-
-<p>在MongoDB安装目录下的bin下使用mongod启动MongoDB</p>
-
-<pre><code>./mongod --dbpath=/data/mongodb_data/ --logpath=/data/mongodb_log/mongodb.log --logappend&amp;  </code></pre>
-
-<p>等待启动成功后，可查看是否启动成功了，默认端口号是27017，当然在启动时也可以指定未使用的其它端口。先通过查看端口号看MongoDB是否启动了。</p>
-
-<pre><code>[root@localhost data]# netstat -lanp | grep &quot;27017&quot;  
-tcp   0    0 0.0.0.0:27017      0.0.0.0:*     LISTEN      1573/mongod            
-unix  2  [ ACC ]    STREAM   LISTENING    5874  1573/mongod   /tmp/mongodb-27017.sock    </code></pre>
-
-<p>可以看到，已启动成功，现在使用mongo客户端访问一下该数据库。</p>
-
-<pre><code>[root@localhost bin]# cd /usr/local/mongodb/bin/   
-[root@localhost bin]# ./mongo   
-MongoDB shell version: 1.8.1  
-connecting to: test   </code></pre>
-
-<p>到这一步说明已经安装成功了。</p>
-
-<h3 id='id21'>额外工作</h3>
-
-<p>注意，上述我们启动MongoDB都是手动使用mongod来启动，这样关闭计算机后，下次再进来它又没启动了，所以还得手动启动，因此，为避免这种繁琐的工作，可以把mongod放到服务自启动项中，这样计算机一开启mongod服务也就启动了。编辑/etc/rc.local，加入下述代码然后再保存即可。 (也可以写一个脚本，然后开机自动运行)</p>
-
-<pre><code>#add mongonDB service   
-/usr/local/mongodb/bin/mongod --dbpath=/data/mongodb_data/ --logpath=/data/mongodb_log/mongodb.log --logappend&amp;    </code></pre>
-
-<p>或者编写开机自启动脚本start_mongodb.sh</p>
-
-<pre><code>cd /usr/local/mongodb-linux-i686-2.2.1/bin  //具体版本具体变化
-./mongod --dbpath=/data/mongodb_data/ --logpath=/data/mongodb_log/mongodb.log --logappend&amp;   </code></pre>
-
-<p>路径和你设置mongodb的datapath，logpath一致 我们重启计算机再看MongoDB是否启动，重启后可以直接使用 mongo命令登录，最终发现是可以成功的。</p>
-
-<p>另外，我们使用mongo命令登录 MongoDB还要转到mongo命令所在目录再执行./mongo，这样是不是有些麻烦？因此，我们可以简化这点，将该命令文件copy到/usr/bin下，这样就可以在任何目录下使用mongo命令了。</p>
-
-<pre><code>[root@localhost bin]# ls   
-bsondump  dbbak  mongo  mongod  mongodump  mongoexport  mongofiles  mongoimport  mongorestore mongos  mongosniff  mongostat   
-[root@localhost bin]# cp mongo /usr/bin/    </code></pre>
-
-<p>转到任一目录试下mongo命令：</p>
-
-<pre><code>[root@localhost bin]# cd /   
-[root@localhost /]# mongo   
-MongoDB shell version: 1.8.1  
-connecting to: test   </code></pre>
-
-<p>可以看到登录成功了，说明我们可以像使用ls命令一样使用mongo命令了。</p>
-
-<h3 id='id22'>安装图形化界面</h3>
-
-<p>mongoDB有许多图形化操作软件，我使用的是UMongo：</p>
-
-<p>下载<a href='https://github.com/agirbal/umongo/downloads'>Umongo</a>,解压文件，在终端运行<code>launch-umongo.sh</code>脚本文件即可</p>
-
-<p>ok,至此我们已经安装好了MongoDB~</p></div>
-    </article>
-  </section>
   
   
   <section id="linux20130709mongodb-introduce">
@@ -542,6 +444,31 @@ end  </code></pre></div>
     </article>
   </section>
   
+  
+  <section id="linux20130423mongodb">
+    <article>
+      <header>
+      <h1><a href="/linux/2013/04/23/mongodb">Mongodb的备份与恢复</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-04-23</span></div>
+    </header>
+    <div class="content"><p>坑爹的保密检查需要擦除硬盘，所有环境都需要重新安装，Mongodb数据库需要进行备份，还好Mongodb为我们提供了<code>mongodump</code>和<code>mongorestore</code>两种方法，非常方便。</p>
+
+<p>进到mongodb的bin目录下：</p>
+
+<p>备份：</p>
+
+<pre><code>mongodump -d Injection   //Injection 就是你要备份的数据库</code></pre>
+
+<p>执行之后会生成dump文件夹，里面子目录Injection就是备份的数据</p>
+
+<p>恢复：</p>
+
+<pre><code>mongorestore -d Injection dump/Injection</code></pre>
+
+<p>这样就完成的备份与恢复，是不是十分方便呢~随后送上其他环境配置日志，坑爹的保密检查。</p></div>
+    </article>
+  </section>
+  
   <div class="pagination">
       <ul>
         <li class="next"><a href='/'>&larr; 上一页</a></li>
@@ -557,7 +484,7 @@ end  </code></pre></div>
     <h4>最近发表</h4>
     <ul id="recent_posts">
       <li class="post">
-        <a href="/blog/2014/09/24/factory">创新工场一面总结</a>
+        <a href="/blog/2013/09/24/factory">创新工场一面总结</a>
       </li>
       <li class="post">
         <a href="/blog/2013/09/22/ibm">IBM Linux组电面总结</a>
@@ -567,9 +494,6 @@ end  </code></pre></div>
       </li>
       <li class="post">
         <a href="/blog/2013/09/21/icap">ICAP RFC3507 部分章节翻译</a>
-      </li>
-      <li class="post">
-        <a href="/blog/2013/09/20/alibaba">阿里巴巴面试总结</a>
       </li>
       <li class="post">
         <a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a>
@@ -586,6 +510,9 @@ end  </code></pre></div>
       <li class="post">
         <a href="/linux/2013/05/01/fluentd">fluentd插件开发</a>
       </li>
+      <li class="post">
+        <a href="/linux/2013/04/23/mongodb">Mongodb的备份与恢复</a>
+      </li>
     </ul>
     </section>
     
@@ -599,7 +526,7 @@ end  </code></pre></div>
   
      
     	<li><a href="/categories.html#blog-ref">
-    		blog <span>6</span>
+    		blog <span>5</span>
     	</a></li>
      
     	<li><a href="/categories.html#algorithm-ref">
