@@ -1,0 +1,46 @@
+<p>话不多说，直接上代码</p>
+
+<pre><code>void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+void merge_array(int a[],int low,int mid,int high,int result[])
+{
+    int i,j,k;
+    i=low;
+    j=mid+1;
+    k=0;
+    while(i&lt;=mid&amp;&amp;j&lt;=high)
+    {
+        if(a[i]&lt;a[j])
+        {
+            result[k]=a[i];
+            i++;
+            k++;
+        }
+        else
+        {
+            result[k]=a[j];
+            k++;
+            j++;
+        }
+    }
+    while(i&lt;=mid)
+    {
+        result[k]=a[i];
+        i++;
+        k++;
+    }
+    while(j&lt;=high)
+    {
+        result[k]=a[j];
+        j++;
+        k++;
+    }
+    for(i=0;i&lt;k;i++)    //注意 需要这一步
+    {
+        a[low+i]=result[i];  //low+i
+    }
+}</code></pre>

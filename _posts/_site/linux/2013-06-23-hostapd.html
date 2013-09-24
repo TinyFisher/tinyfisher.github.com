@@ -1,0 +1,78 @@
+<p>网上这类文章一大堆，但都有一些问题，应该是环境不一样，所以在搭建之前，先说下我的环境：</p>
+
+<ol>
+<li>
+<p>Linux系统：<code>ubuntu 10.04</code></p>
+</li>
+
+<li>
+<p>无线网卡：<code>TP-LINK WN822N</code>（需要网卡支持Master模式，其他网卡请自行搜索）</p>
+</li>
+</ol>
+
+<p>ok, 下面介绍如何搭建：</p>
+
+<p><strong>step1：</strong>安装网卡驱动，网卡都不识别的话就gg了，请参见我的博文<a href='http://tinyfisher.github.io/linux/2013/03/05/tplink/'>《TL-WN822N TL-WN722N linux安装驱动》</a>，识别之后</p>
+
+<pre><code>ifconfig wlan1 10.0.0.1  </code></pre>
+
+<p>为网卡设置ip地址。</p>
+
+<p><strong>step2：</strong>下载<a href='http://hostap.epitest.fi/releases/hostapd-1.1.tar.gz'>hostapd</a>，在解压安装之前，先安装libnl和libssl，否则hostapd无法编译通过，命令如下：</p>
+
+<pre><code>sudo apt-get install libnl-dev
+sudo apt-get install libssl-dev  </code></pre>
+
+<p><strong>step3：</strong>安装hostapd，解压压缩包，终端进入到hostapd文件夹，<code>configure</code>，<code>make</code>，<code>make install</code> 常见的三个步骤</p>
+
+<p><strong>step4：</strong>修改配置文件，在hostapd文件夹里的etc目录下，找到<code>hostapd.conf</code>文件，编辑如下</p>
+
+<pre><code>interface=wlan1 // 根据你的无线网卡名修改
+driver=nl80211  //重要
+ssid=tinyfisher  //这是AP名称
+channel=6
+hw_mode=g
+ignore_broadcast_ssid=0
+auth_algs=1
+wpa=3
+wpa_passphrase=xxxxxxxx   //这是你的密码
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP  </code></pre>
+
+<p>启动hostapd，命令：</p>
+
+<pre><code>./hostapd -B hostapd.conf  </code></pre>
+
+<p>之后就可以搜索到 tinyfisher的wifi了。</p>
+
+<p>但是此时设备还不能通过wifi上网，还需要搭建dhcp服务器：</p>
+
+<pre><code>sudo apt-get install dnsmasq  </code></pre>
+
+<p>修改<code>/etc/dnsmasq.conf</code></p>
+
+<pre><code>interface=wlan1 #根据你的网卡名称修改
+dhcp-range=10.0.0.10,10.0.0.110,6h     #设置dhcp地址范围，即租借时间6小时
+dhcp-option=3,10.0.0.1 #配置网关
+dhcp-option=6,202.114.128.2  #配置dns，请自己修改为外网的dns地址  </code></pre>
+
+<p>重启</p>
+
+<pre><code>dnsmasq：/etc/init.d/dnsmasq restart  </code></pre>
+
+<p>ok，此时连接到wifi上的设备都能被随机分配到从<code>10.0.0.10~10.0.0.110</code> 的地址</p>
+
+<p>现在就能上网了吗？不行，我们还需要一个外网出口，并且将内网的流量通过这个外网接口连出去，其实就是做一个<code>SNAT</code>，所以我们还需要设置<code>iptables</code>，命令如下：</p>
+
+<pre><code>iptables -F
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t nat -A POSTROUTING -s 10.0.0.0/8 -o eth0 -j MASQUERADE    //其中eth0就是外网接口，请根据你的实际情况修改  </code></pre>
+
+<p>最后一步，开启网卡转发功能：</p>
+
+<pre><code>echo 1 &gt;/proc/sys/net/ipv4/ip_forward  </code></pre>
+
+<p>搞定收工！</p>

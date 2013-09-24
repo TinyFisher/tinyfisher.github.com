@@ -1,0 +1,36 @@
+<p>快速排序，经典必须掌握</p>
+
+<pre><code>void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+int partition (int input[],int low,int high)
+{
+    int position=low-1;
+    int key=input[high];
+    while(low&lt;high)
+    {
+        if(input[low]&lt;key)
+        {
+            position++;
+            swap(&amp;input[position],&amp;input[low]);
+        }
+        low++;
+    }
+    position++;
+    swap(&amp;input[position],&amp;input[high]);
+    return position;
+
+}
+void q_sort(int a[],int low,int high)
+{
+    if(low &lt; high)               //不是while，因为是递归调用
+    {
+        int p;
+        p=partition(a,low,high);
+        q_sort(a,low,p-1);
+        q_sort(a,p+1,high);
+     }
+}</code></pre>

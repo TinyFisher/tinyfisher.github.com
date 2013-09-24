@@ -1,0 +1,144 @@
+<p>双向链表的操作和单链表很像，主要包括创建，删除，插入；只要注意下指针的操作即可，废话不多说，直接上代码：</p>
+
+<pre><code>typedef struct dnode
+{
+    int num;
+    struct dnode *pre;
+    struct dnode *next;
+}Dnode,*pDnode;
+
+pDnode Create()  //用户输入创建，-1表示结束
+{
+    pDnode head=(pDnode)malloc(sizeof(Dnode));
+    pDnode p=head;
+    int a;
+    printf(&quot;please input :\n&quot;);
+    scanf(&quot;%d&quot;,&amp;a);
+    while(a!=-1)
+    {
+        pDnode q=(pDnode)malloc(sizeof(Dnode));
+        q-&gt;num=a;
+        p-&gt;next=q;
+        q-&gt;pre=p;
+        p=q;
+        scanf(&quot;%d&quot;,&amp;a);
+    }
+    p-&gt;next=NULL;
+    head=head-&gt;next;
+    head-&gt;pre=NULL;
+    return head;
+}
+
+pDnode CreateFromArray(int a[],int len)    //根据数组创建
+{
+    pDnode head=(pDnode)malloc(sizeof(Dnode));
+    pDnode p=head;
+    int i=0;
+    while(i&lt;len)
+    {
+        pDnode q=(pDnode)malloc(sizeof(Dnode));
+        q-&gt;num=a[i];
+        p-&gt;next=q;
+        q-&gt;pre=p;
+        p=q;
+        i++;
+    }
+    p-&gt;next=NULL;
+    head=head-&gt;next;
+    head-&gt;pre=NULL;
+    return head;
+}
+
+pDnode del(pDnode head, int key)   //删除
+{
+    pDnode q1=head;
+    pDnode q2=head;
+    if(head==NULL)
+        return NULL;
+    if(head-&gt;num==key)
+    {
+        head=head-&gt;next;
+        head-&gt;pre=NULL;
+        free(q1);
+        return head;
+    }
+    while(q1-&gt;num!=key&amp;&amp;q1-&gt;next!=NULL)
+    {
+        q2=q1;
+        q1=q1-&gt;next;
+    }
+    if(q1-&gt;num==key&amp;&amp;q1-&gt;next==NULL)
+    {
+        q2-&gt;next=NULL;
+        free(q1);
+    }
+    else if(q1-&gt;num==key&amp;&amp;q1-&gt;next!=NULL)
+    {
+        q2-&gt;next=q1-&gt;next;
+        q1-&gt;next-&gt;pre=q2;
+        free(q1);
+    }
+    else
+    {
+        printf(&quot;not found\n&quot;);
+    }
+    return head;
+}
+
+pDnode insert(pDnode head,int key)    // 插入
+{
+    pDnode s=(pDnode)malloc(sizeof(Dnode));
+    s-&gt;num=key;
+    pDnode p=head;
+    pDnode q=head;
+    while(p-&gt;num&lt;key&amp;&amp;p-&gt;next!=NULL)
+    {
+        p=p-&gt;next;
+    }
+    if(p==head)
+    {
+        s-&gt;next=head;
+        head-&gt;pre=s;
+        head=s;
+        head-&gt;pre=NULL;
+    }
+    else if(p-&gt;next==NULL&amp;&amp;p-&gt;num&lt;key)
+    {
+        p-&gt;next=s;
+        s-&gt;pre=p;
+        s-&gt;next=NULL;
+    }
+    else
+    {
+        q=p-&gt;next;
+        p-&gt;next=s;
+        s-&gt;next=q;
+        s-&gt;pre=p;
+        q-&gt;pre=s;
+    }
+    return head;
+}
+
+void print_from_head(pDnode head)  //打印
+{
+    while(head-&gt;next!=NULL)
+    {
+        printf(&quot;%d&quot;,head-&gt;num);
+        head=head-&gt;next;
+    }
+    printf(&quot;%d&quot;,head-&gt;num);
+    printf(&quot;\n&quot;);
+}
+
+void print_from_tail(pDnode head)
+{
+    while(head-&gt;next!=NULL)
+        head=head-&gt;next;
+    while(head-&gt;pre!=NULL)
+    {
+        printf(&quot;%d&quot;,head-&gt;num);
+        head=head-&gt;pre;
+    }
+    printf(&quot;%d&quot;,head-&gt;num);
+    printf(&quot;\n&quot;);
+}</code></pre>

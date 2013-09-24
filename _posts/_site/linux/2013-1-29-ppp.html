@@ -1,0 +1,19 @@
+<p>在linux下使用3G网卡上网，使用pppd工具进行拨号，拨号脚本如下：</p>
+
+<pre><code>nodetach
+/dev/ttyUSB0
+19200
+nocrtscts
+connect &#39;/usr/sbin/chat -v -f /etc/ppp/peers/chat_script_unicom&#39;
+debug
+user &quot;card&quot;
+password &quot;card&quot;
+ipcp-accept-local
+ipcp-accept-remote
+defaultroute</code></pre>
+
+<p>其中<code>defaultroute</code>表示拨号成功后，自动添加一条默认路由，如果只使用一个网卡拨号，当然很方便;</p>
+
+<p>但是我发现如果使用两个以上的网卡进行拨号，会产生多条默认路由，这当然也没有问题，只是当其中一条断开后，所有的默认路由都消失了，即使其他的网卡工作正常，也不能上网，所以当有多个网卡拨号的时侯，不建议使用<code>defaultroute</code>这个选项，可以手动添加默认路由：</p>
+
+<pre><code>route add default gw x.x.x.x</code></pre>

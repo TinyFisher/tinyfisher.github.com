@@ -1,0 +1,37 @@
+<pre><code>/*
+    LIS:最长递增子序列，例如：23453267，最长递增子序列为：234567
+    lis(i)表示以a[i]结束的递增子序列的长度
+    lis(i)=max{lis(k)+1,1}  k from 0 to i-1
+    最长递增子序列长度为max(lis[]);
+*/
+
+
+int LIS(int a[],int len)
+{
+   int *p=(int *)malloc(sizeof(int)*len);
+   int i=0;
+   int j=0;
+   int result=0;
+   if(p==NULL)
+        return -1;
+   for(i=0;i&lt;len;i++)
+   {
+       p[i]=1;
+       for(j=0;j&lt;i;j++)
+       {
+           if(a[i]&gt;a[j]&amp;&amp;p[j]+1&gt;p[i])
+           {
+               p[i]=p[j]+1;
+           }
+       }
+   }
+   for(i=0;i&lt;len;i++)
+   {
+       if(result&lt;p[i])
+       {
+           result =p[i];
+       }
+   }
+   free(p);
+   return result;
+}</code></pre>

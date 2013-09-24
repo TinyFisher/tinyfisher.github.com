@@ -1,0 +1,46 @@
+<p>fluentd默认支持了一些插件，如apache，但是最近做项目对squid日志进行分析时，发现fluentd没有这个默认插件，需要自己开发，方法如下 自己编写一个ruby脚本，比如:<code>in_mytail.rb</code>,将他放到<code>/etc/td-agent/plugin</code> 即可</p>
+
+<p>修改<code>/etc/td-agent/td-agent.conf</code></p>
+
+<pre><code>&lt;source&gt;
+	type mytail
+	path /path/to/myformat_file
+	tag myapp.mytail
+&lt;source&gt;  </code></pre>
+
+<p>标签里面是日志来源，type表示input插件类型，这里是自己编写的类型，path是源日志文件，tag是标签，用于区分其他插件.</p>
+
+<pre><code>&lt;match **&gt;
+	type stdout
+&lt;/match&gt;  </code></pre>
+
+<p>用于输出，这里输出到stdout，可以是file，mongodb等，看自己需要. 调试模式：</p>
+
+<pre><code>td-agent -vv  </code></pre>
+
+<p>ruby脚本如下</p>
+
+<pre><code>class MyTailInput &lt; Fluent::TailInput  
+  Fluent::Plugin.register_input(&#39;mytail&#39;, self)  
+  
+  # Override &#39;configure_parser(conf)&#39; method.  
+  # You can get config parameters in this method.  
+  def configure_parser(conf)  
+    @time_format = conf[&#39;time_format&#39;] || &#39;%Y-%M-%d %H:%M:%S&#39;  
+  end  
+    
+  # Override &#39;parse_line(line)&#39; method that returns time and record.  
+  # This example method assumes following log format:  
+  #   %Y-%m-%d %H:%M:%S\tkey1\tvalue1\tkey2\tvalue2...  
+  #   %Y-%m-%d %H:%M:%S\tkey1\tvalue1\tkey2\tvalue2...  
+  #   ...  
+  def parse_line(line)  
+    elements = line.split(&quot;\t&quot;)  
+    time=&quot;2012-11-11 11:11:11&quot;  #why unknow  
+    t_time = Time.strptime(time, @time_format).to_i  
+    record = {}  
+    record[&#39;logtime&#39;]=elements[0]  
+    record[&#39;logcontent&#39;]=elements[1]  
+    return t_time, record  
+  end  
+end  </code></pre>

@@ -1,0 +1,119 @@
+<pre><code>1.配置准备
+＃iptables -F //清除原有规则
+＃iptables -X //清除自定义链
+ 
+2.定义策略
+＃iptables -P INPUT DROP //默认丢弃，即丢弃所有的包
+＃iptables -P OUTPUT DROP
+＃iptables -P FORWARD DROP
+ 
+3.典型的规则配置实例
+# iptables -A INPUT|OUTPUT|FORWARD -s 源IP -d 目的IP -p tcp|udp|icmp --sport 源端口--dport 目的端口 -j ACCEPT|DROP
+ 
+4.添加规则
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放HTTP
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 80 -j ACCEPT //针对本机,若本机不需要，可省略
+＃iptables -A OUTPUT -p tcp --dport 80 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 80 -j ACCEPT //允许转发
+＃iptables -A FORWARD -p tcp --dport 80 -j ACCEPT //下面类似
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放DNS
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p udp --sport 53 -j ACCEPT
+＃iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
+＃iptables -A FORWARD -p udp --sport 53 -j ACCEPT
+＃iptables -A FORWARD -p udp --dport 53 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放SMTP和POP3
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 25 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 25 -j ACCEPT
+＃iptables -A INPUT -p tcp --sport 110 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 110 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 25 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 25 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 110 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 110 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放SSH
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 22 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 22 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 22 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 22 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放Telnet
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 23 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 23 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 23 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 23 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放FTP
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 21 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 21 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 21 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 21 -j ACCEPT
+＃iptables -A INPUT -p tcp --sport 20 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 20 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 20 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 20 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放SSL
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 443 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 443 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 443 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 443 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放ICMP
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p icmp -j ACCEPT
+＃iptables -A OUTPUT -p icmp -j ACCEPT
+＃iptables -A FORWARD -p icmp -j ACCEPT
+＃iptables -A FORWARD -p icmp -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放TCP
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp -j ACCEPT
+＃iptables -A OUTPUT -p tcp -j ACCEPT
+＃iptables -A FORWARD -p tcp -j ACCEPT
+＃iptables -A FORWARD -p tcp -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放udp
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p udp -j ACCEPT
+＃iptables -A OUTPUT -p udp -j ACCEPT
+＃iptables -A FORWARD -p udp -j ACCEPT
+＃iptables -A FORWARD -p udp -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃实现NAT
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth0 -j SNAT --to-source 1.2.3.4
+＃iptables -t nat -A PREROUTING -d 192.168.1.0/24 -i eth1 -j DNAT --to-destination 1.2.3.4
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃规则的保存和重载
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables-save -c &gt; /etc/iptables-save
+＃iptables-restore -c &lt; /etc/iptables-save
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃根据数据出入网卡匹配，假设eth0连接内网，eth1连接外网
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables –A INPUT –i eth0 –j ACCEPT  //从eth0流入的数据都接收
+＃iptables – A FORWARD – o eth1 –j ACCEPT //从eth1流出的数据都转发</code></pre>
+
+<p>以上是一些基本配置，可以开放更多的服务，还可以进行更详尽的匹配，如源目地址，出入网卡等，以后可以根据要求进一步设置。</p>

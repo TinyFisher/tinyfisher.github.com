@@ -1,0 +1,13 @@
+<p>这两款的芯片都是AR系列的芯片，所以只要安装这款芯片的驱动：</p>
+
+<p><code>ath9k_htc</code>即可,只需要两步</p>
+
+<p>(1)安装<a href='https://www.kernel.org/pub/linux/kernel/projects/backports/stable/v3.7.9/'>compat-drivers-3.7.9-1.tar.gz</a>,这类似于万能驱动，里面包含了很多芯片的驱动，很好用，编译时间有点长，耐心等待</p>
+
+<p>下载完成之后，将压缩包解压，从命令行终端进入到解压的文件夹中，输入命令<code>sudo make</code>，等待时间较长，再输入命令 <code>make install</code>,等待时间也较长，便完成了安装</p>
+
+<p>(2)安装<a href='http://nl.archive.ubuntu.com/ubuntu/pool/main/l/linux-firmware/linux-firmware_1.60_all.deb'>linux-firmware</a></p>
+
+<p>下载完成之后，直接双击文件包，即可自动安装</p>
+
+<p>重新启动 ，插上usb无线网卡，命令行输入<code>ifconfig -a</code> ，如果出现<code>wlan0</code>，<code>wlan1</code> 等信息，则驱动成功</p>

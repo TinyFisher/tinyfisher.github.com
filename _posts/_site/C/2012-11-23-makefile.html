@@ -1,0 +1,17 @@
+<p>最近写了个小程序，用到了<code>pow()</code>函数，我们都知道需要添加头文件<code>&lt;math.h&gt;</code>，以及在<code>gcc</code>编译的侍侯加上<code>-lm</code>选项，但是这个<code>-lm</code>选项的位值也是有讲究的，我之前的makefile如下：</p>
+
+<pre><code>solution:solution.o
+     gcc  -lm solution.o  -o solution 
+solution.o:solution.c
+     gcc  -c  solution.c</code></pre>
+
+<p>报出错误：<code>undefined reference to pow</code></p>
+
+<p>原因是<code>-lm</code>的位置在<code>solution.o</code>之前，所以编译器链接的时侯先去链接<code>lm</code>库，之后无法解释<code>solution.o</code>里的<code>pow</code>函数</p>
+
+<p>所以正确的makefile如下：</p>
+
+<pre><code>solution:solution.o
+     gcc  solution.o  -o solution  -lm
+solution.o:solution.c
+     gcc  -c  solution.c</code></pre>

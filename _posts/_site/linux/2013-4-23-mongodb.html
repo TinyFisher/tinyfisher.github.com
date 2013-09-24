@@ -1,0 +1,15 @@
+<p>坑爹的保密检查需要擦除硬盘，所有环境都需要重新安装，Mongodb数据库需要进行备份，还好Mongodb为我们提供了<code>mongodump</code>和<code>mongorestore</code>两种方法，非常方便。</p>
+
+<p>进到mongodb的bin目录下：</p>
+
+<p>备份：</p>
+
+<pre><code>mongodump -d Injection   //Injection 就是你要备份的数据库</code></pre>
+
+<p>执行之后会生成dump文件夹，里面子目录Injection就是备份的数据</p>
+
+<p>恢复：</p>
+
+<pre><code>mongorestore -d Injection dump/Injection</code></pre>
+
+<p>这样就完成的备份与恢复，是不是十分方便呢~随后送上其他环境配置日志，坑爹的保密检查。</p>

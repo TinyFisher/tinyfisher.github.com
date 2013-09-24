@@ -1,0 +1,145 @@
+<p>二叉树的概念、性质等就不多介绍了，这里用C语言实现了二叉树的建立（1.用户输入，2.给数组参数），前中后序遍历和按层遍历。</p>
+
+<p>1.二叉树的建立</p>
+
+<pre><code>typedef struct BNode
+{
+    char value;  //类型假设为char
+    struct BNode *left;
+    struct BNode *right;
+
+} Node,*pNode,**ppNode;
+
+pNode CreateBTree()  //通过输入建立二叉树，&#39;@&#39;表示空节点，先序顺序，空节点必须输入
+{
+    char ch;
+    pNode q;
+    scanf(&quot; %c&quot;,&amp;ch);  //%c前面的空格 用来清空缓冲区
+   // fflush(stdin);  //或者这样清空缓冲区
+    if(ch==&#39;@&#39;)
+    {
+        return NULL;
+    }
+    else
+    {
+        q=(pNode)malloc(sizeof(Node));
+        if(q==NULL)
+        {
+            printf(&quot;malloc error\n&quot;);
+            return NULL;
+        }
+        q-&gt;value=ch;
+        q-&gt;left=CreateBTree();
+        q-&gt;right=CreateBTree();
+        return q;
+    }
+
+}
+
+pNode CreateBTree_from_array(char a[],int index,int len) //根据数组创建二叉树双链表
+{
+	if(index&gt;=len) //叶子节点
+		return NULL;
+	else
+	{
+	pNode root=(pNode)malloc(sizeof(Node));
+	if(root==NULL)
+	{
+		printf(&quot;malloc error\n&quot;);
+		return NULL;
+	}
+	root-&gt;value=a[index];
+	root-&gt;left=CreateBTree_from_array(a,2*index+1,len);
+	root-&gt;right=CreateBTree_from_array(a,2*index+2,len);
+	return root;
+	}
+}</code></pre>
+
+<p>2.二叉树的前中后序遍历：</p>
+
+<pre><code>void preorder(pNode root)  //先序遍历
+{
+    if(root==NULL)
+        return;
+    else
+    {
+        printf(&quot;%c&quot;,root-&gt;value);
+        preorder(root-&gt;left);
+        preorder(root-&gt;right);
+    }
+}
+
+void midorder(pNode root)  //中序遍历
+{
+    if(root==NULL)
+        return;
+    else
+    {
+        midorder(root-&gt;left);
+        printf(&quot;%c&quot;,root-&gt;value);
+        midorder(root-&gt;right);
+    }
+}
+
+void postorder(pNode root)//后序遍历
+{
+    if(root==NULL)
+        return;
+    else
+    {
+        postorder(root-&gt;left);
+        postorder(root-&gt;right);
+        printf(&quot;%c&quot;,root-&gt;value);
+    }
+}</code></pre>
+
+<p>3.二叉树按层遍历</p>
+
+<pre><code>/*
+    二叉树按层遍历，借助队列，构建一个队列专门用来储存二叉树节点指针，先把根节点入队，假设是A，对A元素进行访问，
+    然后对A的左右孩子依次入队，假设B,C。A出队列，再是对B进行访问，同样将B的左右孩子入队列，B出对列······
+    重复以上，直到队列为空。
+*/
+#define LEN 10
+typedef struct queue  //队列，包含pNode数组，首尾index
+{
+    pNode data[LEN];
+    int front;
+    int rear;
+}BTreeQueue,*pBTreeQueue;
+
+void TransLevel(pNode root)
+{
+    pBTreeQueue pqueue=(pBTreeQueue)malloc(sizeof(BTreeQueue));
+    pNode proot=root;
+    pqueue-&gt;front=0;
+    pqueue-&gt;rear=0;
+    if(proot==NULL)
+    {
+        printf(&quot;tree is null&quot;);
+        return;
+    }
+    else
+    {
+        printf(&quot;%c&quot;,proot-&gt;value);
+        pqueue-&gt;data[pqueue-&gt;front]=proot;  //根节点入队；
+        (pqueue-&gt;rear)++;
+        while((pqueue-&gt;front)&lt;(pqueue-&gt;rear))
+        {
+            proot=pqueue-&gt;data[pqueue-&gt;front];
+            (pqueue-&gt;front)++;  //队列首元素出列，保存为proot
+            if(proot-&gt;left!=NULL)
+            {
+                printf(&quot;%c&quot;,proot-&gt;left-&gt;value);
+                pqueue-&gt;data[pqueue-&gt;rear]=proot-&gt;left; //左子节点入队
+                (pqueue-&gt;rear)++;
+            }
+            if(proot-&gt;right!=NULL)
+            {
+                printf(&quot;%c&quot;,proot-&gt;right-&gt;value);
+                pqueue-&gt;data[pqueue-&gt;rear]=proot-&gt;right; //右子节点入队
+                (pqueue-&gt;rear)++;
+            }
+        }
+    }
+}</code></pre>
