@@ -52,3 +52,13 @@ description: 归并排序C语言实现
 	        a[low+i]=result[i];  //low+i
 	    }
 	}
+    void merge_sort(int a[],int low,int high,int temp[])
+	{
+		int mid=(low+high)/2;
+		if(low<high)
+		{
+			merge_sort(a,low,mid,temp);
+			merge_sort(a,mid+1,high,temp);
+			merge_array(a,low,mid,high,temp);
+		}
+	}
