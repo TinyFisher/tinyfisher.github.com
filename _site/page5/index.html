@@ -52,17 +52,111 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#c20121007callback" title="关于回调函数">关于回调函数</a></li>
+    <li><a href="#linux20120923OS-memory" title="分段和分页内存管理">分段和分页内存管理</a></li>
     <li><a href="#vim20120901vim" title="vim的备份和还原">vim的备份和还原</a></li>
     <li><a href="#btree20120826btree-back" title="根据二叉树的先序和中序遍历还原二叉树">根据二叉树的先序和中序遍历还原二叉树</a></li>
     <li><a href="#btree20120821btree-getinfo" title="获取二叉树叶子数、高度及左右子树交换">获取二叉树叶子数、高度及左右子树交换</a></li>
-    <li><a href="#btree20120803btree-create-traversal" title="二叉树创建和遍历">二叉树创建和遍历</a></li>
-    <li><a href="#link20120801doublelink" title="双链表操作大全">双链表操作大全</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="c20121007callback">
+    <article>
+      <header>
+      <h1><a href="/c/2012/10/07/callback">关于回调函数</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-10-07</span></div>
+    </header>
+    <div class="content"><h3 id='id10'>关于回调函数，搜集了一些网上的说法：</h3>
+
+<p><strong>1.形象的例子：</strong></p>
+
+<p>你饿了,想吃饭,就一会去问你妈一声&#8221;开饭没有啊?&#8221;这就正常函数调用. 但是今天你妈包饺子,花的时间比较长,你跑啊跑啊,就烦了.于是你给你妈说,我先出去玩会,开饭的时候打我手机.等过了一阵,你妈给你打电话说&#8221;开饭啦,快回来吃饭吧!&#8221;</p>
+
+<p><em>其中,你告诉你妈打手机找你,就是个你把回调函数句柄保存到你妈的动作.你妈打电话叫你,就是个回调过程.</em></p>
+
+<p><strong>2.为什么使用回调函数</strong></p>
+
+<p>本质上都是“<strong>你想让别人的代码执行你的代码，而别人的代码你又不能动</strong>”这种需求下产生的</p>
+
+<p>别人给你的不是源代码，是一个已经编译好的模块，并且不会给你源代码，那是商业机密，留给你一个接口，你把你要执行的代码以回调函数的形式交给这个接口，由别人编写的模块在需要的时候调用</p>
+
+<p><strong>3.怎么调用回调函数</strong></p>
+
+<p>使用回调函数实际上就是在调用某个函数（通常是API函数）时，将自己的一个函数（这个函数为回调函数）的地址作为参数传递给那个函数。而那个函数在需要的时候，利用传递的地址调用回调函数，这时你可以利用这个机会在回调函数中处理消息或完成一定的操作。至于如何定义回调函数，跟具体使用的API函数有关，一般在帮助中有说明回调函数的参数和返回值等。C++中一般要求在回调函数前加CALLBACK，这主要是说明该函数的调用方式。</p></div>
+    </article>
+  </section>
+  
+  
+  <section id="linux20120923OS-memory">
+    <article>
+      <header>
+      <h1><a href="/linux/2012/09/23/OS-memory">分段和分页内存管理</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-09-23</span></div>
+    </header>
+    <div class="content"><h3 id='id5'><strong>两者描述</strong></h3>
+
+<p>打个比方，比如说你去听课，带了一个纸质笔记本做笔记。笔记本有100张纸，课程有语文、数学、英语三门，对于这个笔记本的使用，为了便于以后复习方便，你可以有两种选择。</p>
+
+<p>第一种是，你从本子的第一张纸开始用，并且事先在本子上做划分：第2张到第30张纸记语文笔记，第31到60张纸记数学笔记，第61到100张纸记英语笔记，最后在第一张纸做个列表，记录着三门笔记各自的范围。这就是分段管理，第一张纸叫段表。</p>
+
+<p>第二种是，你从第二张纸开始做笔记，各种课的笔记是连在一起的：第2张纸是数学，第3张是语文，第4张英语……最后呢，你在第一张纸做了一个目录，记录着语文笔记在第3、7、14、15张纸……，数学笔记在第2、6、8、9、11……，英语笔记在第4、5、12……。这就是分页管理，第一张纸叫页表。你要复习哪一门课，就到页表里查寻相关的纸的编号，然后翻到那一页去复习</p>
+
+<h3 id='id6'><strong>两者的优缺点：</strong></h3>
+
+<p>在段式存储管理中，将程序的地址空间划分为若干段（segment），如代码段，数据段，堆栈段；这样每个进程有一个二维地址空间，相互独立，互不干扰。<em>段式管理的优点是：没有内碎片（因为段大小可变，改变段大小来消除内碎片）。但段换入换出时，会产生外碎片（比如4k的段换5k的段，会产生1k的外碎片）</em></p>
+
+<p>在页式存储管理中，将程序的逻辑地址划分为固定大小的页（page），而物理内存划分为同样大小的页框，程序加载时，可以将任意一页放入内存中任意一个页框，这些页框不必连续，从而实现了离散分离。<em>页式存储管理的优点是：没有外碎片（因为页的大小固定），但会产生内碎片（一个页可能填充不满）</em></p>
+
+<h3 id='id7'><strong>两者的不同点：</strong></h3>
+
+<p>(1) 分页仅仅是由于系统管理的需要而不是用户的需要。段则是信息的逻辑单位，它含有一组其意义相对完整的信息。分段的目的是为了能更好地满足用户的需要。</p>
+
+<p>(2) 页的大小固定且由系统决定，由系统把逻辑地址划分为页号和页内地址两部分，是由机器硬件实现的，因而在系统中只能有一种大小的页面；而段的长度却不固定，决定于用户所编写的程序，通常由编译程序在对源程序进行编译时，根据信息的性质来划分。</p>
+
+<p>(3) 分页的作业地址空间是一维的，即单一的线性地址空间，程序员只需利用一个记忆符，即可表示一个地址；而分段的作业地址空间则是二维的，程序员在标识一个地址时，既需给出段名，又需给出段内地址。</p>
+
+<h3 id='id8'><strong>两者结合——段页式存储管理：</strong></h3>
+
+<p>1．基本思想：</p>
+
+<p>分页系统能有效地提高内存的利用率，而分段系统能反映程序的逻辑结构，便于段的共享与保护，将分页与分段两种存储方式结合起来，就形成了段页式存储管理方式。</p>
+
+<p>在段页式存储管理系统中，作业的地址空间首先被分成若干个逻辑分段，每段都有自己的段号，然后再将每段分成若干个大小相等的页。对于主存空间也分成大小相等的页，主存的分配以页为单位。</p>
+
+<p>段页式系统中，作业的地址结构包含三部分的内容：段号，页号，页内位移量</p>
+
+<p>程序员按照分段系统的地址结构将地址分为段号与段内位移量，地址变换机构将段内位移量分解为页号和页内位移量。</p>
+
+<p>为实现段页式存储管理，系统应为每个进程设置一个段表，包括每段的段号，该段的页表始址和页表长度。每个段有自己的页表，记录段中的每一页的页号和存放在主存中的物理块号。</p>
+
+<p>2．地址变换的过程：</p>
+
+<p>（1）程序执行时，从PCB中取出段表始址和段表长度，装入段表寄存器。</p>
+
+<p>（2）由地址变换机构将逻辑地址自动分成段号、页号和页内地址。</p>
+
+<p>（3）将段号与段表长度进行比较，若段号大于或等于段表长度，则表示本次访问的地址已超越进程的地址空间，产生越界中断。</p>
+
+<p>（4）将段表始址与段号和段表项长度的乘积相加，便得到该段表项在段表中的位置。</p>
+
+<p>（5）取出段描述子得到该段的页表始址和页表长度。</p>
+
+<p>（6）将页号与页表长度进行比较，若页号大于或等于页表长度，则表示本次访问的地址已超越进程的地址空间，产生越界中断。</p>
+
+<p>（7）将页表始址与页号和页表项长度的乘积相加，便得到该页表项在页表中的位置。</p>
+
+<p>（8）取出页描述子得到该页的物理块号。</p>
+
+<p>（9）对该页的存取控制进行检查。</p>
+
+<p>（10）将物理块号送入物理地址寄存器中，再将有效地址寄存器中的页内地址直接送入物理地址寄存器的块内地址字段中，拼接得到实际的物理地址。</p></div>
+    </article>
+  </section>
   
   
   <section id="vim20120901vim">
@@ -196,315 +290,6 @@ int GetLeafeNum(pNode root)
     </article>
   </section>
   
-  
-  <section id="btree20120803btree-create-traversal">
-    <article>
-      <header>
-      <h1><a href="/btree/2012/08/03/btree-create-traversal">二叉树创建和遍历</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-08-03</span></div>
-    </header>
-    <div class="content"><p>二叉树的概念、性质等就不多介绍了，这里用C语言实现了二叉树的建立（1.用户输入，2.给数组参数），前中后序遍历和按层遍历。</p>
-
-<p>1.二叉树的建立</p>
-
-<pre><code>typedef struct BNode
-{
-    char value;  //类型假设为char
-    struct BNode *left;
-    struct BNode *right;
-
-} Node,*pNode,**ppNode;
-
-pNode CreateBTree()  //通过输入建立二叉树，&#39;@&#39;表示空节点，先序顺序，空节点必须输入
-{
-    char ch;
-    pNode q;
-    scanf(&quot; %c&quot;,&amp;ch);  //%c前面的空格 用来清空缓冲区
-   // fflush(stdin);  //或者这样清空缓冲区
-    if(ch==&#39;@&#39;)
-    {
-        return NULL;
-    }
-    else
-    {
-        q=(pNode)malloc(sizeof(Node));
-        if(q==NULL)
-        {
-            printf(&quot;malloc error\n&quot;);
-            return NULL;
-        }
-        q-&gt;value=ch;
-        q-&gt;left=CreateBTree();
-        q-&gt;right=CreateBTree();
-        return q;
-    }
-
-}
-
-pNode CreateBTree_from_array(char a[],int index,int len) //根据数组创建二叉树双链表
-{
-	if(index&gt;=len) //叶子节点
-		return NULL;
-	else
-	{
-	pNode root=(pNode)malloc(sizeof(Node));
-	if(root==NULL)
-	{
-		printf(&quot;malloc error\n&quot;);
-		return NULL;
-	}
-	root-&gt;value=a[index];
-	root-&gt;left=CreateBTree_from_array(a,2*index+1,len);
-	root-&gt;right=CreateBTree_from_array(a,2*index+2,len);
-	return root;
-	}
-}</code></pre>
-
-<p>2.二叉树的前中后序遍历：</p>
-
-<pre><code>void preorder(pNode root)  //先序遍历
-{
-    if(root==NULL)
-        return;
-    else
-    {
-        printf(&quot;%c&quot;,root-&gt;value);
-        preorder(root-&gt;left);
-        preorder(root-&gt;right);
-    }
-}
-
-void midorder(pNode root)  //中序遍历
-{
-    if(root==NULL)
-        return;
-    else
-    {
-        midorder(root-&gt;left);
-        printf(&quot;%c&quot;,root-&gt;value);
-        midorder(root-&gt;right);
-    }
-}
-
-void postorder(pNode root)//后序遍历
-{
-    if(root==NULL)
-        return;
-    else
-    {
-        postorder(root-&gt;left);
-        postorder(root-&gt;right);
-        printf(&quot;%c&quot;,root-&gt;value);
-    }
-}</code></pre>
-
-<p>3.二叉树按层遍历</p>
-
-<pre><code>/*
-    二叉树按层遍历，借助队列，构建一个队列专门用来储存二叉树节点指针，先把根节点入队，假设是A，对A元素进行访问，
-    然后对A的左右孩子依次入队，假设B,C。A出队列，再是对B进行访问，同样将B的左右孩子入队列，B出对列······
-    重复以上，直到队列为空。
-*/
-#define LEN 10
-typedef struct queue  //队列，包含pNode数组，首尾index
-{
-    pNode data[LEN];
-    int front;
-    int rear;
-}BTreeQueue,*pBTreeQueue;
-
-void TransLevel(pNode root)
-{
-    pBTreeQueue pqueue=(pBTreeQueue)malloc(sizeof(BTreeQueue));
-    pNode proot=root;
-    pqueue-&gt;front=0;
-    pqueue-&gt;rear=0;
-    if(proot==NULL)
-    {
-        printf(&quot;tree is null&quot;);
-        return;
-    }
-    else
-    {
-        printf(&quot;%c&quot;,proot-&gt;value);
-        pqueue-&gt;data[pqueue-&gt;front]=proot;  //根节点入队；
-        (pqueue-&gt;rear)++;
-        while((pqueue-&gt;front)&lt;(pqueue-&gt;rear))
-        {
-            proot=pqueue-&gt;data[pqueue-&gt;front];
-            (pqueue-&gt;front)++;  //队列首元素出列，保存为proot
-            if(proot-&gt;left!=NULL)
-            {
-                printf(&quot;%c&quot;,proot-&gt;left-&gt;value);
-                pqueue-&gt;data[pqueue-&gt;rear]=proot-&gt;left; //左子节点入队
-                (pqueue-&gt;rear)++;
-            }
-            if(proot-&gt;right!=NULL)
-            {
-                printf(&quot;%c&quot;,proot-&gt;right-&gt;value);
-                pqueue-&gt;data[pqueue-&gt;rear]=proot-&gt;right; //右子节点入队
-                (pqueue-&gt;rear)++;
-            }
-        }
-    }
-}</code></pre></div>
-    </article>
-  </section>
-  
-  
-  <section id="link20120801doublelink">
-    <article>
-      <header>
-      <h1><a href="/link/2012/08/01/doublelink">双链表操作大全</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-08-01</span></div>
-    </header>
-    <div class="content"><p>双向链表的操作和单链表很像，主要包括创建，删除，插入；只要注意下指针的操作即可，废话不多说，直接上代码：</p>
-
-<pre><code>typedef struct dnode
-{
-    int num;
-    struct dnode *pre;
-    struct dnode *next;
-}Dnode,*pDnode;
-
-pDnode Create()  //用户输入创建，-1表示结束
-{
-    pDnode head=(pDnode)malloc(sizeof(Dnode));
-    pDnode p=head;
-    int a;
-    printf(&quot;please input :\n&quot;);
-    scanf(&quot;%d&quot;,&amp;a);
-    while(a!=-1)
-    {
-        pDnode q=(pDnode)malloc(sizeof(Dnode));
-        q-&gt;num=a;
-        p-&gt;next=q;
-        q-&gt;pre=p;
-        p=q;
-        scanf(&quot;%d&quot;,&amp;a);
-    }
-    p-&gt;next=NULL;
-    head=head-&gt;next;
-    head-&gt;pre=NULL;
-    return head;
-}
-
-pDnode CreateFromArray(int a[],int len)    //根据数组创建
-{
-    pDnode head=(pDnode)malloc(sizeof(Dnode));
-    pDnode p=head;
-    int i=0;
-    while(i&lt;len)
-    {
-        pDnode q=(pDnode)malloc(sizeof(Dnode));
-        q-&gt;num=a[i];
-        p-&gt;next=q;
-        q-&gt;pre=p;
-        p=q;
-        i++;
-    }
-    p-&gt;next=NULL;
-    head=head-&gt;next;
-    head-&gt;pre=NULL;
-    return head;
-}
-
-pDnode del(pDnode head, int key)   //删除
-{
-    pDnode q1=head;
-    pDnode q2=head;
-    if(head==NULL)
-        return NULL;
-    if(head-&gt;num==key)
-    {
-        head=head-&gt;next;
-        head-&gt;pre=NULL;
-        free(q1);
-        return head;
-    }
-    while(q1-&gt;num!=key&amp;&amp;q1-&gt;next!=NULL)
-    {
-        q2=q1;
-        q1=q1-&gt;next;
-    }
-    if(q1-&gt;num==key&amp;&amp;q1-&gt;next==NULL)
-    {
-        q2-&gt;next=NULL;
-        free(q1);
-    }
-    else if(q1-&gt;num==key&amp;&amp;q1-&gt;next!=NULL)
-    {
-        q2-&gt;next=q1-&gt;next;
-        q1-&gt;next-&gt;pre=q2;
-        free(q1);
-    }
-    else
-    {
-        printf(&quot;not found\n&quot;);
-    }
-    return head;
-}
-
-pDnode insert(pDnode head,int key)    // 插入
-{
-    pDnode s=(pDnode)malloc(sizeof(Dnode));
-    s-&gt;num=key;
-    pDnode p=head;
-    pDnode q=head;
-    while(p-&gt;num&lt;key&amp;&amp;p-&gt;next!=NULL)
-    {
-        p=p-&gt;next;
-    }
-    if(p==head)
-    {
-        s-&gt;next=head;
-        head-&gt;pre=s;
-        head=s;
-        head-&gt;pre=NULL;
-    }
-    else if(p-&gt;next==NULL&amp;&amp;p-&gt;num&lt;key)
-    {
-        p-&gt;next=s;
-        s-&gt;pre=p;
-        s-&gt;next=NULL;
-    }
-    else
-    {
-        q=p-&gt;next;
-        p-&gt;next=s;
-        s-&gt;next=q;
-        s-&gt;pre=p;
-        q-&gt;pre=s;
-    }
-    return head;
-}
-
-void print_from_head(pDnode head)  //打印
-{
-    while(head-&gt;next!=NULL)
-    {
-        printf(&quot;%d&quot;,head-&gt;num);
-        head=head-&gt;next;
-    }
-    printf(&quot;%d&quot;,head-&gt;num);
-    printf(&quot;\n&quot;);
-}
-
-void print_from_tail(pDnode head)
-{
-    while(head-&gt;next!=NULL)
-        head=head-&gt;next;
-    while(head-&gt;pre!=NULL)
-    {
-        printf(&quot;%d&quot;,head-&gt;num);
-        head=head-&gt;pre;
-    }
-    printf(&quot;%d&quot;,head-&gt;num);
-    printf(&quot;\n&quot;);
-}</code></pre></div>
-    </article>
-  </section>
-  
   <div class="pagination">
       <ul>
         <li class="next"><a href='/page4'>&larr; 上一页</a></li>
@@ -520,6 +305,9 @@ void print_from_tail(pDnode head)
     <h4>最近发表</h4>
     <ul id="recent_posts">
       <li class="post">
+        <a href="/blog/2013/09/26/alibaba2">阿里巴巴二面总结</a>
+      </li>
+      <li class="post">
         <a href="/blog/2013/09/24/factory">创新工场一面总结</a>
       </li>
       <li class="post">
@@ -532,6 +320,9 @@ void print_from_tail(pDnode head)
         <a href="/blog/2013/09/21/icap">ICAP RFC3507 部分章节翻译</a>
       </li>
       <li class="post">
+        <a href="/blog/2013/09/20/alibaba">阿里巴巴面试总结</a>
+      </li>
+      <li class="post">
         <a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a>
       </li>
       <li class="post">
@@ -542,12 +333,6 @@ void print_from_tail(pDnode head)
       </li>
       <li class="post">
         <a href="/blog/2013/05/23/microsoft_test">2013微软暑期实习笔试错题、疑题整理</a>
-      </li>
-      <li class="post">
-        <a href="/linux/2013/05/01/fluentd">fluentd插件开发</a>
-      </li>
-      <li class="post">
-        <a href="/linux/2013/04/23/mongodb">Mongodb的备份与恢复</a>
       </li>
     </ul>
     </section>
@@ -562,7 +347,7 @@ void print_from_tail(pDnode head)
   
      
     	<li><a href="/categories.html#blog-ref">
-    		blog <span>5</span>
+    		blog <span>7</span>
     	</a></li>
      
     	<li><a href="/categories.html#algorithm-ref">

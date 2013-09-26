@@ -5,10 +5,50 @@
         <description>tinyfisher blog - tinyfisher</description>
         <link>http://tinyfisher.github.com</link>
         <link>http://tinyfisher.github.com</link>
-        <lastBuildDate>2013-09-24T21:01:11+08:00</lastBuildDate>
-        <pubDate>2013-09-24T21:01:11+08:00</pubDate>
+        <lastBuildDate>2013-09-26T15:32:43+08:00</lastBuildDate>
+        <pubDate>2013-09-26T15:32:43+08:00</pubDate>
         <ttl>1800</ttl>
 
+
+        <item>
+                <title>阿里巴巴二面总结</title>
+                <description>&lt;p&gt;二面面试官澄观，一看就很牛逼的样子，年龄也比一面的易统大一些，拿着我的简历，顺手拿了几个零食把我带到大厅，开始面试&lt;br /&gt;&lt;strong&gt;1.你擅长什么？&lt;/strong&gt;&lt;br /&gt;我去，突出一个防不胜防，没有自我介绍，也不问项目，简历扫了一眼，扔一边。&lt;br /&gt;这个问题不好答，我怕给自己挖一个坑，我就说linux用的还行，他说哪方面，我说系统使用方面，常用命令比较熟，他就问了一个问题，把一个文件夹里的.cpp文件中的BUPT换成alibaba，怎么实现？&lt;br /&gt;&lt;code&gt;sed -i &amp;quot;s/BUPT/alibaba/g&amp;quot; ./*.cpp&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;个人感觉这个问题就是坑啊，如果不是特别擅长，很容易被问住，好比让你在简历上选填你精通什么，然后问到你挂。&lt;br /&gt;&lt;strong&gt;2.学生期间有什么可以展示的，不限技术&lt;/strong&gt;&lt;br /&gt;随意发挥&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;3.有用过多线程或者多进程么？在什么情况下用的？两者有什么区别&lt;/strong&gt;&lt;br /&gt;项目中有个监听线程，监听到3G网卡掉线，自动重连。&lt;br /&gt;多线程好处：节约资源，并发快&lt;br /&gt;多进程好处：安全，即使子进程挂了，父进程不会挂 &lt;br /&gt;多线程缺点：不安全，一个线程挂掉，整个进程挂了&lt;br /&gt;多进程缺点：资源占用比较多，并发性不如线程&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;4.apache知道吗？看过源码吗？是多进程还是多线程的？http请求方法有哪些？服务器怎么知道用户登陆过？&lt;/strong&gt;&lt;br /&gt;知道，没看过，猜测是多进程的，GET，POST，（其余不常用，没怎么记，面试官貌似不满意）。&lt;br /&gt;通过sessionid，用户请求时，服务器生成一个sessionid传给客户端，客户端用cookie保存sessionid，然后登陆的时候通过cookie把sessionid再发送给服务端。（大致这个意思，面试官大致满意）&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;5.二叉树求深度，不准递归，树是只读的&lt;/strong&gt;&lt;br /&gt;我的思路：用队列按层遍历，每一层加一，面试官说：你怎么知道这一层遍历完了？这里想了很久，说再用一个栈保存结果，栈为空的时候，这层完了，此时加一，面试官说：行是行，但浪费空间。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;6.求一千亿个数的中位数，这些数无序&lt;/strong&gt;&lt;br /&gt;我的思路：hash%1000，分成小文件，求出小文件的最大和最小值，然后按照这个区间，使得这1000个小文件按照顺序排列，中位数在中间的小文件里，面试官说：不一定。发现是的，我说那我记录每个文件的个数，根据这个元素个数定位到小文件，对这个小文件排序，根据偏移量，找到中位数，面试官说对。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;总结：深入再深入，必须能有一样能征服面试官的，要有亮点，这点我还得加强，本来想说项目，直接被无视。算法题注定是难的，千万别放弃，展示出想要解决他的勇气，可以问面试官要提示，互动的解决这个问题，一旦放弃，这轮面试也就挂了。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;附：http请求方式&lt;/strong&gt;&lt;br /&gt;0.GET&lt;br /&gt;1，HEAD&lt;br /&gt;2，PUT 3，DELETE&lt;br /&gt;4，POST&lt;br /&gt;5，OPTIONS&lt;/p&gt;
+
+&lt;p&gt;但其实我们大部分情况下只用到了GET和POST。如果想设计一个符合RESTful规范的web应用程序，则这六种方法都会用到。不过即使暂时不想涉及REST，了解这六种方法的本质仍然是很有作用的。大家将会发现，原来web也是很简洁明了的。下面依次说明这六种方法。&lt;/p&gt;
+
+&lt;p&gt;0，GET：GET可以说是最常见的了，它本质就是发送一个请求来取得服务器上的某一资源。资源通过一组HTTP头和呈现数据（如HTML文本，或者图片或者视频等）返回给客户端。GET请求中，没有body&lt;/p&gt;
+
+&lt;p&gt;1，HEAD：HEAD和GET本质是一样的，但只请求页面的头部。有的人可能觉得这个方法没什么用，其实不是这样的。想象一个业务情景：欲判断某个资源是否存在，我们通常使用GET，但这里用HEAD则意义更加明确。&lt;br /&gt;2，PUT：这个方法比较少见。HTML表单也不支持这个。本质上来讲， PUT和POST极为相似，都是向服务器发送数据，但它们之间有一个重要区别，&lt;strong&gt;PUT通常指定了资源的存放位置，而POST则没有，POST的数据存放位置由服务器自己决定。&lt;/strong&gt;举个例子：如一个用于提交博文的URL，/addBlog。如果用PUT，则提交的URL会是像这样的”/addBlog/abc123”，其中abc123就是这个博文的地址。而如果用POST，则这个地址会在提交后由服务器告知客户端。目前大部分博客都是这样的。显然，PUT和POST用途是不一样的。具体用哪个还取决于当前的业务场景。&lt;br /&gt;3，DELETE：删除某一个资源。基本上这个也很少见，不过还是有一些地方比如amazon的S3云服务里面就用的这个方法来删除资源。&lt;br /&gt;4，POST：向服务器提交数据。这个方法用途广泛，几乎目前所有的提交操作都是靠这个完成。&lt;br /&gt;5，OPTIONS：这个方法很有趣，但极少使用。它用于获取当前URL所支持的方法。若请求成功，则它会在HTTP头中包含一个名为“Allow”的头，值是所支持的方法，如“GET, POST”。&lt;br /&gt;其实还有一个TRACE方法，不过这个基本上不会用到，这里就不介绍了。以上的六种方法，我们可以跟数据库的CRUD增删改查操作对应起来：&lt;br /&gt;　　CREATE ：PUT&lt;br /&gt;　　READ：GET&lt;br /&gt;　　UPDATE：POST&lt;br /&gt;　　DELETE：DELETE&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;关于session和cookie&lt;/strong&gt;&lt;br /&gt;为什么会有cookie和session呢,大家都知道，http是无状态的协议（&lt;strong&gt;无状态是指，当浏览器发送请求给服务器的时候，服务器响应，但是同一个浏览器再发送请求给服务器的时候，他会响应，但是他不知道你就是刚才那个浏览器，简单地说，就是服务器不会去记得你，所以是无状态协议。&lt;/strong&gt;），客户每次读取web页面时，服务器都打开新的会话，而且服务器也不会自动维护客户的上下文信息，那么要怎么才能实现网上商店中的购物车呢？&lt;/p&gt;
+
+&lt;p&gt;session就是一种保存上下文信息的机制，它是针对每一个用户的，变量的值保存在服务器端，通过SessionID来区分不同的客户,session是以cookie或URL重写为基础的，默认使用cookie来实现，系统会创造一个名为JSESSIONID的输出cookie，我们叫做session cookie,以区别persistent cookies,也就是我们通常所说的cookie,注意session cookie是存储于浏览器内存中的，并不是写到硬盘上的，这也就是我们刚才看到的JSESSIONID，我们通常情是看不到JSESSIONID的，但是当我们把浏览器的cookie禁止后，WEB服务器会采用URL重写的方式传递Sessionid，我们就可以在地址栏看到sessionid=KWJHUG6JJM65HS2K6之类的字符串。还有一种技术叫做表单隐藏字段。就是服务器会自动修改表单，添加一个隐藏字段，以便在表单提交时能够把sessionid传递回服务器。&lt;/p&gt;
+
+&lt;p&gt;Cookie是通过客户端保持状态的解决方案。从定义上来说，Cookie就是由服务器发给客户端的特殊信息，而这些信息以文本文件的方式存放在客户端，然后客户端每次向服务器发送请求的时候都会带上这些特殊的信息。让我们说得更具体一些：当用户使用浏览器访问一个支持Cookie的网站的时候，用户会提供包括用户名在内的个人信息并且提交至服务器；接着，服务器在向客户端回传相应的超文本的同时也会发回这些个人信息，当然这些信息并不是存放在HTTP响应体（Response Body）中的，而是存放于HTTP响应头（Response Header）；当客户端浏览器接收到来自服务器的响应之后，浏览器会将这些信息存放在一个统一的位置，对于Windows操作系统而言，我们可以从：&lt;span&gt;系统盘&lt;/span&gt;:\Documents and Settings[用户名]\Cookies目录中找到存储的Cookie；自此，客户端再向服务器发送请求的时候，都会把相应的Cookie再次发回至服务器。而这次，Cookie信息则存放在HTTP请求头（Request Header）了。有了Cookie这样的技术实现，服务器在接收到来自客户端浏览器的请求之后，就能够通过分析存放于请求头的Cookie得到客户端特有的信息，从而动态生成与该客户端相对应的内容。通常，我们可以从很多网站的登录界面中看到“请记住我”这样的选项，如果你勾选了它之后再登录，那么在下一次访问该网站的时候就不需要进行重复而繁琐的登录动作了，而这个功能就是通过Cookie实现的。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;关于二叉树求深度&lt;/strong&gt;&lt;br /&gt;思路：先层次遍历一遍找出最后一个节点，然后目的变为求这个节点的深度。然后我们用循环一层一层找到它的上一层，找到一次，深度加1，最终可以得到二叉树的深度。不需要栈了。&lt;br /&gt;例如下面的树：&lt;br /&gt;&lt;img alt='hello' src='/assets/themes/images/btree.jpg' /&gt; &lt;br /&gt;首先按层遍历获得最后一个元素J，然后从根再次按层遍历找到他的父节点E，此时深度+1，再从头按层遍历找到E的父节点B，此时深度加1，直到根节点为止&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;关于1000亿个数的中位数&lt;/strong&gt;&lt;br /&gt;我的那种hash%1000的分割法有点问题，因为整数是有范围的，可按照整数范围分割文件，这样就不需要对每个文件排序，然后根据index偏移量找到小文件，只需对这个文件进行排序，取偏移量的数即可&lt;/p&gt;
+
+&lt;p&gt;　　&lt;/p&gt;</description>
+                <link>http://tinyfisher.github.com/blog/2013/09/26/alibaba2</link>
+                <guid>http://tinyfisher.github.com/blog/2013/09/26/alibaba2</guid>
+                <pubDate>2013-09-26T00:00:00+08:00</pubDate>
+        </item>
 
         <item>
                 <title>创新工场一面总结</title>
@@ -104,7 +144,7 @@
                 <title>Mongodb学习整理之内存映射机制</title>
                 <description>&lt;p&gt;sql数据库在数据量达到百万级的时候性能直线下降，在建立索引的表上做一个条件查询甚至达到分钟级别查询时间，这是无法忍受的，瓶颈在于大量的磁盘i/o操作，而这些i/o操作无疑使很耗费时间的。mongodb之所以对海量数据的查询如此高效，是因为他使用了内存映射机制，避免了大量的磁盘i/o，从而大大提高了查询效率，但相应的对内存要求也比较高。ok，下面我们来看看什么是内存映射机制&lt;/p&gt;
 
-&lt;h4 id='id23'&gt;官网的说法：&lt;/h4&gt;
+&lt;h4 id='id27'&gt;官网的说法：&lt;/h4&gt;
 
 &lt;p&gt;&lt;strong&gt;What are memory mapped files?&lt;/strong&gt;&lt;/p&gt;
 
@@ -130,7 +170,7 @@
 
 &lt;p&gt;This process, particularly on an active system can take a long time, particularly in comparison to reading a page that is already in memory.&lt;/p&gt;
 
-&lt;h4 id='id24'&gt;我的理解：&lt;/h4&gt;
+&lt;h4 id='id28'&gt;我的理解：&lt;/h4&gt;
 
 &lt;p&gt;首先，“映射”这个词，就和数学课上说的“一一映射”是一个意思，就是建立一种一一对应关系，在这里主要是只&lt;em&gt;硬盘上文件&lt;/em&gt;的位置与进程&lt;em&gt;逻辑地址空间&lt;/em&gt;中一块大小相同的区域之间的一一对应（按字节对应），如过程1所示。这种对应关系纯属是逻辑上的概念，物理上是不存在的，原因是进程的逻辑地址空间本身就是不存在的。在内存映射的过程中，&lt;strong&gt;并没有实际的数据拷贝，文件没有被载入内存，只是逻辑上被放入了内存&lt;/strong&gt;，这个过程由系统调用mmap()实现，所以建立内存映射的效率很高。&lt;/p&gt;
 
@@ -249,6 +289,88 @@ Referer:http://202.168.1.13/support.html\r\n
                 <link>http://tinyfisher.github.com/blog/2013/09/21/icap</link>
                 <guid>http://tinyfisher.github.com/blog/2013/09/21/icap</guid>
                 <pubDate>2013-09-21T00:00:00+08:00</pubDate>
+        </item>
+
+        <item>
+                <title>阿里巴巴面试总结</title>
+                <description>&lt;p&gt;15号接到阿里通知，18号上午去面试，研究生期间第一次面试，颇为激动，准备了一番，18号去了大望路那里。前台签到后，在大厅等了一会，面试官拿着我的简历叫我跟他走，到了一个会议室，里面人很多，面试官的花名叫易统，阿里每个人都有花名，武侠风浓烈，马云的花名叫风清扬。。。易统说欢迎来面试，让我自我介绍，期间点开了我的blog- -&lt;/p&gt;
+
+&lt;p&gt;后来主要是围绕简历上写得项目的技能，做了一些提问，主要是我在说，面试官如果感兴趣会深入问下去。时间在一个小时左右，易统十分友好，没有什么压力，问的问题待会详细记录。最后易统说今天的面试就到这里，让我回去了，我想完蛋了，因为之前得知如果面的好会直接二面的，看来是面挂了，而我自我感觉还不错，后来细想想，可能某些问题回答的不够深入，要反思了。问题总结如下：&lt;/p&gt;
+
+&lt;h4 id='tcpip'&gt;tcp/ip三次握手&lt;/h4&gt;
+
+&lt;p&gt;这个基本是滥问题了，答得还不错&lt;/p&gt;
+
+&lt;h4 id='tcp'&gt;tcp有哪些机制保证了他的可靠性&lt;/h4&gt;
+
+&lt;p&gt;这个答得不够好，这里总结下：&lt;/p&gt;
+
+&lt;h5 id='id23'&gt;可靠性包括以下几个方面：&lt;/h5&gt;
+
+&lt;p&gt;1.能够处理数据传输过程中被破坏问题。&lt;/p&gt;
+
+&lt;p&gt;2.能够处理重复数据接收问题。&lt;/p&gt;
+
+&lt;p&gt;3.能够发现数据丢失以及对此进行有效解决。&lt;/p&gt;
+
+&lt;p&gt;4.能够处理接收端数据乱序到达问题。&lt;/p&gt;
+
+&lt;h5 id='id24'&gt;怎么保证解决上述问题？&lt;/h5&gt;
+
+&lt;p&gt;TCP协议规范和当前绝大多数TCP 协议实现代码均采用数据重传和数据确认应答机制来完成TCP 协议的可靠性数据传输。数据超时重传和数据应答机制的基本前提是对每个传输的字节进行编号，即我们通常所说的序列号。数据超时重传是发送端在某个数据包发送出去，在一段固定时间后如果没有收到对该数据包的确认应答，则（假定该数据包在传输过程中丢失）重新发送该数据包。而数据确认应答是指接收端在成功接收到一个有效数据包后，发送一个确认应答数据包给发送端主机，该确认应答数据包中所包含的应答序列号即指已接收到的数据中最后一个字节的序列号加1，加1 的目的在于指出此时接收端期望接收的下一个数据包中第一个字节的序列号。&lt;strong&gt;数据超时重传、数据确认应答以及对每个传输的字节分配序列号是TCP 协议提供可靠性数据传输的核心本质。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;1.解决数据传输中被破坏的问题&lt;/p&gt;
+
+&lt;p&gt;首先通过对所接收数据包的&lt;strong&gt;CRC校验&lt;/strong&gt;，确认该数据包中数据是否存在错误。如果有，则简单丢弃或者发送一个应答数据包重新对这些数据进行请求。发送端在等待一段时间后，则会重新发送这些数据。本质上，数据传输错误的解决是通过&lt;strong&gt;数据重传机制&lt;/strong&gt;完成的。&lt;/p&gt;
+
+&lt;p&gt;2.解决重复数据接收问题&lt;br /&gt;接到数据包之后，查看序列号，如果数据包已经接收过，则丢弃该数据包，返回确认信息，主要是通过&lt;strong&gt;序列号&lt;/strong&gt;解决这个问题&lt;/p&gt;
+
+&lt;p&gt;3.解决数据丢失问题&lt;br /&gt;主要依靠tcp的&lt;strong&gt;重传机制&lt;/strong&gt;来解决。TCP通过在发送数据报文时设置一个超时定时器来解决这种问题，如果在定时器溢出时还没有收到来自对端对发送报文的确认，它就重传该数据报文。&lt;/p&gt;
+
+&lt;p&gt;4.解决乱序问题&lt;br /&gt;如果通信双方存在多条传输路径， 则有可能出现数据乱序问题，即序列号较大的数据先于序列号较小的数据到达，而发送端确实是按序列号由小到大的顺序发送的。数据乱序的本质是数据都成功到达了，但到达的顺序不尽如人意。对于收到的乱序报文并不丢弃，而是缓存下来(这样做是为了减少更多的重传)，立即发送希望接受的报文确认。对这个问题的解决相对比较简单，只需对这些数据进行重新排序即可。本质上，对数据乱序问题的解决是通过&lt;strong&gt;排序数据序列号&lt;/strong&gt;完成的。&lt;/p&gt;
+
+&lt;h4 id='syn_flood_'&gt;syn flood 攻击&lt;/h4&gt;
+
+&lt;p&gt;由于是安全专业的，面试官又问了我这个问题，答得一般，总结如下：&lt;/p&gt;
+
+&lt;h5 id='synflood'&gt;什么是synflood？&lt;/h5&gt;
+
+&lt;p&gt;在TCP连接的三次握手中，假设一个用户向服务器发送了SYN报文后突然死机或掉线，那么服务器在发出SYN+ACK应答报文后是无法收到客户端的ACK报文的（第三次握手无法完成），这种情况下服务器端一般会重试（再次发送SYN+ACK给客户端）并等待一段时间后丢弃这个未完成的连接，这段时间的长度我们称为SYN Timeout，一般来说这个时间是分钟的数量级（大约为30秒-2分钟）；一个用户出现异常导致服务器的一个线程等待1分钟并不是什么很大的问题，但如果有一个恶意的攻击者大量模拟这种情况，&lt;strong&gt;服务器端将为了维护一个非常大的半连接列表而消耗非常多的资源&lt;/strong&gt;&amp;#8212;-数以万计的半连接，即使是简单的保存并遍历也会消耗非常多的CPU时间和内存，何况还要不断对这个列表中的IP进行SYN+ACK的重试。实际上如果服务器的TCP/IP栈不够强大，最后的结果往往是堆栈溢出崩溃&amp;#8212;即使服务器端的系统足够强大，服务器端也将忙于处理攻击者伪造的TCP连接请求而无暇理睬客户的正常请求（毕竟客户端的正常请求比率非常之小），此时从正常客户的角度看来，服务器失去响应，这种情况我们称作：服务器端受到了SYN Flood攻击（SYN洪水攻击）。&lt;/p&gt;
+
+&lt;h5 id='syn_flood'&gt;怎么检测Syn flood？&lt;/h5&gt;
+
+&lt;p&gt;1、服务端无法提供正常的TCP服务。连接请求被拒绝或超时；&lt;/p&gt;
+
+&lt;p&gt;2、通过 &lt;code&gt;netstat -an&lt;/code&gt; 命令检查系统，发现有大量的&lt;code&gt;SYN_RECV&lt;/code&gt;连接状态。&lt;/p&gt;
+
+&lt;h5 id='id25'&gt;如何防范？&lt;/h5&gt;
+
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;缩短SYN- Timeout时间&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li&gt;
+&lt;p&gt;设置每秒最多3个syn封包进入&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id='linux_cpu'&gt;查看Linux CPU使用率命令&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;top&lt;/code&gt;&lt;/p&gt;
+
+&lt;h4 id='id26'&gt;查看进程信息&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;ps -aux&lt;/code&gt;&lt;/p&gt;
+
+&lt;h4 id='vim100200'&gt;vim从100到200行替换字符串&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;:100,200s/vivian/sky/g&lt;/code&gt;&lt;/p&gt;
+
+&lt;h4 id='fluentdmongodboffer23'&gt;总结：简历上写的尽量往深处了解，面试官可能追问具体的机制，例如我用到的几个工具，fluentd，mongodb，我只是简单的使用，不清楚里面的实现机制，往往不能令面试官满意。面试失败的还有一个原因是简历上写的一定是自己非常了解的，不是很懂的还是不要往上写了，或者写了赶紧去补功课，路漫漫其修远兮，找工作是一个虐心的过程，相信经过不断的积攒经验，一定能够拿到满意的offer，下一站：创新工场23号面试，加油！&lt;/h4&gt;</description>
+                <link>http://tinyfisher.github.com/blog/2013/09/20/alibaba</link>
+                <guid>http://tinyfisher.github.com/blog/2013/09/20/alibaba</guid>
+                <pubDate>2013-09-20T00:00:00+08:00</pubDate>
         </item>
 
         <item>
@@ -1909,6 +2031,16 @@ void merge_array(int a[],int low,int mid,int high,int result[])
     {
         a[low+i]=result[i];  //low+i
     }
+}
+void merge_sort(int a[],int low,int high,int temp[])
+{
+	int mid=(low+high)/2;
+	if(low&amp;lt;high)
+	{
+		merge_sort(a,low,mid,temp);
+		merge_sort(a,mid+1,high,temp);
+		merge_array(a,low,mid,high,temp);
+	}
 }&lt;/code&gt;&lt;/pre&gt;</description>
                 <link>http://tinyfisher.github.com/algorithm/2012/06/03/merge-sort</link>
                 <guid>http://tinyfisher.github.com/algorithm/2012/06/03/merge-sort</guid>
