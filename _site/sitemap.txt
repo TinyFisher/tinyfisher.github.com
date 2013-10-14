@@ -16,6 +16,7 @@ http://tinyfisher.github.com/page5/index.html
 http://tinyfisher.github.com/page6/index.html
 http://tinyfisher.github.com/page7/index.html
 
+http://tinyfisher.github.com/algorithm/2013/10/14/interview
 http://tinyfisher.github.com/blog/2013/09/26/alibaba2
 http://tinyfisher.github.com/blog/2013/09/24/factory
 http://tinyfisher.github.com/blog/2013/09/22/ibm

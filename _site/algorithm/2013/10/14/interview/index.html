@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>面试算法题整理 - tinyfisher blog</title>
+    <meta name="keywords" content="algorithm" />
+    <meta name="description" content="面试算法题整理" />
+    <meta name="author" content="tinyfisher">
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!-- <link href="http://lib.sinaapp.com/js/bootstrap/latest/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all"> -->
+    <link href="http://lib.sinaapp.com/js/bootstrap/2.0.3/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/css/style.css?body=1" rel="stylesheet" type="text/css" media="all">
+    <link href="/assets/themes/twitter/google-code-prettify/prettify.css" rel="stylesheet" type="text/css" media="all">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <!-- <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/latest/js/bootstrap.min.js"></script> -->
+    <script type="text/javascript" src="http://lib.sinaapp.com/js/bootstrap/2.0.3/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/google-code-prettify/prettify.js"></script>
+    <script type="text/javascript" src="/assets/themes/twitter/js/application.js"></script>
+  </head>
+
+  <body data-spy="scroll" data-target=".subnav" data-offset="100">
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="/">tinyfisher blog</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+
+
+              <li><a href="/archive.html">归档</a></li>
+              <li><a href="/categories.html">目录</a></li>
+              <li><a href="/pages.html">页面</a></li>
+              <li><a href="/tags.html">标签</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="content">
+        
+
+<div class="page-header">
+  <h1>面试算法题整理 </h1>
+</div>
+
+
+<div class="row">
+  <div class="span8">
+    <p>最近面试跪了不少，都基本是跪在算法题上，现在把遇到的一些题目记录下来，方面以后复习</p>
+
+<h4 id='10111001111000001100000014041'>1.一个字符串只有0和1，如“110011110000”，找到这个串中的最长子串，使得子串的0和1个数相等，比如：1000<code>01011100</code>0001，阴影的部分有4个0、4个1（出自美团）</h4>
+
+<p>思路：最简单的想法就是遍历所有的子串，之后判断该子串是否满足条件N^2子串，每个子串扫一遍判断0、1是否出现的次数相等，复杂度为O(N^3)，稍加思考就会发现， <strong>如果一个长度为n的子串满足条件，加么这n个元素的和加起来一定=(n/2)</strong>，这样在循环的过程中，增量加就可以了，不需要每个子串从头计算，复杂度降为O(N^2);伪码：</p>
+
+<pre><code>int maxlen = 0, sum = 0, currlen = 0;
+for(int i = 0; i &lt; N; ++i)
+{
+    sum = 0;
+    for(int j = i; j &lt; N; ++j)
+    {
+        currlen = j - i + 1;
+        sum += int(A[j]);
+        if(currlen%2 == 0 &amp;&amp; sum == currlen/2 &amp;&amp; currlen &gt; maxlen)
+            maxlen = currlen;
+	}
+}</code></pre>
+
+<p>还有没有办法进一步降低算法的复杂度呢？</p>
+
+<p>面试官说有这样一种巧妙的解法：定义一个数据B<span>N</span>， B<span>i</span>表示从A<span>0&#8230;i</span>中 num_of_0 - num_of_1，0的个数与1的个数的差，那么如果A<span>i</span> ~ A<span>j</span>（A<span>i</span>,A<span>j</span>选一个包含）是符合条件的子串，一定有 B<span>i</span> == B<span>j</span>，因为中间的部分0、1个数相等，相减等于0。 只需要扫一遍A<span>N</span>就能把B<span>N</span>构造出来了。<strong>这样问题就转换成了求距离最远的一对数</strong>，使得B<span>i</span> == B<span>j</span>，因为B<span>i</span>的范围一定是<span>-N,N</span>，-N到N的范围都存起来，建一个-N到N的hash表，index就是-N到N，value就是index相等的两个数的最长距离，这样每扫到B<span>i</span>，如果hash表里的值还不存在，填i，若已经存在，填i和里面值得差，即为当前长度，需要更新最大长度这个值。其实代码真的非常简单，一个循环就搞定了，这就是算法和思考的乐趣:)</p>
+
+<pre><code>int A[N],B[N];
+int num[2*N + 1];
+int count[2] = {0,0}, maxlen = 0, currlen = 0;
+memset(C, 2*N, -1);
+for(int i = 0; i &lt; N; ++i)
+{
+   count[ int(A[i]) ] += 1;
+   B[i] = count[1] - count[0];
+   if( num[ B[i] + N ] == -1)//尚不存在，B的下标是差，值是A的下标 
+       num[ B[i] + N ] = i; 
+   else//already exist
+   {
+       currlen = i - num[ B[i] + N ] + 1; //num[ B[i] + N ]是B[i]已存在的下标
+       if(currlen &gt; maxlen)
+           maxlen = currlen;
+   }
+}</code></pre>
+
+<h4 id='2a1b2c4abbcccc'>2.编程实现把一个字符串从“a1b2c4”转成“abbcccc”，不准申请新的内存，原字符串可以认为后面的空间足够大（出自美团）</h4>
+
+<p><strong>思路</strong>：统计所有的数字之和何以得到最终字符串的长度，然后利用两个指针str1指向原字符串尾，str2指向新字符串尾，记录str1的数字n，和前面的字符m，str2从后向前写n个m，直到str1指向第一个字符。</p>
+
+<p><strong>问题</strong>：可能会出现覆盖问题，例如“a1b2c3”转成“abbccc”，原字符串和新字符串长度都是6，按照我上面的算法，第一步之后字符串会变成“a1bccc”，这是我无法得到b的次数2，因为2被c覆盖了。</p>
+
+<p><strong>为什么会覆盖？</strong><br />原因在“a1”上，“a1”最后要变成“a”，原字符串多占了一位，导致后面的出现覆盖，所以对于所有的“X1”要进行预处理。</p>
+
+<p><strong>怎么处理</strong>？<br />遍历一遍字符串，每遇到“1”，把后面的字符串向前移动一位，例如“a1b2c3”变成“ab2c3”，这个时候，再对“ab2c3”进行我之前的处理，第一步变成“ab2ccc”，是没有问题的。</p>
+
+<p><strong>注意</strong>：因为把1去掉之后，原字符串的格式发生了变化，遍历的时候需要注意判断一下。</p>
+
+<h4 id='33333123111'>3.整数分割，比如给定一整数3，其有如下情况：3=3,3=1+2,3=1+1+1,求一个数的所有分割组合（出自创新工场行云）</h4>
+
+<p>n=m1+m2+&#8230;+mi; （其中mi为正整数，并且1 &lt;= mi &lt;= n），则{m1,m2,&#8230;,mi}为n的一个划分。</p>
+
+<p>如果{m1,m2,&#8230;,mi}中的最大值不超过m，即max(m1,m2,&#8230;,mi)&lt;=m，则称它属于n的一个m划分。这里我们记n的m划分的个数为f(n,m);</p>
+
+<p>例如n=4时，他有5个划分，{4},{3,1},{2,2},{2,1,1},{1,1,1,1};</p>
+
+<p>该问题是求出n的所有划分个数，即f(n, n)。下面我们考虑求f(n,m)的方法;<br />根据n和m的关系，考虑以下几种情况：</p>
+
+<p>(1) 当n=1时，不论m的值为多少（m&gt;0)，只有一种划分即{1};</p>
+
+<p>(2) 当m=1时，不论n的值为多少，只有一种划分即n个1，{1,1,1,&#8230;,1};</p>
+
+<p>(3) 当n=m时，根据划分中是否包含n，可以分为两种情况：</p>
+
+<p>(a).划分中包含n的情况，只有一个即{n}；</p>
+
+<p>(b).划分中不包含n的情况，这时划分中最大的数字也一定比n小，即n的所有(n-1)划分。</p>
+
+<p>因此 当n=m时，f(n,n) =1 + f(n,n-1);</p>
+
+<p>(4) 当n &lt; m时，由于划分中不可能出现负数，因此就相当于f(n,n);</p>
+
+<p>(5) 当n &gt; m时，根据划分中是否包含最大值m，可以分为两种情况：</p>
+
+<p>(a).划分中包含m的情况，即{m, {x1,x2,&#8230;xi}}, 其中{x1,x2,&#8230; xi} 的和为n-m，因此这种情况下为f(n-m,m)</p>
+
+<p>(b).划分中不包含m的情况，则划分中所有值都比m小，即n的(m-1)划分，个数为f(n,m-1);</p>
+
+<p>因此，当n &gt; m时 f(n, m) = f(n-m, m)+f(n,m-1);</p>
+
+<p>综上：</p>
+
+<pre><code>f(n,m)=1;(n=1||m=1)  
+
+f(n,m)=f(n,n);(n&lt;m)  
+
+f(n,m)=1+ f(n, m-1);(n=m)  
+
+f(n,m)=f(n-m,m)+f(n,m-1); (n&gt;m)  </code></pre>
+    <hr>
+    <div class="pagination">
+      <ul>
+      
+        <li class="prev"><a href="/blog/2013/09/26/alibaba2" title="阿里巴巴二面总结">&larr; 上一篇</a></li>
+      
+        <li><a href="/archive.html">归档</a></li>
+      
+        <li class="next disabled"><a>下一篇 &rarr;</a>
+      
+      </ul>
+    </div>
+    <hr>
+    
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'tinyfisher'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+  </div>
+  
+  <div class="span4">
+    <h4>发布日期</h4>
+    <div class="date"><span>2013-10-14</span></div>
+
+  
+    <h4>标签</h4>
+    <ul class="tag_box">
+    
+    
+
+
+  
+     
+    	<li><a href="/tags.html#algorithm-ref">algorithm <span>14</span></a></li>
+    
+  
+
+
+
+    </ul>
+    
+
+  <section>
+    <h4>最近发表</h4>
+    <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/algorithm/2013/10/14/interview">面试算法题整理</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/26/alibaba2">阿里巴巴二面总结</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/24/factory">创新工场一面总结</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/22/ibm">IBM Linux组电面总结</a>
+      </li>
+    
+      <li class="post">
+        <a href="/linux/2013/09/21/mongodb-mmp">Mongodb学习整理之内存映射机制</a>
+      </li>
+    
+    </ul>
+  </section>
+  </div>
+</div>
+
+
+      </div>
+
+      <footer>
+        <p>&copy; tinyfisher 2013 
+          基于 <a href="http://jekyllbootstrap.com" target="_blank" title="The Definitive Jekyll Blogging Framework">Jekyll Bootstrap</a>
+          和 <a href="http://twitter.github.com/bootstrap/" target="_blank">Twitter Bootstrap</a> 构建
+        </p>
+      </footer>
+
+    </div> <!-- /container -->
+    
+  </body>
+</html>
+

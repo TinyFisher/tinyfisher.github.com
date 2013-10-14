@@ -115,6 +115,13 @@
 
 
 	<url>
+		<loc>http://tinyfisher.github.com/algorithm/2013/10/14/interview</loc>
+		<lastmod>2013-10-14</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>1.0</priority>
+	</url>
+
+	<url>
 		<loc>http://tinyfisher.github.com/blog/2013/09/26/alibaba2</loc>
 		<lastmod>2013-09-26</lastmod>
 		<changefreq>hourly</changefreq>

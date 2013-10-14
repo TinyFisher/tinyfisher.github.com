@@ -5,10 +5,111 @@
         <description>tinyfisher blog - tinyfisher</description>
         <link>http://tinyfisher.github.com</link>
         <link>http://tinyfisher.github.com</link>
-        <lastBuildDate>2013-09-26T20:50:34+08:00</lastBuildDate>
-        <pubDate>2013-09-26T20:50:34+08:00</pubDate>
+        <lastBuildDate>2013-10-14T15:12:28+08:00</lastBuildDate>
+        <pubDate>2013-10-14T15:12:28+08:00</pubDate>
         <ttl>1800</ttl>
 
+
+        <item>
+                <title>面试算法题整理</title>
+                <description>&lt;p&gt;最近面试跪了不少，都基本是跪在算法题上，现在把遇到的一些题目记录下来，方面以后复习&lt;/p&gt;
+
+&lt;h4 id='10111001111000001100000014041'&gt;1.一个字符串只有0和1，如“110011110000”，找到这个串中的最长子串，使得子串的0和1个数相等，比如：1000&lt;code&gt;01011100&lt;/code&gt;0001，阴影的部分有4个0、4个1（出自美团）&lt;/h4&gt;
+
+&lt;p&gt;思路：最简单的想法就是遍历所有的子串，之后判断该子串是否满足条件N^2子串，每个子串扫一遍判断0、1是否出现的次数相等，复杂度为O(N^3)，稍加思考就会发现， &lt;strong&gt;如果一个长度为n的子串满足条件，加么这n个元素的和加起来一定=(n/2)&lt;/strong&gt;，这样在循环的过程中，增量加就可以了，不需要每个子串从头计算，复杂度降为O(N^2);伪码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;int maxlen = 0, sum = 0, currlen = 0;
+for(int i = 0; i &amp;lt; N; ++i)
+{
+    sum = 0;
+    for(int j = i; j &amp;lt; N; ++j)
+    {
+        currlen = j - i + 1;
+        sum += int(A[j]);
+        if(currlen%2 == 0 &amp;amp;&amp;amp; sum == currlen/2 &amp;amp;&amp;amp; currlen &amp;gt; maxlen)
+            maxlen = currlen;
+	}
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;还有没有办法进一步降低算法的复杂度呢？&lt;/p&gt;
+
+&lt;p&gt;面试官说有这样一种巧妙的解法：定义一个数据B&lt;span&gt;N&lt;/span&gt;， B&lt;span&gt;i&lt;/span&gt;表示从A&lt;span&gt;0&amp;#8230;i&lt;/span&gt;中 num_of_0 - num_of_1，0的个数与1的个数的差，那么如果A&lt;span&gt;i&lt;/span&gt; ~ A&lt;span&gt;j&lt;/span&gt;（A&lt;span&gt;i&lt;/span&gt;,A&lt;span&gt;j&lt;/span&gt;选一个包含）是符合条件的子串，一定有 B&lt;span&gt;i&lt;/span&gt; == B&lt;span&gt;j&lt;/span&gt;，因为中间的部分0、1个数相等，相减等于0。 只需要扫一遍A&lt;span&gt;N&lt;/span&gt;就能把B&lt;span&gt;N&lt;/span&gt;构造出来了。&lt;strong&gt;这样问题就转换成了求距离最远的一对数&lt;/strong&gt;，使得B&lt;span&gt;i&lt;/span&gt; == B&lt;span&gt;j&lt;/span&gt;，因为B&lt;span&gt;i&lt;/span&gt;的范围一定是&lt;span&gt;-N,N&lt;/span&gt;，-N到N的范围都存起来，建一个-N到N的hash表，index就是-N到N，value就是index相等的两个数的最长距离，这样每扫到B&lt;span&gt;i&lt;/span&gt;，如果hash表里的值还不存在，填i，若已经存在，填i和里面值得差，即为当前长度，需要更新最大长度这个值。其实代码真的非常简单，一个循环就搞定了，这就是算法和思考的乐趣:)&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;int A[N],B[N];
+int num[2*N + 1];
+int count[2] = {0,0}, maxlen = 0, currlen = 0;
+memset(C, 2*N, -1);
+for(int i = 0; i &amp;lt; N; ++i)
+{
+   count[ int(A[i]) ] += 1;
+   B[i] = count[1] - count[0];
+   if( num[ B[i] + N ] == -1)//尚不存在，B的下标是差，值是A的下标 
+       num[ B[i] + N ] = i; 
+   else//already exist
+   {
+       currlen = i - num[ B[i] + N ] + 1; //num[ B[i] + N ]是B[i]已存在的下标
+       if(currlen &amp;gt; maxlen)
+           maxlen = currlen;
+   }
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id='2a1b2c4abbcccc'&gt;2.编程实现把一个字符串从“a1b2c4”转成“abbcccc”，不准申请新的内存，原字符串可以认为后面的空间足够大（出自美团）&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;思路&lt;/strong&gt;：统计所有的数字之和何以得到最终字符串的长度，然后利用两个指针str1指向原字符串尾，str2指向新字符串尾，记录str1的数字n，和前面的字符m，str2从后向前写n个m，直到str1指向第一个字符。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;问题&lt;/strong&gt;：可能会出现覆盖问题，例如“a1b2c3”转成“abbccc”，原字符串和新字符串长度都是6，按照我上面的算法，第一步之后字符串会变成“a1bccc”，这是我无法得到b的次数2，因为2被c覆盖了。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;为什么会覆盖？&lt;/strong&gt;&lt;br /&gt;原因在“a1”上，“a1”最后要变成“a”，原字符串多占了一位，导致后面的出现覆盖，所以对于所有的“X1”要进行预处理。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;怎么处理&lt;/strong&gt;？&lt;br /&gt;遍历一遍字符串，每遇到“1”，把后面的字符串向前移动一位，例如“a1b2c3”变成“ab2c3”，这个时候，再对“ab2c3”进行我之前的处理，第一步变成“ab2ccc”，是没有问题的。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt;：因为把1去掉之后，原字符串的格式发生了变化，遍历的时候需要注意判断一下。&lt;/p&gt;
+
+&lt;h4 id='33333123111'&gt;3.整数分割，比如给定一整数3，其有如下情况：3=3,3=1+2,3=1+1+1,求一个数的所有分割组合（出自创新工场行云）&lt;/h4&gt;
+
+&lt;p&gt;n=m1+m2+&amp;#8230;+mi; （其中mi为正整数，并且1 &amp;lt;= mi &amp;lt;= n），则{m1,m2,&amp;#8230;,mi}为n的一个划分。&lt;/p&gt;
+
+&lt;p&gt;如果{m1,m2,&amp;#8230;,mi}中的最大值不超过m，即max(m1,m2,&amp;#8230;,mi)&amp;lt;=m，则称它属于n的一个m划分。这里我们记n的m划分的个数为f(n,m);&lt;/p&gt;
+
+&lt;p&gt;例如n=4时，他有5个划分，{4},{3,1},{2,2},{2,1,1},{1,1,1,1};&lt;/p&gt;
+
+&lt;p&gt;该问题是求出n的所有划分个数，即f(n, n)。下面我们考虑求f(n,m)的方法;&lt;br /&gt;根据n和m的关系，考虑以下几种情况：&lt;/p&gt;
+
+&lt;p&gt;(1) 当n=1时，不论m的值为多少（m&amp;gt;0)，只有一种划分即{1};&lt;/p&gt;
+
+&lt;p&gt;(2) 当m=1时，不论n的值为多少，只有一种划分即n个1，{1,1,1,&amp;#8230;,1};&lt;/p&gt;
+
+&lt;p&gt;(3) 当n=m时，根据划分中是否包含n，可以分为两种情况：&lt;/p&gt;
+
+&lt;p&gt;(a).划分中包含n的情况，只有一个即{n}；&lt;/p&gt;
+
+&lt;p&gt;(b).划分中不包含n的情况，这时划分中最大的数字也一定比n小，即n的所有(n-1)划分。&lt;/p&gt;
+
+&lt;p&gt;因此 当n=m时，f(n,n) =1 + f(n,n-1);&lt;/p&gt;
+
+&lt;p&gt;(4) 当n &amp;lt; m时，由于划分中不可能出现负数，因此就相当于f(n,n);&lt;/p&gt;
+
+&lt;p&gt;(5) 当n &amp;gt; m时，根据划分中是否包含最大值m，可以分为两种情况：&lt;/p&gt;
+
+&lt;p&gt;(a).划分中包含m的情况，即{m, {x1,x2,&amp;#8230;xi}}, 其中{x1,x2,&amp;#8230; xi} 的和为n-m，因此这种情况下为f(n-m,m)&lt;/p&gt;
+
+&lt;p&gt;(b).划分中不包含m的情况，则划分中所有值都比m小，即n的(m-1)划分，个数为f(n,m-1);&lt;/p&gt;
+
+&lt;p&gt;因此，当n &amp;gt; m时 f(n, m) = f(n-m, m)+f(n,m-1);&lt;/p&gt;
+
+&lt;p&gt;综上：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;f(n,m)=1;(n=1||m=1)  
+
+f(n,m)=f(n,n);(n&amp;lt;m)  
+
+f(n,m)=1+ f(n, m-1);(n=m)  
+
+f(n,m)=f(n-m,m)+f(n,m-1); (n&amp;gt;m)  &lt;/code&gt;&lt;/pre&gt;</description>
+                <link>http://tinyfisher.github.com/algorithm/2013/10/14/interview</link>
+                <guid>http://tinyfisher.github.com/algorithm/2013/10/14/interview</guid>
+                <pubDate>2013-10-14T00:00:00+08:00</pubDate>
+        </item>
 
         <item>
                 <title>阿里巴巴二面总结</title>
@@ -28,41 +129,31 @@
 
 &lt;p&gt;&lt;strong&gt;附：http请求方式&lt;/strong&gt;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;0，GET  
-  
-1，HEAD  
-  
-2，PUT  
-
-3，DELETE  
-  
-4，POST  
-  
-5，OPTIONS  &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;GET,HEAD,PUT,DELETE,POST,OPTIONS&lt;/p&gt;
 
 &lt;p&gt;但其实我们大部分情况下只用到了GET和POST。如果想设计一个符合RESTful规范的web应用程序，则这六种方法都会用到。不过即使暂时不想涉及REST，了解这六种方法的本质仍然是很有作用的。大家将会发现，原来web也是很简洁明了的。下面依次说明这六种方法。&lt;/p&gt;
 
-&lt;p&gt;0，GET：GET可以说是最常见的了，它本质就是发送一个请求来取得服务器上的某一资源。资源通过一组HTTP头和呈现数据（如HTML文本，或者图片或者视频等）返回给客户端。GET请求中，没有body&lt;/p&gt;
+&lt;p&gt;GET：GET可以说是最常见的了，它本质就是发送一个请求来取得服务器上的某一资源。资源通过一组HTTP头和呈现数据（如HTML文本，或者图片或者视频等）返回给客户端。GET请求中，没有body&lt;/p&gt;
 
-&lt;p&gt;1，HEAD：HEAD和GET本质是一样的，但只请求页面的头部。有的人可能觉得这个方法没什么用，其实不是这样的。想象一个业务情景：欲判断某个资源是否存在，我们通常使用GET，但这里用HEAD则意义更加明确。&lt;/p&gt;
+&lt;p&gt;HEAD：HEAD和GET本质是一样的，但只请求页面的头部。有的人可能觉得这个方法没什么用，其实不是这样的。想象一个业务情景：欲判断某个资源是否存在，我们通常使用GET，但这里用HEAD则意义更加明确。&lt;/p&gt;
 
-&lt;p&gt;2，PUT：这个方法比较少见。HTML表单也不支持这个。本质上来讲， PUT和POST极为相似，都是向服务器发送数据，但它们之间有一个重要区别，&lt;strong&gt;PUT通常指定了资源的存放位置，而POST则没有，POST的数据存放位置由服务器自己决定。&lt;/strong&gt;举个例子：如一个用于提交博文的URL，/addBlog。如果用PUT，则提交的URL会是像这样的”/addBlog/abc123”，其中abc123就是这个博文的地址。而如果用POST，则这个地址会在提交后由服务器告知客户端。目前大部分博客都是这样的。显然，PUT和POST用途是不一样的。具体用哪个还取决于当前的业务场景。&lt;/p&gt;
+&lt;p&gt;PUT：这个方法比较少见。HTML表单也不支持这个。本质上来讲， PUT和POST极为相似，都是向服务器发送数据，但它们之间有一个重要区别，&lt;strong&gt;PUT通常指定了资源的存放位置，而POST则没有，POST的数据存放位置由服务器自己决定。&lt;/strong&gt;举个例子：如一个用于提交博文的URL，/addBlog。如果用PUT，则提交的URL会是像这样的”/addBlog/abc123”，其中abc123就是这个博文的地址。而如果用POST，则这个地址会在提交后由服务器告知客户端。目前大部分博客都是这样的。显然，PUT和POST用途是不一样的。具体用哪个还取决于当前的业务场景。&lt;/p&gt;
 
-&lt;p&gt;3，DELETE：删除某一个资源。基本上这个也很少见，不过还是有一些地方比如amazon的S3云服务里面就用的这个方法来删除资源。&lt;/p&gt;
+&lt;p&gt;DELETE：删除某一个资源。基本上这个也很少见，不过还是有一些地方比如amazon的S3云服务里面就用的这个方法来删除资源。&lt;/p&gt;
 
-&lt;p&gt;4，POST：向服务器提交数据。这个方法用途广泛，几乎目前所有的提交操作都是靠这个完成。&lt;/p&gt;
+&lt;p&gt;POST：向服务器提交数据。这个方法用途广泛，几乎目前所有的提交操作都是靠这个完成。&lt;/p&gt;
 
-&lt;p&gt;5，OPTIONS：这个方法很有趣，但极少使用。它用于获取当前URL所支持的方法。若请求成功，则它会在HTTP头中包含一个名为“Allow”的头，值是所支持的方法，如“GET, POST”。&lt;/p&gt;
+&lt;p&gt;OPTIONS：这个方法很有趣，但极少使用。它用于获取当前URL所支持的方法。若请求成功，则它会在HTTP头中包含一个名为“Allow”的头，值是所支持的方法，如“GET, POST”。&lt;/p&gt;
 
 &lt;p&gt;其实还有一个TRACE方法，不过这个基本上不会用到，这里就不介绍了。以上的六种方法，我们可以跟数据库的CRUD增删改查操作对应起来：&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;CREATE ：PUT  
-	  
-READ：GET  
-	  
-UPDATE：POST   
-	 
-DELETE：DELETE  &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;CREATE ：PUT&lt;/p&gt;
+
+&lt;p&gt;READ：GET&lt;/p&gt;
+
+&lt;p&gt;UPDATE：POST&lt;/p&gt;
+
+&lt;p&gt;DELETE：DELETE&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;关于session和cookie&lt;/strong&gt;&lt;/p&gt;
 

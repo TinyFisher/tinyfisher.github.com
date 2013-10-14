@@ -52,17 +52,121 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#algorithm20131014interview" title="面试算法题整理">面试算法题整理</a></li>
     <li><a href="#blog20130926alibaba2" title="阿里巴巴二面总结">阿里巴巴二面总结</a></li>
     <li><a href="#blog20130924factory" title="创新工场一面总结">创新工场一面总结</a></li>
     <li><a href="#blog20130922ibm" title="IBM Linux组电面总结">IBM Linux组电面总结...</a></li>
     <li><a href="#linux20130921mongodb-mmp" title="Mongodb学习整理之内存映射机制">Mongodb学习整理之内存映射机制</a></li>
-    <li><a href="#blog20130921icap" title="ICAP RFC3507 部分章节翻译">ICAP RFC3507...</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="algorithm20131014interview">
+    <article>
+      <header>
+      <h1><a href="/algorithm/2013/10/14/interview">面试算法题整理</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-10-14</span></div>
+    </header>
+    <div class="content"><p>最近面试跪了不少，都基本是跪在算法题上，现在把遇到的一些题目记录下来，方面以后复习</p>
+
+<h4 id='10111001111000001100000014041'>1.一个字符串只有0和1，如“110011110000”，找到这个串中的最长子串，使得子串的0和1个数相等，比如：1000<code>01011100</code>0001，阴影的部分有4个0、4个1（出自美团）</h4>
+
+<p>思路：最简单的想法就是遍历所有的子串，之后判断该子串是否满足条件N^2子串，每个子串扫一遍判断0、1是否出现的次数相等，复杂度为O(N^3)，稍加思考就会发现， <strong>如果一个长度为n的子串满足条件，加么这n个元素的和加起来一定=(n/2)</strong>，这样在循环的过程中，增量加就可以了，不需要每个子串从头计算，复杂度降为O(N^2);伪码：</p>
+
+<pre><code>int maxlen = 0, sum = 0, currlen = 0;
+for(int i = 0; i &lt; N; ++i)
+{
+    sum = 0;
+    for(int j = i; j &lt; N; ++j)
+    {
+        currlen = j - i + 1;
+        sum += int(A[j]);
+        if(currlen%2 == 0 &amp;&amp; sum == currlen/2 &amp;&amp; currlen &gt; maxlen)
+            maxlen = currlen;
+	}
+}</code></pre>
+
+<p>还有没有办法进一步降低算法的复杂度呢？</p>
+
+<p>面试官说有这样一种巧妙的解法：定义一个数据B<span>N</span>， B<span>i</span>表示从A<span>0&#8230;i</span>中 num_of_0 - num_of_1，0的个数与1的个数的差，那么如果A<span>i</span> ~ A<span>j</span>（A<span>i</span>,A<span>j</span>选一个包含）是符合条件的子串，一定有 B<span>i</span> == B<span>j</span>，因为中间的部分0、1个数相等，相减等于0。 只需要扫一遍A<span>N</span>就能把B<span>N</span>构造出来了。<strong>这样问题就转换成了求距离最远的一对数</strong>，使得B<span>i</span> == B<span>j</span>，因为B<span>i</span>的范围一定是<span>-N,N</span>，-N到N的范围都存起来，建一个-N到N的hash表，index就是-N到N，value就是index相等的两个数的最长距离，这样每扫到B<span>i</span>，如果hash表里的值还不存在，填i，若已经存在，填i和里面值得差，即为当前长度，需要更新最大长度这个值。其实代码真的非常简单，一个循环就搞定了，这就是算法和思考的乐趣:)</p>
+
+<pre><code>int A[N],B[N];
+int num[2*N + 1];
+int count[2] = {0,0}, maxlen = 0, currlen = 0;
+memset(C, 2*N, -1);
+for(int i = 0; i &lt; N; ++i)
+{
+   count[ int(A[i]) ] += 1;
+   B[i] = count[1] - count[0];
+   if( num[ B[i] + N ] == -1)//尚不存在，B的下标是差，值是A的下标 
+       num[ B[i] + N ] = i; 
+   else//already exist
+   {
+       currlen = i - num[ B[i] + N ] + 1; //num[ B[i] + N ]是B[i]已存在的下标
+       if(currlen &gt; maxlen)
+           maxlen = currlen;
+   }
+}</code></pre>
+
+<h4 id='2a1b2c4abbcccc'>2.编程实现把一个字符串从“a1b2c4”转成“abbcccc”，不准申请新的内存，原字符串可以认为后面的空间足够大（出自美团）</h4>
+
+<p><strong>思路</strong>：统计所有的数字之和何以得到最终字符串的长度，然后利用两个指针str1指向原字符串尾，str2指向新字符串尾，记录str1的数字n，和前面的字符m，str2从后向前写n个m，直到str1指向第一个字符。</p>
+
+<p><strong>问题</strong>：可能会出现覆盖问题，例如“a1b2c3”转成“abbccc”，原字符串和新字符串长度都是6，按照我上面的算法，第一步之后字符串会变成“a1bccc”，这是我无法得到b的次数2，因为2被c覆盖了。</p>
+
+<p><strong>为什么会覆盖？</strong><br />原因在“a1”上，“a1”最后要变成“a”，原字符串多占了一位，导致后面的出现覆盖，所以对于所有的“X1”要进行预处理。</p>
+
+<p><strong>怎么处理</strong>？<br />遍历一遍字符串，每遇到“1”，把后面的字符串向前移动一位，例如“a1b2c3”变成“ab2c3”，这个时候，再对“ab2c3”进行我之前的处理，第一步变成“ab2ccc”，是没有问题的。</p>
+
+<p><strong>注意</strong>：因为把1去掉之后，原字符串的格式发生了变化，遍历的时候需要注意判断一下。</p>
+
+<h4 id='33333123111'>3.整数分割，比如给定一整数3，其有如下情况：3=3,3=1+2,3=1+1+1,求一个数的所有分割组合（出自创新工场行云）</h4>
+
+<p>n=m1+m2+&#8230;+mi; （其中mi为正整数，并且1 &lt;= mi &lt;= n），则{m1,m2,&#8230;,mi}为n的一个划分。</p>
+
+<p>如果{m1,m2,&#8230;,mi}中的最大值不超过m，即max(m1,m2,&#8230;,mi)&lt;=m，则称它属于n的一个m划分。这里我们记n的m划分的个数为f(n,m);</p>
+
+<p>例如n=4时，他有5个划分，{4},{3,1},{2,2},{2,1,1},{1,1,1,1};</p>
+
+<p>该问题是求出n的所有划分个数，即f(n, n)。下面我们考虑求f(n,m)的方法;<br />根据n和m的关系，考虑以下几种情况：</p>
+
+<p>(1) 当n=1时，不论m的值为多少（m&gt;0)，只有一种划分即{1};</p>
+
+<p>(2) 当m=1时，不论n的值为多少，只有一种划分即n个1，{1,1,1,&#8230;,1};</p>
+
+<p>(3) 当n=m时，根据划分中是否包含n，可以分为两种情况：</p>
+
+<p>(a).划分中包含n的情况，只有一个即{n}；</p>
+
+<p>(b).划分中不包含n的情况，这时划分中最大的数字也一定比n小，即n的所有(n-1)划分。</p>
+
+<p>因此 当n=m时，f(n,n) =1 + f(n,n-1);</p>
+
+<p>(4) 当n &lt; m时，由于划分中不可能出现负数，因此就相当于f(n,n);</p>
+
+<p>(5) 当n &gt; m时，根据划分中是否包含最大值m，可以分为两种情况：</p>
+
+<p>(a).划分中包含m的情况，即{m, {x1,x2,&#8230;xi}}, 其中{x1,x2,&#8230; xi} 的和为n-m，因此这种情况下为f(n-m,m)</p>
+
+<p>(b).划分中不包含m的情况，则划分中所有值都比m小，即n的(m-1)划分，个数为f(n,m-1);</p>
+
+<p>因此，当n &gt; m时 f(n, m) = f(n-m, m)+f(n,m-1);</p>
+
+<p>综上：</p>
+
+<pre><code>f(n,m)=1;(n=1||m=1)  
+
+f(n,m)=f(n,n);(n&lt;m)  
+
+f(n,m)=1+ f(n, m-1);(n=m)  
+
+f(n,m)=f(n-m,m)+f(n,m-1); (n&gt;m)  </code></pre></div>
+    </article>
+  </section>
   
   
   <section id="blog20130926alibaba2">
@@ -87,41 +191,31 @@
 
 <p><strong>附：http请求方式</strong></p>
 
-<pre><code>0，GET  
-  
-1，HEAD  
-  
-2，PUT  
-
-3，DELETE  
-  
-4，POST  
-  
-5，OPTIONS  </code></pre>
+<p>GET,HEAD,PUT,DELETE,POST,OPTIONS</p>
 
 <p>但其实我们大部分情况下只用到了GET和POST。如果想设计一个符合RESTful规范的web应用程序，则这六种方法都会用到。不过即使暂时不想涉及REST，了解这六种方法的本质仍然是很有作用的。大家将会发现，原来web也是很简洁明了的。下面依次说明这六种方法。</p>
 
-<p>0，GET：GET可以说是最常见的了，它本质就是发送一个请求来取得服务器上的某一资源。资源通过一组HTTP头和呈现数据（如HTML文本，或者图片或者视频等）返回给客户端。GET请求中，没有body</p>
+<p>GET：GET可以说是最常见的了，它本质就是发送一个请求来取得服务器上的某一资源。资源通过一组HTTP头和呈现数据（如HTML文本，或者图片或者视频等）返回给客户端。GET请求中，没有body</p>
 
-<p>1，HEAD：HEAD和GET本质是一样的，但只请求页面的头部。有的人可能觉得这个方法没什么用，其实不是这样的。想象一个业务情景：欲判断某个资源是否存在，我们通常使用GET，但这里用HEAD则意义更加明确。</p>
+<p>HEAD：HEAD和GET本质是一样的，但只请求页面的头部。有的人可能觉得这个方法没什么用，其实不是这样的。想象一个业务情景：欲判断某个资源是否存在，我们通常使用GET，但这里用HEAD则意义更加明确。</p>
 
-<p>2，PUT：这个方法比较少见。HTML表单也不支持这个。本质上来讲， PUT和POST极为相似，都是向服务器发送数据，但它们之间有一个重要区别，<strong>PUT通常指定了资源的存放位置，而POST则没有，POST的数据存放位置由服务器自己决定。</strong>举个例子：如一个用于提交博文的URL，/addBlog。如果用PUT，则提交的URL会是像这样的”/addBlog/abc123”，其中abc123就是这个博文的地址。而如果用POST，则这个地址会在提交后由服务器告知客户端。目前大部分博客都是这样的。显然，PUT和POST用途是不一样的。具体用哪个还取决于当前的业务场景。</p>
+<p>PUT：这个方法比较少见。HTML表单也不支持这个。本质上来讲， PUT和POST极为相似，都是向服务器发送数据，但它们之间有一个重要区别，<strong>PUT通常指定了资源的存放位置，而POST则没有，POST的数据存放位置由服务器自己决定。</strong>举个例子：如一个用于提交博文的URL，/addBlog。如果用PUT，则提交的URL会是像这样的”/addBlog/abc123”，其中abc123就是这个博文的地址。而如果用POST，则这个地址会在提交后由服务器告知客户端。目前大部分博客都是这样的。显然，PUT和POST用途是不一样的。具体用哪个还取决于当前的业务场景。</p>
 
-<p>3，DELETE：删除某一个资源。基本上这个也很少见，不过还是有一些地方比如amazon的S3云服务里面就用的这个方法来删除资源。</p>
+<p>DELETE：删除某一个资源。基本上这个也很少见，不过还是有一些地方比如amazon的S3云服务里面就用的这个方法来删除资源。</p>
 
-<p>4，POST：向服务器提交数据。这个方法用途广泛，几乎目前所有的提交操作都是靠这个完成。</p>
+<p>POST：向服务器提交数据。这个方法用途广泛，几乎目前所有的提交操作都是靠这个完成。</p>
 
-<p>5，OPTIONS：这个方法很有趣，但极少使用。它用于获取当前URL所支持的方法。若请求成功，则它会在HTTP头中包含一个名为“Allow”的头，值是所支持的方法，如“GET, POST”。</p>
+<p>OPTIONS：这个方法很有趣，但极少使用。它用于获取当前URL所支持的方法。若请求成功，则它会在HTTP头中包含一个名为“Allow”的头，值是所支持的方法，如“GET, POST”。</p>
 
 <p>其实还有一个TRACE方法，不过这个基本上不会用到，这里就不介绍了。以上的六种方法，我们可以跟数据库的CRUD增删改查操作对应起来：</p>
 
-<pre><code>CREATE ：PUT  
-	  
-READ：GET  
-	  
-UPDATE：POST   
-	 
-DELETE：DELETE  </code></pre>
+<p>CREATE ：PUT</p>
+
+<p>READ：GET</p>
+
+<p>UPDATE：POST</p>
+
+<p>DELETE：DELETE</p>
 
 <p><strong>关于session和cookie</strong></p>
 
@@ -290,112 +384,6 @@ DELETE：DELETE  </code></pre>
     </article>
   </section>
   
-  
-  <section id="blog20130921icap">
-    <article>
-      <header>
-      <h1><a href="/blog/2013/09/21/icap">ICAP RFC3507 部分章节翻译</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2013-09-21</span></div>
-    </header>
-    <div class="content"><h4 id='icaphttprfc3507okicap'>之前项目中用到了icap协议，成功实现了对http数据包的内容修改，增加等功能，现将一些协议中一些字段进行总结，参考了RFC3507，ok，让我们首先看一个icap报文</h4>
-<pre class='prettyprint linenums lang-clj'>
-REQMOD  icap://127.0.0.1:1344/greasyspoon_req ICAP/1.0\r\n       
-Host:127.0.0.1:1344\r\n                                     
-Date:Wed, 08 May 2013 15:47:28 GMT\r\n                         
-Encapsulated:req-hdr=0, null-body=336\r\n                                                      
-Preview:0\r\n                                                    
-Allow:204\r\n                               
-\r\n                                     
-GET   http://202.168.1.13/1.html HTTP/1.1\r\n                  
-Host:   202.168.1.13\r\n                          
-User-Agent:  Mozilla/5.0 (Windows NT 6.1; WOW64; rv:17.0) Gecko/20100101 
-Firefox/17.0\r\n                        
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n  
-Accept-Language:   en-US,en;q=0.5\r\n                  
-Accept-Encoding:   gzip, deflate\r\n                    
-Referer:  http://202.168.1.13/support.html\r\n                    
-\r\n
-</pre>
-<p>其中1到7行为icap头，剩下的是我们常见的http头，我们一条一条看一下：<br />第一行中<code>REQMOD</code>表示icap工作在请求模式，icap还有一种模式叫<code>RESPMOD</code>，意思是工作在响应模式，<strong>简单的说，请求模式主要针对http请求报文进行匹配修改增值，响应模式主要针对http响应报文进行匹配修改增值</strong>；<code>icap://127.0.0.1:1344/greasyspoon_req ICAP/1.0</code>说的是资源url和版本号1.0，其中<code>greasyspoon</code>是指icap服务器的具体名称，icap服务器还有c-icap等。<br /><code>host</code>和<code>date</code>这里就不详细说了<br /><code>Encapsulated:req-hdr=0, null-body=336\r\n </code>说的是封装了http请求包，http头偏移量为0，这个请求包只有头，没有body，所以<code>null-body=336</code>，336是指body的偏移量；如果有请求包的body的话,例如post消息，会出现下面的情况：<br /><code>Encapsulated: req-hdr=0, req-body=412</code>,意思是头偏移长度0，bdoy偏移长度为412，通过这个可以得到http头和消息体的开始位置，<strong>总结一下，<code>Encapsulated</code>这个字段主要用来定位http消息的header和body。</strong></p>
-
-<p>再来看<code>preview</code>字段的用途，首先看一下RFC3507中对他的描述：</p>
-
-<pre><code>ICAP REQMOD or RESPMOD requests sent by the ICAP client to the ICAP server may include a &quot;preview&quot;. This feature allows an ICAP server to see the beginning of a transaction, then decide if it wants to opt-out of the transaction early instead of receiving the remainder of the request message.   </code></pre>
-
-<p>翻译如下：icap客户端发送给服务端的REQMOD或者RESPMOD请求可能包含“preview” 字段，它能让icap服务端看到事务的最开始的一些信息，从而决定是否直接退出这个事务，而不是等到将所有的请求信息接收完毕再做判断。<strong>说白了就是预览icap封装消息body的前n个字节，来判断是否对这个消息进行处理，而不是接收完所有消息再判断。</strong>举个例子（RFC上的）：</p>
-
-<pre><code>If an ICAP server wants to transcode all GIF87 files into GIF89 files, then the GIF87 files could quickly be detected by looking at the first few body bytes of the file.  </code></pre>
-
-<p>翻译：如果icap服务器想要把所有gif87的文件转码成gif89文件，gif87的文件可以通过body的前几行检测出来。</p>
-
-<p>这里由于我们的包里只有http header，没有http body，所以preview为0</p>
-
-<p>最后<code>Allow:204</code>,我们先看看RFC上怎么说：<br /> An ICAP client MAY include &#8220;Allow: 204&#8221; in its request headers,indicating that the server MAY reply to the message with a &#8220;204 NoContent&#8221; response if the object does not need modification.</p>
-
-<pre><code>If an ICAP server receives a request that does not have &quot;Allow: 204&quot;,it MUST NOT reply with a 204. In this case, an ICAP server MUST return the entire message back to the client, even though it is identical to the message it received.</code></pre>
-
-<p>翻译：&#8221;Allow: 204&#8221;是可选的，加上这个选项表示：如果这个包不需要处理，则服务器返回&#8221;204 NoContent&#8221;给客户端，如果不加这个选项，服务器绝不会返回204，而是将整个消息返回给客户端<br /><strong>总结一下：这个allow：204主要是真针对不需要处理的数据包进行简单返回状态码204，从而减少了icap服务器和客户端的工作量</strong></p>
-
-<h4 id='okicapicap'>ok，到这里我们基本分析了icap的请求包，再来看看，icap服务器的返回包：</h4>
-<pre class='prettyprint linenums lang-clj'>
-ICAP/1.0 200 OK\r\n 
-ISTag:"GreasySpoon-1.0.8-01"\r\n                   
-Host:0.0.0.0:1344\r\n                         
-Encapsulated:req-hdr=0, null-body=333\r\n                 
-Connection:close\r\n                          
-\r\n                                     
-GET http://202.168.2.34/2.html HTTP/1.1\r\n                 
-Host:202.168.2.34\r\n                          
-User-Agent:  Mozilla/5.0 (Windows NT 6.1; WOW64; rv:17.0) Gecko/20100101 
-Firefox/17.0\r\n                         
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n     
-Accept-Language:   en-US,en;q=0.5\r\n                   
-Accept-Encoding:   gzip, deflate\r\n                     
-Referer:http://202.168.1.13/support.html\r\n                   
-\r\n                                     
-</pre>
-<p>前6行为icap响应包头，下面的是修改后的http请求，可以看到<code>GET http://202.168.2.34/1.html HTTP/1.1\r\n</code>改成了<code>GET http://202.168.2.34/2.html HTTP/1.1\r\n</code>,我们成功修改了http请求。下面具体看一下响应包的各个字段：</p>
-
-<p><code>ICAP/1.0 200 OK\r\n </code>说的是icap的返回状态码200，表示http请求已经被成功修改，类似于http状态码200</p>
-
-<p><code>ISTag</code>（ICAP Service Tag）说的是我们用的icap service的具体名称和版本号，我们这里用的是greasyspoon</p>
-
-<p><code>host</code>和<code>Encapsulated</code>不再赘述了</p>
-
-<p><code>Connection</code>字段和http协议的connection一样，含义是当client和server通信时对于长链接如何进行处理。在http1.1中，client和server都是默认对方支持长链接的， 如果client使用http1.1协议，但又不希望使用长链接，则需要在header中指明connection的值为close；如果server方也不想支持长链接，则在response中也需要明确说明connection的值为close.</p>
-
-<p>不论request还是response的header中包含了值为close的connection，都表明当前正在使用的tcp链接在当天请求处理完毕后会被断掉。以后client再进行新的请求时就必须创建新的tcp链接了。</p>
-
-<h4 id='http'>顺便再复习一下http报文里的各个字段的含义：</h4>
-
-<p>1、 Accept：告诉WEB服务器自己接受什么介质类型，<em>/</em> 表示任何类型，type/* 表示该类型下的所有子类型，type/sub-type。</p>
-
-<p>2、 Accept-Charset： 浏览器申明自己接收的字符集</p>
-
-<p>Accept-Encoding： 浏览器申明自己接收的编码方法，通常指定压缩方法，是否支持压缩，支持什么压缩方法（gzip，deflate）</p>
-
-<p>Accept-Language：：浏览器申明自己接收的语言</p>
-
-<p>语言跟字符集的区别：中文是语言，中文有多种字符集，比如big5，gb2312，gbk等等。</p>
-
-<p>3、 Connection：请求：close（告诉WEB服务器或者代理服务器，在完成本次请求的响应后，断开连接，不要等待本次连接的后续请求了）。</p>
-
-<p>keepalive（告诉WEB服务器或者代理服务器，在完成本次请求的响应后，保持连接，等待本次连接的后续请求）。</p>
-
-<p>响应：close（连接已经关闭）。</p>
-
-<p>keepalive（连接保持着，在等待本次连接的后续请求）。</p>
-
-<p>Keep-Alive：如果浏览器请求保持连接，则该头部表明希望 WEB 服务器保持连接多长时间（秒）。例如：Keep-Alive：300</p>
-
-<p>4、 Host：客户端指定自己想访问的WEB服务器的域名/IP 地址和端口号。例如：Host：rss.sina.com.cn</p>
-
-<p>5、 Referer：浏览器向 WEB 服务器表明自己是从哪个 网页/URL 获得/点击 当前请求中的网址/URL。例如：Referer：http://www.sina.com/</p>
-
-<p>6、 Server: WEB 服务器表明自己是什么软件及版本等信息。例如：Server：Apache/2.0.61 (Unix) 7、 User-Agent: 浏览器表明自己的身份（是哪种浏览器）。例如：User-Agent：Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.8.1.14) Gecko/20080404 Firefox/2、0、0、14</p></div>
-    </article>
-  </section>
-  
   <div class="pagination">
       <ul>
         <li><a href="/archive.html">归档</a></li>
@@ -409,6 +397,9 @@ Referer:http://202.168.1.13/support.html\r\n
     <section>
     <h4>最近发表</h4>
     <ul id="recent_posts">
+      <li class="post">
+        <a href="/algorithm/2013/10/14/interview">面试算法题整理</a>
+      </li>
       <li class="post">
         <a href="/blog/2013/09/26/alibaba2">阿里巴巴二面总结</a>
       </li>
@@ -436,9 +427,6 @@ Referer:http://202.168.1.13/support.html\r\n
       <li class="post">
         <a href="/linux/2013/06/23/hostapd">利用Hostapd搭建无线wifi</a>
       </li>
-      <li class="post">
-        <a href="/blog/2013/05/23/microsoft_test">2013微软暑期实习笔试错题、疑题整理</a>
-      </li>
     </ul>
     </section>
     
@@ -456,7 +444,7 @@ Referer:http://202.168.1.13/support.html\r\n
     	</a></li>
      
     	<li><a href="/categories.html#algorithm-ref">
-    		algorithm <span>8</span>
+    		algorithm <span>9</span>
     	</a></li>
      
     	<li><a href="/categories.html#link-ref">

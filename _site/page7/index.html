@@ -52,6 +52,7 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#algorithm20120603merge-sort" title="归并排序C语言实现">归并排序C语言实现</a></li>
     <li><a href="#algorithm20120524quick-sort" title="快速排序C语言实现">快速排序C语言实现</a></li>
     <li><a href="#algorithm20120515heap-sort" title="堆排序C语言实现">堆排序C语言实现</a></li>
     <li><a href="#algorithm20120502bubble-sort" title="冒泡排序C语言实现">冒泡排序C语言实现</a></li>
@@ -62,6 +63,72 @@
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="algorithm20120603merge-sort">
+    <article>
+      <header>
+      <h1><a href="/algorithm/2012/06/03/merge-sort">归并排序C语言实现</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-06-03</span></div>
+    </header>
+    <div class="content"><p>话不多说，直接上代码</p>
+
+<pre><code>void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+void merge_array(int a[],int low,int mid,int high,int result[])
+{
+    int i,j,k;
+    i=low;
+    j=mid+1;
+    k=0;
+    while(i&lt;=mid&amp;&amp;j&lt;=high)
+    {
+        if(a[i]&lt;a[j])
+        {
+            result[k]=a[i];
+            i++;
+            k++;
+        }
+        else
+        {
+            result[k]=a[j];
+            k++;
+            j++;
+        }
+    }
+    while(i&lt;=mid)
+    {
+        result[k]=a[i];
+        i++;
+        k++;
+    }
+    while(j&lt;=high)
+    {
+        result[k]=a[j];
+        j++;
+        k++;
+    }
+    for(i=0;i&lt;k;i++)    //注意 需要这一步
+    {
+        a[low+i]=result[i];  //low+i
+    }
+}
+void merge_sort(int a[],int low,int high,int temp[])
+{
+	int mid=(low+high)/2;
+	if(low&lt;high)
+	{
+		merge_sort(a,low,mid,temp);
+		merge_sort(a,mid+1,high,temp);
+		merge_array(a,low,mid,high,temp);
+	}
+}</code></pre></div>
+    </article>
+  </section>
   
   
   <section id="algorithm20120524quick-sort">
@@ -290,6 +357,9 @@ export LANG=en_US.UTF-8
     <h4>最近发表</h4>
     <ul id="recent_posts">
       <li class="post">
+        <a href="/algorithm/2013/10/14/interview">面试算法题整理</a>
+      </li>
+      <li class="post">
         <a href="/blog/2013/09/26/alibaba2">阿里巴巴二面总结</a>
       </li>
       <li class="post">
@@ -316,9 +386,6 @@ export LANG=en_US.UTF-8
       <li class="post">
         <a href="/linux/2013/06/23/hostapd">利用Hostapd搭建无线wifi</a>
       </li>
-      <li class="post">
-        <a href="/blog/2013/05/23/microsoft_test">2013微软暑期实习笔试错题、疑题整理</a>
-      </li>
     </ul>
     </section>
     
@@ -336,7 +403,7 @@ export LANG=en_US.UTF-8
     	</a></li>
      
     	<li><a href="/categories.html#algorithm-ref">
-    		algorithm <span>8</span>
+    		algorithm <span>9</span>
     	</a></li>
      
     	<li><a href="/categories.html#link-ref">
