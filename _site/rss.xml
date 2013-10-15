@@ -5,10 +5,34 @@
         <description>tinyfisher blog - tinyfisher</description>
         <link>http://tinyfisher.github.com</link>
         <link>http://tinyfisher.github.com</link>
-        <lastBuildDate>2013-10-14T15:12:28+08:00</lastBuildDate>
-        <pubDate>2013-10-14T15:12:28+08:00</pubDate>
+        <lastBuildDate>2013-10-15T17:31:14+08:00</lastBuildDate>
+        <pubDate>2013-10-15T17:31:14+08:00</pubDate>
         <ttl>1800</ttl>
 
+
+        <item>
+                <title>一道有趣的面试题</title>
+                <description>&lt;h4 id='60910120131'&gt;题目：给你两个骰子，每个骰子的6个面都是空的，现在要你把0~9这10个数填到这两个骰子的12个空白面上（数字可以重复），使得能够用这两个骰子表示一个月的号数：从01到31（出自中清龙图）&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;提示：这两个骰子中的数既可以表示十位，又可以表示个位&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;思路：1.那就先看从01到09怎么填吧&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;例如两个骰子A,B；我首先在A中填0，在B中填1,2,3,4,5 此时，按照AB的摆放，可以表示01到05，我再在B中填0，A中填6,7,8,9，此时按照BA的摆放，可以表示06到09，这时A六个面：0,6,7,8,9，空；B中六个面：1,2,3,4,5,0&lt;br /&gt;此时A中还剩一个空位，B已经满。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;2.再来看10~19怎么填&lt;/strong&gt;&lt;br /&gt;因为B中有1，按照BA的摆放，可以表示10,16,17,18,19；要表示其他的必须在A中存放1，此时A：0,6,7,8,9,1；按照AB摆放，可以表示：11,12,13,14,15,10；&lt;br /&gt;此时A，B都满了，其中A:0,6,7,8,9,1；B：1,2,3,4,5,0；&lt;br /&gt;&lt;strong&gt;3.再看20~29：&lt;/strong&gt;&lt;br /&gt;因为B中有2，按照BA摆放，可以表示：20,26,27,28,29,21；&lt;strong&gt;可A中已经满了，怎么表示其他的数呢？&lt;/strong&gt;&lt;br /&gt;&lt;strong&gt;面试官提示：如果A有7个面，你怎么做？&lt;/strong&gt;&lt;br /&gt;如果A有7个面，那我按照上面的思路，在A中再填2，此时A:0,6,7,8,9,1,2；按照AB的摆放可以表示20,21,22,23,24,25；至于30,31是没有问题的。&lt;br /&gt;&lt;strong&gt;现在的问题就是：2个骰子12个面，如果13个面，问题解决，但少了一个面，能否将某些数字压缩？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;面试官提示：首先看看那些数字是必须存在于两个骰子？看看0,1,2是否必须存在？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;首先1和2肯定存在，因为要表示11和22,0也是必须存在，若只有一个面有0，肯定不能表示01到09；&lt;br /&gt;ok，此时A:0,1,2；B:0,1,2；那么还剩下6个面和7个数：3,4,5,6,7,8,9，&lt;strong&gt;现在的问题是：怎么把这7个数压缩成六个？&lt;/strong&gt;&lt;br /&gt;我：“这不可能吧？”&lt;br /&gt;面试官：“我给你的是骰子，不是数组，想想有没有其他方法？”&lt;br /&gt;我：“我用刀切一个骰子，变成13个面”（囧）&lt;br /&gt;面试官：“我可没给你刀，骰子可以随意摆，再想想？”&lt;br /&gt;我：“难道是6跟9算一个？”&lt;br /&gt;面试官：“嗯，不错，想的还挺快。”&lt;/p&gt;
+
+&lt;p&gt;有点脑经急转弯的意思，面试官后来说了他为什么出这道题：&lt;strong&gt;程序员在编代码的时候，可能会陷入思维定式，有时候我们的空间和时间有限，必须要提高程序的效率，还有就是代码的重用，6跟9倒一下就可以，代码中可重用的有很多，需要注意。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;总的来说，这道题还是非常有趣的，面试官是北邮师兄，通过一步步的沟通提示，完成这道题，感觉还是不错的，哈哈~&lt;/p&gt;</description>
+                <link>http://tinyfisher.github.com/blog/2013/10/15/zqlt</link>
+                <guid>http://tinyfisher.github.com/blog/2013/10/15/zqlt</guid>
+                <pubDate>2013-10-15T00:00:00+08:00</pubDate>
+        </item>
 
         <item>
                 <title>面试算法题整理</title>

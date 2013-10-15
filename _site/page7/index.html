@@ -52,17 +52,66 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#algorithm20120622bin-search" title="二分查找C语言实现">二分查找C语言实现</a></li>
     <li><a href="#algorithm20120603merge-sort" title="归并排序C语言实现">归并排序C语言实现</a></li>
     <li><a href="#algorithm20120524quick-sort" title="快速排序C语言实现">快速排序C语言实现</a></li>
     <li><a href="#algorithm20120515heap-sort" title="堆排序C语言实现">堆排序C语言实现</a></li>
     <li><a href="#algorithm20120502bubble-sort" title="冒泡排序C语言实现">冒泡排序C语言实现</a></li>
-    <li><a href="#blog20120401blog" title="github 搭建博客">github 搭建博客...</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="algorithm20120622bin-search">
+    <article>
+      <header>
+      <h1><a href="/algorithm/2012/06/22/bin-search">二分查找C语言实现</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-06-22</span></div>
+    </header>
+    <div class="content"><p>据说90%的程序员都无法正确的写出二分搜索，试了下果然如此，需要注意的地方挺多（边界条件），所以讲递归与非递归的写法记录下来，以便于复习</p>
+
+<pre><code>int binary_search(int array[],int n,int key)  //非递归
+{
+    int low=0;
+    int high=n-1;
+    while(low&lt;=high)    //请注意=
+    {
+        if(array[low+(high-low)/2]==key)
+        {
+            return low+(high-low)/2;   //请注意 low+
+        }
+        else if(array[low+(high-low)/2]&gt;key)
+        {
+            high=low+(high-low)/2 -1;    //请注意-1
+        }
+        else
+        {
+            low=low+(high-low)/2 +1 ;  //请注意+1
+        }
+    }
+    return -1;
+}
+int binary_search(int array[],int low,int high,int key)  //递归 ,需要参数 low high
+{
+    if(low&lt;=high)
+    {
+        if(key==array[low+(high-low)/2])
+            return (low+(high-low)/2);
+        else if(key&gt;array[low+(high-low)/2])
+            return binary_search(array,low+(high-low)/2+1,high,key);
+        else
+            return binary_search(array,low,low+(high-low)/2-1,key);
+    }
+    else
+    {
+        return -1;
+    }
+}</code></pre></div>
+    </article>
+  </section>
   
   
   <section id="algorithm20120603merge-sort">
@@ -279,74 +328,11 @@ void bubble_sort(int input[],int length)
     </article>
   </section>
   
-  
-  <section id="blog20120401blog">
-    <article>
-      <header>
-      <h1><a href="/blog/2012/04/01/blog">github 搭建博客</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-04-01</span></div>
-    </header>
-    <div class="content"><h2 id='github'>注册github帐号</h2>
-
-<p>在github上注册帐号,如果你的帐号为tinyfisher 创建tinyfisher.github.com这个项目.</p>
-
-<h2 id='jekyll'>安装jekyll</h2>
-
-<p>安装jekyll到github上, 这里我用的是 Jekyll-Bootstrap<br />执行以下命令 <pre class='prettyprint linenums lang-clj'>
-git clone https://github.com/plusjade/jekyll-bootstrap.git tinyfisher.github.com
-cd tinyfisher.github.com
-git remote set-url origin git@github.com:tinyfisher/tinyfisher.github.com.git
-git push origin master
-</pre></p>
-
-<h2 id='jekyll'>配置jekyll</h2>
-
-<p>修改 <code>_config.yml</code>文件 将着一些基础信息配置成你的个性化设置</p>
-
-<h3 id='id1'>配置首页</h3>
-
-<p>jekyllbootstrap默认的首页是<code>index.md</code><br />但是如果需要分页效果的话需要使用的是<code>index.html</code>, 并且修改<code>_config.yml</code>, 添加一个配置项<code>paginate: 5</code><br />详细的配置可以clone我的<a href='https://github.com/tinyfisher/tinyfisher.github.com'>博客项目</a>进行查看</p>
-
-<h2 id='id2'>添加文章</h2>
-
-<p>在<code>_posts</code>目录下新建一个<code>markdown(*.md)</code>文件, 文件命名规范是<code>yyyy-mm-dd-url</code>, 例如该文章的文件为<code>2012-05-18-github-blog-jekyll-bootstrap.md</code><br />得到的访问路径却是<a href=''>/javascript/2012/05/18/github-blog-jekyll-bootstrap/</a>其中/javascript是在markdown文件中配置的.</p>
-
-<p>markdown文件头需要几个配置, 以下是该文章的头配置</p>
-<pre class='prettyprint linenums lang-clj'>
----
-layout: post
-title: 在github上搭建博客
-category: javascript
-tags: [github, bootstrap, jekyll, javascript]
----
-</pre>
-<p>每个markdown必须在头部加上这段. 然后下面直接写markdown代码就行了.</p>
-
-<h2 id='id3'>遇到的问题</h2>
-
-<h3 id='1gbk'>1.打开浏览器出现GBK编码错误</h3>
-
-<p>打开Git Bash后运行 jekyll server在本地测试时出现一下错误<br /><pre>
-Liquid error: invalid byte sequence in GBK
-</pre> 这个问题是在 Windows 下出现的，英文博文没问题，中文博文就会报错，原因是你所使用的控制台并不能工作 UTF-8。</p>
-
-<p>临时方案：在执行 jekyll 命令前，将当前控制台的代码格式转为 UTF-8: <pre>
-$export LC_ALL=en_US.UTF-8
-$export LANG=en_US.UTF-8
-$jekyll --server --auto
-</pre> 永久方案：添加两对用户自定义的环境变量，<code>LC_ALL=en_US.UTF-8</code> 和 <code>LANG=en_US.UTF-8</code>在git安装目录<code>Git\etc\profile</code>文件里加入以下内容 <pre>
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
-</pre></p>
-
-<p>参考文献：<a href='http://jekyllbootstrap.com/'>3min搭建jekyll博客</a></p></div>
-    </article>
-  </section>
-  
   <div class="pagination">
       <ul>
         <li class="next"><a href='/page6'>&larr; 上一页</a></li>
         <li><a href="/archive.html">归档</a></li>
+        <li class="prev"><a href='/page8'>下一页 &rarr;</a></li>
       </ul>
   </div>
   </div>
@@ -356,6 +342,9 @@ export LANG=en_US.UTF-8
     <section>
     <h4>最近发表</h4>
     <ul id="recent_posts">
+      <li class="post">
+        <a href="/blog/2013/10/15/zqlt">一道有趣的面试题</a>
+      </li>
       <li class="post">
         <a href="/algorithm/2013/10/14/interview">面试算法题整理</a>
       </li>
@@ -383,9 +372,6 @@ export LANG=en_US.UTF-8
       <li class="post">
         <a href="/linux/2013/07/09/mongodb-introduce">Mongodb 学习整理之介绍</a>
       </li>
-      <li class="post">
-        <a href="/linux/2013/06/23/hostapd">利用Hostapd搭建无线wifi</a>
-      </li>
     </ul>
     </section>
     
@@ -399,7 +385,7 @@ export LANG=en_US.UTF-8
   
      
     	<li><a href="/categories.html#blog-ref">
-    		blog <span>7</span>
+    		blog <span>8</span>
     	</a></li>
      
     	<li><a href="/categories.html#algorithm-ref">
