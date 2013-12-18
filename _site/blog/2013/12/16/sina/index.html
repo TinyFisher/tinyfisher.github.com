@@ -3,9 +3,9 @@
 <html lang="zh-CN">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Mongodb的备份与恢复 - tinyfisher blog</title>
-    <meta name="keywords" content="Linux,mongodb" />
-    <meta name="description" content="Mongodb的备份与恢复" />
+    <title>新浪实习 - tinyfisher blog</title>
+    <meta name="keywords" content="实习" />
+    <meta name="description" content="新浪实习" />
     <meta name="author" content="tinyfisher">
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -47,36 +47,54 @@
         
 
 <div class="page-header">
-  <h1>Mongodb的备份与恢复 </h1>
+  <h1>新浪实习 </h1>
 </div>
 
 
 <div class="row">
   <div class="span8">
-    <p>坑爹的保密检查需要擦除硬盘，所有环境都需要重新安装，Mongodb数据库需要进行备份，还好Mongodb为我们提供了<code>mongodump</code>和<code>mongorestore</code>两种方法，非常方便。</p>
+    <p>今天第一天去新浪实习，吐槽下实验室，一直不让实习，太黑。最近比较闲，没啥面试，论文也差不多了，终于找到了人生第一份实习，也算是和北京告别的第一天。当年怀着无比向往的心情来到帝都，时间真快， 一转眼就要离开了，从一开始不适应这里干燥的空气，鼻子出血，到现在已经习惯了这里的气侯，甚至雾霾，真要离开竟有一丝不舍，因为这里是北京，有着五彩斑阑的机会和无限的可能，有着无数年轻人的梦想。 告别帝都从新浪实习开始吧。第一天，人工查看是否是垃圾邮件，编写python脚本自动发邮件进行测试，代码如下</p>
 
-<p>进到mongodb的bin目录下：</p>
-
-<p>备份：</p>
-
-<pre><code>mongodump -d Injection   //Injection 就是你要备份的数据库</code></pre>
-
-<p>执行之后会生成dump文件夹，里面子目录Injection就是备份的数据</p>
-
-<p>恢复：</p>
-
-<pre><code>mongorestore -d Injection dump/Injection</code></pre>
-
-<p>这样就完成的备份与恢复，是不是十分方便呢~随后送上其他环境配置日志，坑爹的保密检查。</p>
+<pre><code>#!/usr/bin/env python
+# -*- coding: utf-8 -*- 
+import smtplib
+from email.mime.text import MIMEText
+mailto_list=[&quot;yxh.8116836@163.com&quot;,&quot;tinyfisher@foxmail.com&quot;] 
+mail_host=&quot;smtp.sina.cn&quot;   
+mail_user=&quot;tinyfisherbupt&quot; 
+mail_pass=&quot;yxh19890804&quot;    
+mail_postfix=&quot;sina.com&quot;    
+def send_mail(to_list,sub,content):    
+    me=mail_user+&quot;&lt;&quot;+mail_user+&quot;@&quot;+mail_postfix+&quot;&gt;&quot;
+    msg = MIMEText(content)
+    msg[&#39;Subject&#39;] = sub
+    msg[&#39;From&#39;] = me
+    msg[&#39;To&#39;] = &quot;;&quot;.join(to_list)
+    try:
+        s = smtplib.SMTP()
+        s.connect(mail_host)
+        s.login(mail_user,mail_pass)
+        #send mail 
+        s.sendmail(me, to_list, msg.as_string())
+        s.close()
+        return True
+        except Exception, e:
+        print str(e)
+        return False
+if __name__ == &#39;__main__&#39;:
+    if send_mail(mailto_list,&quot;subject&quot;,&quot;content&quot;):
+        print &quot;send success&quot;
+    else:
+        print &quot;send fail&quot;</code></pre>
     <hr>
     <div class="pagination">
       <ul>
       
-        <li class="prev"><a href="/linux/2013/03/05/tplink" title="TL-WN822N TL-WN722N linux安装驱动">&larr; 上一篇</a></li>
+        <li class="prev"><a href="/blog/2013/10/15/zqlt" title="一道有趣的面试题">&larr; 上一篇</a></li>
       
         <li><a href="/archive.html">归档</a></li>
       
-        <li class="next"><a href="/linux/2013/05/01/fluentd" title="fluentd插件开发">下一篇 &rarr;</a></li>
+        <li class="next disabled"><a>下一篇 &rarr;</a>
       
       </ul>
     </div>
@@ -106,7 +124,7 @@
   
   <div class="span4">
     <h4>发布日期</h4>
-    <div class="date"><span>2013-04-23</span></div>
+    <div class="date"><span>2013-12-16</span></div>
 
   
     <h4>标签</h4>
@@ -117,9 +135,9 @@
 
   
      
-    	<li><a href="/tags.html#Linux-ref">Linux <span>13</span></a></li>
+    	<li><a href="/tags.html#blog-ref">blog <span>8</span></a></li>
      
-    	<li><a href="/tags.html#mongodb-ref">mongodb <span>1</span></a></li>
+    	<li><a href="/tags.html#实习-ref">实习 <span>1</span></a></li>
     
   
 

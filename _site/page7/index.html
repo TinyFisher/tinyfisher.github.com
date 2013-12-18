@@ -52,17 +52,178 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#link20120722link" title="单链表操作大全">单链表操作大全</a></li>
     <li><a href="#algorithm20120622bin-search" title="二分查找C语言实现">二分查找C语言实现</a></li>
     <li><a href="#algorithm20120603merge-sort" title="归并排序C语言实现">归并排序C语言实现</a></li>
     <li><a href="#algorithm20120524quick-sort" title="快速排序C语言实现">快速排序C语言实现</a></li>
     <li><a href="#algorithm20120515heap-sort" title="堆排序C语言实现">堆排序C语言实现</a></li>
-    <li><a href="#algorithm20120502bubble-sort" title="冒泡排序C语言实现">冒泡排序C语言实现</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="link20120722link">
+    <article>
+      <header>
+      <h1><a href="/link/2012/07/22/link">单链表操作大全</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-07-22</span></div>
+    </header>
+    <div class="content"><p>单链表的操作一般包括：建立，删除节点，插入节点，链表反转</p>
+
+<p>1.单链表建立，包括从终端输入和由数组转换而来两种：</p>
+
+<pre><code>typedef struct node
+{
+    int num;
+    struct node * next;
+}Node,*pNode;
+
+pNode CreateLink()
+{
+    pNode head=(pNode)malloc(sizeof(Node));
+    pNode p=head;
+    int a;
+    printf(&quot;please input:\n&quot;);
+    scanf(&quot;%d&quot;,&amp;a);
+    while(a!=-1)
+    {
+        pNode q=(pNode)malloc(sizeof(Node));
+        q-&gt;num=a;
+        p-&gt;next=q;
+        p=q;
+        scanf(&quot;%d&quot;,&amp;a);
+    }
+    p-&gt;next=NULL;
+    head=head-&gt;next;
+    return head;
+}
+
+pNode CreateLinkFromArray(int a[],int len)
+{
+    pNode head=(pNode)malloc(sizeof(Node));
+    pNode p=head;
+    int i=0;
+    while(i&lt;len)
+    {
+        pNode q=(pNode)malloc(sizeof(Node));
+        q-&gt;num=a[i];
+        p-&gt;next=q;
+        p=q;
+        i++;
+    }
+    p-&gt;next=NULL;
+    head=head-&gt;next;
+    return head;
+}</code></pre>
+
+<p>2.单链表删除节点，考虑删除头结点，尾节点和中间节点：</p>
+
+<pre><code>pNode del(pNode head,int key)
+{
+pNode p=head;
+pNode q=head;
+if(p==NULL) &amp;nbsp; //若链表为空
+{
+    return NULL;
+}
+if(p-&gt;num==key) //删除头指针
+{
+    head=head-&gt;next;
+    free(p);    // 释放删除节点空间
+    return head;
+}
+while(p-&gt;num!=key&amp;&amp;p-&gt;next!=NULL) //遍历链表直到最后一个元素 寻找key，若有删掉
+{
+    q=p;
+    p=p-&gt;next;
+}
+if(p-&gt;next==NULL&amp;&amp;p-&gt;num==key) //删除尾元素
+{
+    q-&gt;next=NULL;
+    free(p);
+}
+else if(p-&gt;next!=NULL) &amp;nbsp;//删除中间元素
+{
+    q-&gt;next=p-&gt;next;
+    free(p);
+}
+else
+{
+    printf(&quot;not found\n&quot;);
+}
+return head;
+}</code></pre>
+
+<p>3.单链表插入元素，考虑插入头结点，尾节点和中间节点</p>
+
+<pre><code>pNode insert(pNode head,int value)
+{
+    pNode s=(pNode)malloc(sizeof(Node));
+    s-&gt;num=value;
+    pNode p=head;
+    pNode q=head;
+    if(head==NULL) //链表为空
+    {
+        s-&gt;next=NULL;
+        return s;
+    }
+    while(p-&gt;num&lt;value&amp;&amp;p-&gt;next!=NULL)
+    {
+        q=p;
+        p=p-&gt;next;
+    }
+    if(p-&gt;next==NULL&amp;&amp;p-&gt;num&lt;value)  //插入尾节点
+    {
+        p-&gt;next=s;
+        s-&gt;next=NULL;
+        return head;
+    }
+    else if(p==head) //插入头结点
+    {
+        p=s;
+        s-&gt;next=q;
+        return p;
+    }
+    else
+    {
+        q-&gt;next=s;
+        s-&gt;next=p;
+        return head;
+    }
+}</code></pre>
+
+<p>4.单链表反转</p>
+
+<pre><code>pNode reverse(pNode head)
+{
+    if(head==NULL)
+    {
+        return NULL;
+    }
+    if(head-&gt;next==NULL)
+    {
+        return head;
+    }
+    pNode p1,p2,p3;
+    p1=head;
+    p2=head;
+    while(p2-&gt;next!=NULL)
+    {
+        p3=p2-&gt;next;
+        p2-&gt;next=p1;
+        p1=p2;
+        p2=p3;
+    }
+    p2-&gt;next=p1;
+    head-&gt;next=NULL;
+    head=p2;
+    return head;
+}</code></pre></div>
+    </article>
+  </section>
   
   
   <section id="algorithm20120622bin-search">
@@ -293,41 +454,6 @@ void MinHeapSort(int a[],int n)
     </article>
   </section>
   
-  
-  <section id="algorithm20120502bubble-sort">
-    <article>
-      <header>
-      <h1><a href="/algorithm/2012/05/02/bubble-sort">冒泡排序C语言实现</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-05-02</span></div>
-    </header>
-    <div class="content"><p>最近打算将各种常用的算法（排序，查找等）复习一遍，都是用C语言实现，代码均在codeblocks下编译通过。<br />第一篇：冒泡排序</p>
-
-<pre><code>void swap(int *a,int *b)
-{
-    int temp=*a;
-    *a=*b;
-    *b=temp;
-}
-
-void bubble_sort(int input[],int length)
-{
-    int i,j,flag=1;
-    for(i=0;i&lt;length&amp;&amp;flag;i++)
-    {
-        flag=0;             //若flag为0 表示这一趟没有交换，则已经排序完成，无需再扫描，即使扫描 也不会发生交换
-        for(j=length-1;j&gt;i;j--)
-        {
-            if(input[j]&lt;input[j-1])
-            {
-                 swap(&amp;input[j],&amp;input[j-1]);
-                 flag=1;
-            }
-        }
-    }
-}</code></pre></div>
-    </article>
-  </section>
-  
   <div class="pagination">
       <ul>
         <li class="next"><a href='/page6'>&larr; 上一页</a></li>
@@ -342,6 +468,9 @@ void bubble_sort(int input[],int length)
     <section>
     <h4>最近发表</h4>
     <ul id="recent_posts">
+      <li class="post">
+        <a href="/blog/2013/12/16/sina">新浪实习</a>
+      </li>
       <li class="post">
         <a href="/blog/2013/10/15/zqlt">一道有趣的面试题</a>
       </li>
@@ -369,9 +498,6 @@ void bubble_sort(int input[],int length)
       <li class="post">
         <a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a>
       </li>
-      <li class="post">
-        <a href="/linux/2013/07/09/mongodb-introduce">Mongodb 学习整理之介绍</a>
-      </li>
     </ul>
     </section>
     
@@ -385,7 +511,7 @@ void bubble_sort(int input[],int length)
   
      
     	<li><a href="/categories.html#blog-ref">
-    		blog <span>8</span>
+    		blog <span>9</span>
     	</a></li>
      
     	<li><a href="/categories.html#algorithm-ref">

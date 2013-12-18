@@ -52,17 +52,58 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#linux20130709mongodb-introduce" title="Mongodb 学习整理之介绍">Mongodb 学习整理之介绍...</a></li>
     <li><a href="#linux20130623hostapd" title="利用Hostapd搭建无线wifi">利用Hostapd搭建无线wifi</a></li>
     <li><a href="#blog20130523microsoft_test" title="2013微软暑期实习笔试错题、疑题整理">2013微软暑期实习笔试错题、疑题整理</a></li>
     <li><a href="#linux20130501fluentd" title="fluentd插件开发">fluentd插件开发</a></li>
     <li><a href="#linux20130423mongodb" title="Mongodb的备份与恢复">Mongodb的备份与恢复</a></li>
-    <li><a href="#linux20130305tplink" title="TL-WN822N TL-WN722N linux安装驱动">TL-WN822N TL-WN722N...</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="linux20130709mongodb-introduce">
+    <article>
+      <header>
+      <h1><a href="/linux/2013/07/09/mongodb-introduce">Mongodb 学习整理之介绍</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-07-09</span></div>
+    </header>
+    <div class="content"><h2 id='what_is_mongodb'>What is Mongodb?</h2>
+
+<p>MongoDB是一个高性能，开源，无模式的文档型数据库，是当前<strong>NoSQL</strong>数据库产品中最热门的一种。它在许多场景下可用于替代传统的关系型数据库或键/值存储方式。那什么是NoSQL呢？</p>
+
+<h3 id='what_is_nosql'>What is NoSQL?</h3>
+
+<p>NoSQL，全称是”<strong>Not Only Sql</strong>”,指的是非关系型的数据库。这类数据库主要有这些特点：非关系型的、分布式的、开源的、水平可扩展的。原始的目的是为了大规模web应用。NoSQL被我们用得最多的当数<strong>key-value</strong>存储，当然还有其他的文档型的、列存储、图型数据库、xml数据库等。</p>
+
+<h3 id='why_nosql'>Why NoSQL?</h3>
+
+<p>随着互联网web2.0网站的兴起，传统的关系型数据库在应付web2.0网站，特别是超大规模和高并发的SNS类型的web2.0纯动态网站已经显得力不从心，暴露了很多难以克服的问题，例如：</p>
+
+<h4 id='id15'>对数据库高并发读写的需求</h4>
+
+<p>web2.0网站要根据用户个性化信息来实时生成动态页面和提供动态信息，所以基本上无法使用动态页面静态化技术，因此数据库并发负载非常高，往往要达到每秒上万次读写请求。<strong>关系型数据库应付上万次SQL查询还勉强顶得住，但是应付上万次SQL写数据请求，硬盘IO 就已经无法承受了</strong>，其实对于普通的BBS网站，往往也存在对高并发写请求的需求。</p>
+
+<h4 id='id16'>对海量数据的高效率存储和访问的需求</h4>
+
+<p>对于大型的SNS网站，每天用户产生海量的用户动态信息，以国外的Friend feed为例，一个月就达到了2.5亿条用户动态，<strong>对于关系数据库来说，在一张2.5亿条记录的表里面进行SQL查询，效率是极其低下乃至不可忍受的</strong>。再例如大型web网站的用户登录系统，例如腾讯，盛大，动辄数以亿计的帐号，关系数据库也很难应付。</p>
+
+<h4 id='id17'>对数据库的高可扩展性和高可用性的需求</h4>
+
+<p>在基于web的架构当中，数据库是最难进行横向扩展的，当一个应用系统的用户量和访问量与日俱增的时候，你的数据库却没有办法像web server和app server那样简单的通过添加更多的硬件和服务节点来扩展性能和负载能力。对于很多需要提供24小时不间断服务的网站来说，对数据库系统进行升级和扩展是非常痛苦的事情，往往需要停机维护和数据迁移，可是停机维护随之带来的就是公司收入的减少</p>
+
+<p>基于以上三点，NoSQL在现在越来越流行。</p>
+
+<h2 id='why_mongodb'>Why Mongodb?</h2>
+
+<p>MongoDB是一个介于关系数据库和非关系数据库之间的产品，是非关系数据库当中功能最丰富，最像关系数据库的。<strong>他支持的数据结构非常松散，是类似json 的bjson格式，因此可以存储比较复杂的数据类型</strong>。MongoDB最大的特点是他<strong>支持的查询语言非常强大，其语法有点类似于面向对象的查询语言，几乎可以实现类似关系数据库单表查询的绝大部分功能，而且还支持对数据建立索引</strong>。它是一个面向集合的,模式自由的文档型数据库。</p>
+
+<p>ok，既然MongoDB如此神奇，那么我们该怎么安装和使用他呢？下篇blog继续介绍。</p></div>
+    </article>
+  </section>
   
   
   <section id="linux20130623hostapd">
@@ -428,29 +469,6 @@ end  </code></pre></div>
     </article>
   </section>
   
-  
-  <section id="linux20130305tplink">
-    <article>
-      <header>
-      <h1><a href="/linux/2013/03/05/tplink">TL-WN822N TL-WN722N linux安装驱动</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2013-03-05</span></div>
-    </header>
-    <div class="content"><p>这两款的芯片都是AR系列的芯片，所以只要安装这款芯片的驱动：</p>
-
-<p><code>ath9k_htc</code>即可,只需要两步</p>
-
-<p>(1)安装<a href='https://www.kernel.org/pub/linux/kernel/projects/backports/stable/v3.7.9/'>compat-drivers-3.7.9-1.tar.gz</a>,这类似于万能驱动，里面包含了很多芯片的驱动，很好用，编译时间有点长，耐心等待</p>
-
-<p>下载完成之后，将压缩包解压，从命令行终端进入到解压的文件夹中，输入命令<code>sudo make</code>，等待时间较长，再输入命令 <code>make install</code>,等待时间也较长，便完成了安装</p>
-
-<p>(2)安装<a href='http://nl.archive.ubuntu.com/ubuntu/pool/main/l/linux-firmware/linux-firmware_1.60_all.deb'>linux-firmware</a></p>
-
-<p>下载完成之后，直接双击文件包，即可自动安装</p>
-
-<p>重新启动 ，插上usb无线网卡，命令行输入<code>ifconfig -a</code> ，如果出现<code>wlan0</code>，<code>wlan1</code> 等信息，则驱动成功</p></div>
-    </article>
-  </section>
-  
   <div class="pagination">
       <ul>
         <li class="next"><a href='/page2'>&larr; 上一页</a></li>
@@ -465,6 +483,9 @@ end  </code></pre></div>
     <section>
     <h4>最近发表</h4>
     <ul id="recent_posts">
+      <li class="post">
+        <a href="/blog/2013/12/16/sina">新浪实习</a>
+      </li>
       <li class="post">
         <a href="/blog/2013/10/15/zqlt">一道有趣的面试题</a>
       </li>
@@ -492,9 +513,6 @@ end  </code></pre></div>
       <li class="post">
         <a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a>
       </li>
-      <li class="post">
-        <a href="/linux/2013/07/09/mongodb-introduce">Mongodb 学习整理之介绍</a>
-      </li>
     </ul>
     </section>
     
@@ -508,7 +526,7 @@ end  </code></pre></div>
   
      
     	<li><a href="/categories.html#blog-ref">
-    		blog <span>8</span>
+    		blog <span>9</span>
     	</a></li>
      
     	<li><a href="/categories.html#algorithm-ref">

@@ -52,17 +52,146 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#linux20121205iptables" title="iptables配置笔记">iptables配置笔记</a></li>
     <li><a href="#c20121123makefile" title="makefile 编写问题记录">makefile 编写问题记录...</a></li>
     <li><a href="#algorithm20121102bag" title="DP实例之01背包问题C语言实现">DP实例之01背包问题C语言实现</a></li>
     <li><a href="#c20121007callback" title="关于回调函数">关于回调函数</a></li>
     <li><a href="#linux20120923OS-memory" title="分段和分页内存管理">分段和分页内存管理</a></li>
-    <li><a href="#vim20120901vim" title="vim的备份和还原">vim的备份和还原</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="linux20121205iptables">
+    <article>
+      <header>
+      <h1><a href="/linux/2012/12/05/iptables">iptables配置笔记</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-12-05</span></div>
+    </header>
+    <div class="content"><pre><code>1.配置准备
+＃iptables -F //清除原有规则
+＃iptables -X //清除自定义链
+ 
+2.定义策略
+＃iptables -P INPUT DROP //默认丢弃，即丢弃所有的包
+＃iptables -P OUTPUT DROP
+＃iptables -P FORWARD DROP
+ 
+3.典型的规则配置实例
+# iptables -A INPUT|OUTPUT|FORWARD -s 源IP -d 目的IP -p tcp|udp|icmp --sport 源端口--dport 目的端口 -j ACCEPT|DROP
+ 
+4.添加规则
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放HTTP
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 80 -j ACCEPT //针对本机,若本机不需要，可省略
+＃iptables -A OUTPUT -p tcp --dport 80 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 80 -j ACCEPT //允许转发
+＃iptables -A FORWARD -p tcp --dport 80 -j ACCEPT //下面类似
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放DNS
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p udp --sport 53 -j ACCEPT
+＃iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
+＃iptables -A FORWARD -p udp --sport 53 -j ACCEPT
+＃iptables -A FORWARD -p udp --dport 53 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放SMTP和POP3
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 25 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 25 -j ACCEPT
+＃iptables -A INPUT -p tcp --sport 110 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 110 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 25 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 25 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 110 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 110 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放SSH
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 22 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 22 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 22 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 22 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放Telnet
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 23 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 23 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 23 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 23 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放FTP
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 21 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 21 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 21 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 21 -j ACCEPT
+＃iptables -A INPUT -p tcp --sport 20 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 20 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 20 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 20 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放SSL
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp --sport 443 -j ACCEPT
+＃iptables -A OUTPUT -p tcp --dport 443 -j ACCEPT
+＃iptables -A FORWARD -p tcp --sport 443 -j ACCEPT
+＃iptables -A FORWARD -p tcp --dport 443 -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放ICMP
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p icmp -j ACCEPT
+＃iptables -A OUTPUT -p icmp -j ACCEPT
+＃iptables -A FORWARD -p icmp -j ACCEPT
+＃iptables -A FORWARD -p icmp -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放TCP
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p tcp -j ACCEPT
+＃iptables -A OUTPUT -p tcp -j ACCEPT
+＃iptables -A FORWARD -p tcp -j ACCEPT
+＃iptables -A FORWARD -p tcp -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃开放udp
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -A INPUT -p udp -j ACCEPT
+＃iptables -A OUTPUT -p udp -j ACCEPT
+＃iptables -A FORWARD -p udp -j ACCEPT
+＃iptables -A FORWARD -p udp -j ACCEPT
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃实现NAT
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o eth0 -j SNAT --to-source 1.2.3.4
+＃iptables -t nat -A PREROUTING -d 192.168.1.0/24 -i eth1 -j DNAT --to-destination 1.2.3.4
+ 
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃规则的保存和重载
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables-save -c &gt; /etc/iptables-save
+＃iptables-restore -c &lt; /etc/iptables-save
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃根据数据出入网卡匹配，假设eth0连接内网，eth1连接外网
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
+＃iptables –A INPUT –i eth0 –j ACCEPT  //从eth0流入的数据都接收
+＃iptables – A FORWARD – o eth1 –j ACCEPT //从eth1流出的数据都转发</code></pre>
+
+<p>以上是一些基本配置，可以开放更多的服务，还可以进行更详尽的匹配，如源目地址，出入网卡等，以后可以根据要求进一步设置。</p></div>
+    </article>
+  </section>
   
   
   <section id="c20121123makefile">
@@ -233,29 +362,6 @@ solution.o:solution.c
     </article>
   </section>
   
-  
-  <section id="vim20120901vim">
-    <article>
-      <header>
-      <h1><a href="/vim/2012/09/01/vim">vim的备份和还原</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-09-01</span></div>
-    </header>
-    <div class="content"><p>vim是编辑神器，配置成IDE风格，用起来十分顺手，但是配置过程比较麻烦，前几天配置完了，重做系统还需要再配一遍吗，答案是否定的，如何还原vim环境呢？</p>
-
-<p>我的实验环境：<code>ubuntu10.04.2</code></p>
-
-<p><strong>step0</strong>:安装vim：<code>sudo apt-get install vim</code></p>
-
-<p><strong>step1:</strong>备份文件：1.文件夹：<code>/.vim</code> 2.配置文件：<code>/etc/vimrc</code></p>
-
-<p><strong>step2:</strong><code>sudo apt-get install exuberant-ctags</code></p>
-
-<p><strong>step3:</strong>复制刚才备份的文件到相应的目录下，并修改权限，简单暴力的777权限</p>
-
-<p>ok，还原成功！</p></div>
-    </article>
-  </section>
-  
   <div class="pagination">
       <ul>
         <li class="next"><a href='/page4'>&larr; 上一页</a></li>
@@ -270,6 +376,9 @@ solution.o:solution.c
     <section>
     <h4>最近发表</h4>
     <ul id="recent_posts">
+      <li class="post">
+        <a href="/blog/2013/12/16/sina">新浪实习</a>
+      </li>
       <li class="post">
         <a href="/blog/2013/10/15/zqlt">一道有趣的面试题</a>
       </li>
@@ -297,9 +406,6 @@ solution.o:solution.c
       <li class="post">
         <a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a>
       </li>
-      <li class="post">
-        <a href="/linux/2013/07/09/mongodb-introduce">Mongodb 学习整理之介绍</a>
-      </li>
     </ul>
     </section>
     
@@ -313,7 +419,7 @@ solution.o:solution.c
   
      
     	<li><a href="/categories.html#blog-ref">
-    		blog <span>8</span>
+    		blog <span>9</span>
     	</a></li>
      
     	<li><a href="/categories.html#algorithm-ref">
