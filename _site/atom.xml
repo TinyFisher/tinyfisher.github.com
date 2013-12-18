@@ -4,7 +4,7 @@
  <title>tinyfisher blog</title>
  <link href="http://tinyfisher.github.com/" rel="self"/>
  <link href="http://tinyfisher.github.com"/>
- <updated>2013-12-18T11:40:23+08:00</updated>
+ <updated>2013-12-18T11:49:43+08:00</updated>
  <id>http://tinyfisher.github.com</id>
  <author>
    <name>tinyfisher</name>
@@ -17,11 +17,9 @@
    <link href="http://tinyfisher.github.com/blog/2013/12/16/sina"/>
    <updated>2013-12-16T00:00:00+08:00</updated>
    <id>http://tinyfisher.github.com/blog/2013/12/16/sina</id>
-   <content type="html">&lt;p&gt;今天第一天去新浪实习，吐槽下实验室，一直不让实习，太黑。最近比较闲，没啥面试，论文也差不多了，终于找到了人生第一份实习，也算是和北京告别的第一天。当年怀着无比向往的心情来到帝都，时间真快， 一转眼就要离开了，从一开始不适应这里干燥的空气，鼻子出血，到现在已经习惯了这里的气侯，甚至雾霾，真要离开竟有一丝不舍，因为这里是北京，有着五彩斑阑的机会和无限的可能，有着无数年轻人的梦想。 告别帝都从新浪实习开始吧。第一天，人工查看是否是垃圾邮件，编写python脚本自动发邮件进行测试，代码如下&lt;/p&gt;
+   <content type="html">&lt;p&gt;今天第一天去新浪实习，吐槽下实验室，一直不让实习，太黑。最近比较闲，没啥面试，论文也差不多了，终于找到了人生第一份实习，也算是和北京告别的第一天。当年怀着无比向往的心情来到帝都，时间真快，一转眼就要离开了，从一开始不适应这里干燥的空气，鼻子出血，到现在已经习惯了这里的气侯，甚至雾霾，真要离开竟有一丝不舍，因为这里是北京，有着五彩斑阑的机会和无限的可能，有着无数年轻人的梦想。告别帝都从新浪实习开始吧。第一天，人工查看是否是垃圾邮件，编写python脚本自动发邮件进行测试，代码如下&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;#!/usr/bin/env python
-# -*- coding: utf-8 -*- 
-import smtplib
+&lt;pre&gt;&lt;code&gt;import smtplib
 from email.mime.text import MIMEText
 mailto_list=[&amp;quot;yxh.8116836@163.com&amp;quot;,&amp;quot;tinyfisher@foxmail.com&amp;quot;] 
 mail_host=&amp;quot;smtp.sina.cn&amp;quot;   
@@ -37,8 +35,7 @@ def send_mail(to_list,sub,content):
     try:
         s = smtplib.SMTP()
         s.connect(mail_host)
-        s.login(mail_user,mail_pass)
-        #send mail 
+        s.login(mail_user,mail_pass) 
         s.sendmail(me, to_list, msg.as_string())
         s.close()
         return True
