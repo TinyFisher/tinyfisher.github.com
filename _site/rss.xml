@@ -5,8 +5,8 @@
         <description>tinyfisher blog - tinyfisher</description>
         <link>http://tinyfisher.github.com</link>
         <link>http://tinyfisher.github.com</link>
-        <lastBuildDate>2013-12-18T11:49:43+08:00</lastBuildDate>
-        <pubDate>2013-12-18T11:49:43+08:00</pubDate>
+        <lastBuildDate>2013-12-20T10:36:38+08:00</lastBuildDate>
+        <pubDate>2013-12-20T10:36:38+08:00</pubDate>
         <ttl>1800</ttl>
 
 
@@ -41,7 +41,9 @@ if __name__ == &amp;#39;__main__&amp;#39;:
     if send_mail(mailto_list,&amp;quot;subject&amp;quot;,&amp;quot;content&amp;quot;):
         print &amp;quot;send success&amp;quot;
     else:
-        print &amp;quot;send fail&amp;quot;&lt;/code&gt;&lt;/pre&gt;</description>
+        print &amp;quot;send fail&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;需要注意的是，你的邮箱需要开启smtp/pop3，登录到你的web邮箱，在里面的设置里开启&lt;/strong&gt;&lt;/p&gt;</description>
                 <link>http://tinyfisher.github.com/blog/2013/12/16/sina</link>
                 <guid>http://tinyfisher.github.com/blog/2013/12/16/sina</guid>
                 <pubDate>2013-12-16T00:00:00+08:00</pubDate>
@@ -187,34 +189,6 @@ f(n,m)=f(n-m,m)+f(n,m-1); (n&amp;gt;m)  &lt;/code&gt;&lt;/pre&gt;</description>
 &lt;p&gt;&lt;strong&gt;6.求一千亿个数的中位数，这些数无序&lt;/strong&gt;&lt;br /&gt;我的思路：hash%1000，分成小文件，求出小文件的最大和最小值，然后按照这个区间，使得这1000个小文件按照顺序排列，中位数在中间的小文件里，面试官说：不一定。发现是的，我说那我记录每个文件的个数，根据这个元素个数定位到小文件，对这个小文件排序，根据偏移量，找到中位数，面试官说对。&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;总结：深入再深入，必须能有一样能征服面试官的，要有亮点，这点我还得加强，本来想说项目，直接被无视。算法题注定是难的，千万别放弃，展示出想要解决他的勇气，可以问面试官要提示，互动的解决这个问题，一旦放弃，这轮面试也就挂了。&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;附：http请求方式&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;GET,HEAD,PUT,DELETE,POST,OPTIONS&lt;/p&gt;
-
-&lt;p&gt;但其实我们大部分情况下只用到了GET和POST。如果想设计一个符合RESTful规范的web应用程序，则这六种方法都会用到。不过即使暂时不想涉及REST，了解这六种方法的本质仍然是很有作用的。大家将会发现，原来web也是很简洁明了的。下面依次说明这六种方法。&lt;/p&gt;
-
-&lt;p&gt;GET：GET可以说是最常见的了，它本质就是发送一个请求来取得服务器上的某一资源。资源通过一组HTTP头和呈现数据（如HTML文本，或者图片或者视频等）返回给客户端。GET请求中，没有body&lt;/p&gt;
-
-&lt;p&gt;HEAD：HEAD和GET本质是一样的，但只请求页面的头部。有的人可能觉得这个方法没什么用，其实不是这样的。想象一个业务情景：欲判断某个资源是否存在，我们通常使用GET，但这里用HEAD则意义更加明确。&lt;/p&gt;
-
-&lt;p&gt;PUT：这个方法比较少见。HTML表单也不支持这个。本质上来讲， PUT和POST极为相似，都是向服务器发送数据，但它们之间有一个重要区别，&lt;strong&gt;PUT通常指定了资源的存放位置，而POST则没有，POST的数据存放位置由服务器自己决定。&lt;/strong&gt;举个例子：如一个用于提交博文的URL，/addBlog。如果用PUT，则提交的URL会是像这样的”/addBlog/abc123”，其中abc123就是这个博文的地址。而如果用POST，则这个地址会在提交后由服务器告知客户端。目前大部分博客都是这样的。显然，PUT和POST用途是不一样的。具体用哪个还取决于当前的业务场景。&lt;/p&gt;
-
-&lt;p&gt;DELETE：删除某一个资源。基本上这个也很少见，不过还是有一些地方比如amazon的S3云服务里面就用的这个方法来删除资源。&lt;/p&gt;
-
-&lt;p&gt;POST：向服务器提交数据。这个方法用途广泛，几乎目前所有的提交操作都是靠这个完成。&lt;/p&gt;
-
-&lt;p&gt;OPTIONS：这个方法很有趣，但极少使用。它用于获取当前URL所支持的方法。若请求成功，则它会在HTTP头中包含一个名为“Allow”的头，值是所支持的方法，如“GET, POST”。&lt;/p&gt;
-
-&lt;p&gt;其实还有一个TRACE方法，不过这个基本上不会用到，这里就不介绍了。以上的六种方法，我们可以跟数据库的CRUD增删改查操作对应起来：&lt;/p&gt;
-
-&lt;p&gt;CREATE ：PUT&lt;/p&gt;
-
-&lt;p&gt;READ：GET&lt;/p&gt;
-
-&lt;p&gt;UPDATE：POST&lt;/p&gt;
-
-&lt;p&gt;DELETE：DELETE&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;关于session和cookie&lt;/strong&gt;&lt;/p&gt;
 
@@ -2383,12 +2357,12 @@ void bubble_sort(int input[],int length)
 
 &lt;h2 id='jekyll'&gt;安装jekyll&lt;/h2&gt;
 
-&lt;p&gt;安装jekyll到github上, 这里我用的是 Jekyll-Bootstrap&lt;br /&gt;执行以下命令 &lt;pre class='prettyprint linenums lang-clj'&gt;
-git clone https://github.com/plusjade/jekyll-bootstrap.git tinyfisher.github.com
+&lt;p&gt;安装jekyll到github上, 这里我用的是 Jekyll-Bootstrap&lt;br /&gt;执行以下命令&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;git clone https://github.com/plusjade/jekyll-bootstrap.git tinyfisher.github.com
 cd tinyfisher.github.com
 git remote set-url origin git@github.com:tinyfisher/tinyfisher.github.com.git
-git push origin master
-&lt;/pre&gt;&lt;/p&gt;
+git push origin master&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id='jekyll'&gt;配置jekyll&lt;/h2&gt;
 
@@ -2403,32 +2377,32 @@ git push origin master
 &lt;p&gt;在&lt;code&gt;_posts&lt;/code&gt;目录下新建一个&lt;code&gt;markdown(*.md)&lt;/code&gt;文件, 文件命名规范是&lt;code&gt;yyyy-mm-dd-url&lt;/code&gt;, 例如该文章的文件为&lt;code&gt;2012-05-18-github-blog-jekyll-bootstrap.md&lt;/code&gt;&lt;br /&gt;得到的访问路径却是&lt;a href=''&gt;/javascript/2012/05/18/github-blog-jekyll-bootstrap/&lt;/a&gt;其中/javascript是在markdown文件中配置的.&lt;/p&gt;
 
 &lt;p&gt;markdown文件头需要几个配置, 以下是该文章的头配置&lt;/p&gt;
-&lt;pre class='prettyprint linenums lang-clj'&gt;
----
+
+&lt;pre&gt;&lt;code&gt;---
 layout: post
 title: 在github上搭建博客
 category: javascript
 tags: [github, bootstrap, jekyll, javascript]
----
-&lt;/pre&gt;
+---&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;每个markdown必须在头部加上这段. 然后下面直接写markdown代码就行了.&lt;/p&gt;
 
 &lt;h2 id='id3'&gt;遇到的问题&lt;/h2&gt;
 
 &lt;h3 id='1gbk'&gt;1.打开浏览器出现GBK编码错误&lt;/h3&gt;
 
-&lt;p&gt;打开Git Bash后运行 jekyll server在本地测试时出现一下错误&lt;br /&gt;&lt;pre&gt;
-Liquid error: invalid byte sequence in GBK
-&lt;/pre&gt; 这个问题是在 Windows 下出现的，英文博文没问题，中文博文就会报错，原因是你所使用的控制台并不能工作 UTF-8。&lt;/p&gt;
+&lt;p&gt;打开Git Bash后运行 jekyll server在本地测试时出现一下错误&lt;/p&gt;
 
-&lt;p&gt;临时方案：在执行 jekyll 命令前，将当前控制台的代码格式转为 UTF-8: &lt;pre&gt;
-$export LC_ALL=en_US.UTF-8
-$export LANG=en_US.UTF-8
-$jekyll --server --auto
-&lt;/pre&gt; 永久方案：添加两对用户自定义的环境变量，&lt;code&gt;LC_ALL=en_US.UTF-8&lt;/code&gt; 和 &lt;code&gt;LANG=en_US.UTF-8&lt;/code&gt;在git安装目录&lt;code&gt;Git\etc\profile&lt;/code&gt;文件里加入以下内容 &lt;pre&gt;
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
-&lt;/pre&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Liquid error: invalid byte sequence in GBK&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这个问题是在 Windows 下出现的，英文博文没问题，中文博文就会报错，原因是你所使用的控制台并不能工作 UTF-8。&lt;/p&gt;
+
+&lt;p&gt;临时方案：在执行 jekyll 命令前，将当前控制台的代码格式转为 UTF-8: $export LC_ALL=en_US.UTF-8 $export LANG=en_US.UTF-8 $jekyll &amp;#8211;server &amp;#8211;auto&lt;/p&gt;
+
+&lt;p&gt;永久方案：添加两对用户自定义的环境变量，&lt;code&gt;LC_ALL=en_US.UTF-8&lt;/code&gt; 和 &lt;code&gt;LANG=en_US.UTF-8&lt;/code&gt;在git安装目录&lt;code&gt;Git\etc\profile&lt;/code&gt;文件里加入以下内容&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;参考文献：&lt;a href='http://jekyllbootstrap.com/'&gt;3min搭建jekyll博客&lt;/a&gt;&lt;/p&gt;</description>
                 <link>http://tinyfisher.github.com/blog/2012/04/01/blog</link>
