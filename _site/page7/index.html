@@ -52,17 +52,171 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#link20120801doublelink" title="双链表操作大全">双链表操作大全</a></li>
     <li><a href="#link20120722link" title="单链表操作大全">单链表操作大全</a></li>
     <li><a href="#algorithm20120622bin-search" title="二分查找C语言实现">二分查找C语言实现</a></li>
     <li><a href="#algorithm20120603merge-sort" title="归并排序C语言实现">归并排序C语言实现</a></li>
     <li><a href="#algorithm20120524quick-sort" title="快速排序C语言实现">快速排序C语言实现</a></li>
-    <li><a href="#algorithm20120515heap-sort" title="堆排序C语言实现">堆排序C语言实现</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="link20120801doublelink">
+    <article>
+      <header>
+      <h1><a href="/link/2012/08/01/doublelink">双链表操作大全</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2012-08-01</span></div>
+    </header>
+    <div class="content"><p>双向链表的操作和单链表很像，主要包括创建，删除，插入；只要注意下指针的操作即可，废话不多说，直接上代码：</p>
+
+<pre><code>typedef struct dnode
+{
+    int num;
+    struct dnode *pre;
+    struct dnode *next;
+}Dnode,*pDnode;
+
+pDnode Create()  //用户输入创建，-1表示结束
+{
+    pDnode head=(pDnode)malloc(sizeof(Dnode));
+    pDnode p=head;
+    int a;
+    printf(&quot;please input :\n&quot;);
+    scanf(&quot;%d&quot;,&amp;a);
+    while(a!=-1)
+    {
+        pDnode q=(pDnode)malloc(sizeof(Dnode));
+        q-&gt;num=a;
+        p-&gt;next=q;
+        q-&gt;pre=p;
+        p=q;
+        scanf(&quot;%d&quot;,&amp;a);
+    }
+    p-&gt;next=NULL;
+    head=head-&gt;next;
+    head-&gt;pre=NULL;
+    return head;
+}
+
+pDnode CreateFromArray(int a[],int len)    //根据数组创建
+{
+    pDnode head=(pDnode)malloc(sizeof(Dnode));
+    pDnode p=head;
+    int i=0;
+    while(i&lt;len)
+    {
+        pDnode q=(pDnode)malloc(sizeof(Dnode));
+        q-&gt;num=a[i];
+        p-&gt;next=q;
+        q-&gt;pre=p;
+        p=q;
+        i++;
+    }
+    p-&gt;next=NULL;
+    head=head-&gt;next;
+    head-&gt;pre=NULL;
+    return head;
+}
+
+pDnode del(pDnode head, int key)   //删除
+{
+    pDnode q1=head;
+    pDnode q2=head;
+    if(head==NULL)
+        return NULL;
+    if(head-&gt;num==key)
+    {
+        head=head-&gt;next;
+        head-&gt;pre=NULL;
+        free(q1);
+        return head;
+    }
+    while(q1-&gt;num!=key&amp;&amp;q1-&gt;next!=NULL)
+    {
+        q2=q1;
+        q1=q1-&gt;next;
+    }
+    if(q1-&gt;num==key&amp;&amp;q1-&gt;next==NULL)
+    {
+        q2-&gt;next=NULL;
+        free(q1);
+    }
+    else if(q1-&gt;num==key&amp;&amp;q1-&gt;next!=NULL)
+    {
+        q2-&gt;next=q1-&gt;next;
+        q1-&gt;next-&gt;pre=q2;
+        free(q1);
+    }
+    else
+    {
+        printf(&quot;not found\n&quot;);
+    }
+    return head;
+}
+
+pDnode insert(pDnode head,int key)    // 插入
+{
+    pDnode s=(pDnode)malloc(sizeof(Dnode));
+    s-&gt;num=key;
+    pDnode p=head;
+    pDnode q=head;
+    while(p-&gt;num&lt;key&amp;&amp;p-&gt;next!=NULL)
+    {
+        p=p-&gt;next;
+    }
+    if(p==head)
+    {
+        s-&gt;next=head;
+        head-&gt;pre=s;
+        head=s;
+        head-&gt;pre=NULL;
+    }
+    else if(p-&gt;next==NULL&amp;&amp;p-&gt;num&lt;key)
+    {
+        p-&gt;next=s;
+        s-&gt;pre=p;
+        s-&gt;next=NULL;
+    }
+    else
+    {
+        q=p-&gt;next;
+        p-&gt;next=s;
+        s-&gt;next=q;
+        s-&gt;pre=p;
+        q-&gt;pre=s;
+    }
+    return head;
+}
+
+void print_from_head(pDnode head)  //打印
+{
+    while(head-&gt;next!=NULL)
+    {
+        printf(&quot;%d&quot;,head-&gt;num);
+        head=head-&gt;next;
+    }
+    printf(&quot;%d&quot;,head-&gt;num);
+    printf(&quot;\n&quot;);
+}
+
+void print_from_tail(pDnode head)
+{
+    while(head-&gt;next!=NULL)
+        head=head-&gt;next;
+    while(head-&gt;pre!=NULL)
+    {
+        printf(&quot;%d&quot;,head-&gt;num);
+        head=head-&gt;pre;
+    }
+    printf(&quot;%d&quot;,head-&gt;num);
+    printf(&quot;\n&quot;);
+}</code></pre></div>
+    </article>
+  </section>
   
   
   <section id="link20120722link">
@@ -386,74 +540,6 @@ void q_sort(int a[],int low,int high)
     </article>
   </section>
   
-  
-  <section id="algorithm20120515heap-sort">
-    <article>
-      <header>
-      <h1><a href="/algorithm/2012/05/15/heap-sort">堆排序C语言实现</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2012-05-15</span></div>
-    </header>
-    <div class="content"><p>堆的概念这里不再描述，这里主要实现堆排序，堆排序主要分为两步：<br />1.堆化数组（最小堆）；<br />2.交换首尾元素，（则最后一个元素为最小），调整前n-1个元素，使前n-1个元素仍为为最小堆，循环，直到还剩一个元素；这样排序下来，数组为倒序。<br />代码如下：</p>
-
-<pre><code>void swap(int *a,int *b)
-{
-    int temp=*a;
-    *a=*b;
-    *b=temp;
-}
-void FixdownMinHeap(int a[],int index,int len)   //向下调整堆
-{
-    int father_index=index;
-    int left_child_index=2*father_index+1;
-    int right_child_index=2*father_index+2;
-    int min=0;
-    int min_index=0;
-    while(left_child_index&lt;len)   //重要  判断father_index不是叶子节点  
-    {
-
-        if(a[left_child_index]&gt;a[right_child_index]&amp;&amp;right_child_index&lt;len) //右节点存在且最小
-        {
-            min=a[right_child_index];
-            min_index=right_child_index;
-        }
-        else
-        {
-            min=a[left_child_index];
-            min_index=left_child_index;
-        }
-
-        if(a[father_index]&gt;min)
-        {
-            swap(&amp;a[father_index],&amp;a[min_index]);
-        }
-
-        father_index=left_child_index;
-        left_child_index=2*father_index+1;
-        right_child_index=2*father_index+2;
-    }
-}
-void createMinHeap(int a[],int n)//堆化数组
-{
-    int i=(n-1-1)/2; //因为n是数组长度，（n-1-1）/2表示最大父节点index
-    while(i&gt;=0)
-    {
-        FixdownMinHeap(a,i,n);
-        i--;
-    }
-}
-void MinHeapSort(int a[],int n)
-{
-    createMinHeap(a,n);
-    int i=0;
-    for(i=n-1;i&gt;0;i--)
-    {
-        swap(&amp;a[i],&amp;a[0]);  //交换首尾元素
-        FixdownMinHeap(a,0,i);  //调整堆
-    }
-}</code></pre></div>
-    </article>
-  </section>
-  
   <div class="pagination">
       <ul>
         <li class="next"><a href='/page6'>&larr; 上一页</a></li>
@@ -468,6 +554,9 @@ void MinHeapSort(int a[],int n)
     <section>
     <h4>最近发表</h4>
     <ul id="recent_posts">
+      <li class="post">
+        <a href="/blog/2014/01/29/summary">2013-2014</a>
+      </li>
       <li class="post">
         <a href="/blog/2013/12/16/sina">新浪实习</a>
       </li>
@@ -495,9 +584,6 @@ void MinHeapSort(int a[],int n)
       <li class="post">
         <a href="/blog/2013/09/20/alibaba">阿里巴巴面试总结</a>
       </li>
-      <li class="post">
-        <a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a>
-      </li>
     </ul>
     </section>
     
@@ -511,7 +597,7 @@ void MinHeapSort(int a[],int n)
   
      
     	<li><a href="/categories.html#blog-ref">
-    		blog <span>9</span>
+    		blog <span>10</span>
     	</a></li>
      
     	<li><a href="/categories.html#algorithm-ref">

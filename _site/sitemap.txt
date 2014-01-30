@@ -17,6 +17,7 @@ http://tinyfisher.github.com/page6/index.html
 http://tinyfisher.github.com/page7/index.html
 http://tinyfisher.github.com/page8/index.html
 
+http://tinyfisher.github.com/blog/2014/01/29/summary
 http://tinyfisher.github.com/blog/2013/12/16/sina
 http://tinyfisher.github.com/blog/2013/10/15/zqlt
 http://tinyfisher.github.com/algorithm/2013/10/14/interview

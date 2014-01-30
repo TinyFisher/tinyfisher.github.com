@@ -52,17 +52,34 @@
 
 <div class="subnav page-launcher">
   <ul class="nav nav-pills">
+    <li><a href="#blog20130924factory" title="创新工场一面总结">创新工场一面总结</a></li>
     <li><a href="#blog20130922ibm" title="IBM Linux组电面总结">IBM Linux组电面总结...</a></li>
     <li><a href="#linux20130921mongodb-mmp" title="Mongodb学习整理之内存映射机制">Mongodb学习整理之内存映射机制</a></li>
     <li><a href="#blog20130921icap" title="ICAP RFC3507 部分章节翻译">ICAP RFC3507...</a></li>
     <li><a href="#blog20130920alibaba" title="阿里巴巴面试总结">阿里巴巴面试总结</a></li>
-    <li><a href="#linux20130715mongodb-install" title="Mongodb 学习整理之安装">Mongodb 学习整理之安装...</a></li>
   </ul>
 </div>
 
 
 <div class="row">
   <div class="span8">
+  
+  
+  <section id="blog20130924factory">
+    <article>
+      <header>
+      <h1><a href="/blog/2013/09/24/factory">创新工场一面总结</a></h1>
+      <div class="date">tinyfisher 发表于 <span>2013-09-24</span></div>
+    </header>
+    <div class="content"><p>跟hr约好了9点去面试，早上7点半起来，觉得不出意外能赶到，结果堵车了，急得要死，还好邮件里有hr的联系方式，提前打个电话说明了情况，对方表示没有关系，这下放心了。到了创新工场是大概9:10，迟到了10分钟左右，然后被hr mm带到一个叫手舞的玻璃房里，里面坐着面试官gg，谈吐穿着都非常儒雅，气氛不算很紧张。<br />首先自我介绍，然后挑一个项目介绍，扯了扯，面试官开始直奔主题，写代码，早闻创新工场的面试就是这个样子，开始进入正题：<br /><strong>1.快排，时间复杂度，怎么避免最坏情况的出现</strong></p>
+
+<p>砍瓜切菜，至于优化在《算法导论》中看到过，partition的时候不是固定取末尾一个数，而是随机取，甚至可以随机取3个数，取这3个数的中位数作为key。面试官比较满意。</p>
+
+<p><strong>2.一个整型无序数组，要求从中取三个数，要求：这三个数值递增，三个数在原数组中的下标值也递增，说思路</strong><br />这题时间不够，没想出来。我的思路是：<br />1.既然无序，那我排序试试看，结果发现如果排序势必会打乱下标的顺序，跟没排序其实没区别<br />2.那么既然下标已经有序了，我就把所有符合下标递增的三元组找出来，看他们的值是否递增，面试官说：这个肯定可以，有没有优化的办法？<br />卡住了，实在想不出来了，时间也到了，后来我就问面试官，这题怎么做，他告诉了我答案：<br />举个例子：2,1,4,3,5<br />面试官说我们只需要找到总共有多少个三元组，而不需要把他们找出来，充分利用数组下标已递增的特点，固定一个数，比如说4，那么以4为中值的三元组只需要从左边找到比4小的和右边找到比4大的即可。 哎，充分感觉智商不够用。不知道还能不能进二面</p>
+
+<p><strong>总结：基础要牢，排序神马的基本是送分题，但也要深入研究下各个排序的特点，时间复杂度，最差情况，优化等等；至于算法题，还是搞题海战术吧，我这种智商的实在想不出来</strong><br />今天收到二面通知，开心！</p></div>
+    </article>
+  </section>
   
   
   <section id="blog20130922ibm">
@@ -385,104 +402,6 @@ Referer:http://202.168.1.13/support.html\r\n
     </article>
   </section>
   
-  
-  <section id="linux20130715mongodb-install">
-    <article>
-      <header>
-      <h1><a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a></h1>
-      <div class="date">tinyfisher 发表于 <span>2013-07-15</span></div>
-    </header>
-    <div class="content"><h3 id='id19'>下载</h3>
-
-<p>下载MongoDB，此处下载的版本是：<a href='http://fastdl.mongodb.org/linux/mongodb-linux-i686-1.8.1.tgz'>mongodb-linux-i686-1.8.1.tgz.tar</a></p>
-
-<h3 id='id20'>安装</h3>
-
-<p><strong>step1：</strong>解压文件到某目录下,然后重命名：</p>
-
-<pre><code>[root@localhost src]# tar -xzvf mongodb-linux-i686-1.8.1.tgz.tar    
-[root@localhost src]# mv mongodb-linux-i686-1.8.1 /usr/local/mongodb/  </code></pre>
-
-<p><strong>step2：</strong>查看安装后的文件情况：</p>
-
-<pre><code>[root@localhost src]# cd /usr/local/mongodb/   
-[root@localhost mongodb]# ls   
-bin  GNU-AGPL-3.0  README  THIRD-PARTY-NOTICES   
-[root@localhost mongodb]# cd bin/   
-[root@localhost bin]# ls   
-bsondump  dbbak  mongo  mongod  mongodump  mongoexport  mongofiles  mongoimport  mongorestore mongos  mongosniff  mongostat    </code></pre>
-
-<p>bin下的mongod就是MongoDB的服务端进程，mongo就是其客户端，其它的命令用于MongoDB的其它用途如MongoDB文件导出等。</p>
-
-<p><strong>step3:</strong>启动MongoDB:</p>
-
-<p>要先建立好MongoDB 存放数据文件和日志文件的目录，需要手动建立：</p>
-
-<pre><code>mkdir /data/mongodb_data
-mkdir /data/mongodb_log
-touch /data/mongodb_log/mongodb.log
-[root@localhost etc]# cd /data/   
-[root@localhost data]# ls   
-mongodb_data  mongodb_log    </code></pre>
-
-<p>在MongoDB安装目录下的bin下使用mongod启动MongoDB</p>
-
-<pre><code>./mongod --dbpath=/data/mongodb_data/ --logpath=/data/mongodb_log/mongodb.log --logappend&amp;  </code></pre>
-
-<p>等待启动成功后，可查看是否启动成功了，默认端口号是27017，当然在启动时也可以指定未使用的其它端口。先通过查看端口号看MongoDB是否启动了。</p>
-
-<pre><code>[root@localhost data]# netstat -lanp | grep &quot;27017&quot;  
-tcp   0    0 0.0.0.0:27017      0.0.0.0:*     LISTEN      1573/mongod            
-unix  2  [ ACC ]    STREAM   LISTENING    5874  1573/mongod   /tmp/mongodb-27017.sock    </code></pre>
-
-<p>可以看到，已启动成功，现在使用mongo客户端访问一下该数据库。</p>
-
-<pre><code>[root@localhost bin]# cd /usr/local/mongodb/bin/   
-[root@localhost bin]# ./mongo   
-MongoDB shell version: 1.8.1  
-connecting to: test   </code></pre>
-
-<p>到这一步说明已经安装成功了。</p>
-
-<h3 id='id21'>额外工作</h3>
-
-<p>注意，上述我们启动MongoDB都是手动使用mongod来启动，这样关闭计算机后，下次再进来它又没启动了，所以还得手动启动，因此，为避免这种繁琐的工作，可以把mongod放到服务自启动项中，这样计算机一开启mongod服务也就启动了。编辑/etc/rc.local，加入下述代码然后再保存即可。 (也可以写一个脚本，然后开机自动运行)</p>
-
-<pre><code>#add mongonDB service   
-/usr/local/mongodb/bin/mongod --dbpath=/data/mongodb_data/ --logpath=/data/mongodb_log/mongodb.log --logappend&amp;    </code></pre>
-
-<p>或者编写开机自启动脚本start_mongodb.sh</p>
-
-<pre><code>cd /usr/local/mongodb-linux-i686-2.2.1/bin  //具体版本具体变化
-./mongod --dbpath=/data/mongodb_data/ --logpath=/data/mongodb_log/mongodb.log --logappend&amp;   </code></pre>
-
-<p>路径和你设置mongodb的datapath，logpath一致 我们重启计算机再看MongoDB是否启动，重启后可以直接使用 mongo命令登录，最终发现是可以成功的。</p>
-
-<p>另外，我们使用mongo命令登录 MongoDB还要转到mongo命令所在目录再执行./mongo，这样是不是有些麻烦？因此，我们可以简化这点，将该命令文件copy到/usr/bin下，这样就可以在任何目录下使用mongo命令了。</p>
-
-<pre><code>[root@localhost bin]# ls   
-bsondump  dbbak  mongo  mongod  mongodump  mongoexport  mongofiles  mongoimport  mongorestore mongos  mongosniff  mongostat   
-[root@localhost bin]# cp mongo /usr/bin/    </code></pre>
-
-<p>转到任一目录试下mongo命令：</p>
-
-<pre><code>[root@localhost bin]# cd /   
-[root@localhost /]# mongo   
-MongoDB shell version: 1.8.1  
-connecting to: test   </code></pre>
-
-<p>可以看到登录成功了，说明我们可以像使用ls命令一样使用mongo命令了。</p>
-
-<h3 id='id22'>安装图形化界面</h3>
-
-<p>mongoDB有许多图形化操作软件，我使用的是UMongo：</p>
-
-<p>下载<a href='https://github.com/agirbal/umongo/downloads'>Umongo</a>,解压文件，在终端运行<code>launch-umongo.sh</code>脚本文件即可</p>
-
-<p>ok,至此我们已经安装好了MongoDB~</p></div>
-    </article>
-  </section>
-  
   <div class="pagination">
       <ul>
         <li class="next"><a href='/'>&larr; 上一页</a></li>
@@ -497,6 +416,9 @@ connecting to: test   </code></pre>
     <section>
     <h4>最近发表</h4>
     <ul id="recent_posts">
+      <li class="post">
+        <a href="/blog/2014/01/29/summary">2013-2014</a>
+      </li>
       <li class="post">
         <a href="/blog/2013/12/16/sina">新浪实习</a>
       </li>
@@ -524,9 +446,6 @@ connecting to: test   </code></pre>
       <li class="post">
         <a href="/blog/2013/09/20/alibaba">阿里巴巴面试总结</a>
       </li>
-      <li class="post">
-        <a href="/linux/2013/07/15/mongodb-install">Mongodb 学习整理之安装</a>
-      </li>
     </ul>
     </section>
     
@@ -540,7 +459,7 @@ connecting to: test   </code></pre>
   
      
     	<li><a href="/categories.html#blog-ref">
-    		blog <span>9</span>
+    		blog <span>10</span>
     	</a></li>
      
     	<li><a href="/categories.html#algorithm-ref">
