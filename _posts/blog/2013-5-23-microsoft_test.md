@@ -7,7 +7,7 @@ keywords: Linux,C,C++,Math,CS
 description: 2013微软暑期实习笔试错题、疑题整理
 ---
 
-###参加了微软“智在未来”暑期实习笔试，跪了，将错题、疑题整理如下，方便后面复习整理。  
+### 参加了微软“智在未来”暑期实习笔试，跪了，将错题、疑题整理如下，方便后面复习整理。  
 
 **What's the output of the following code?(3 Points)  ** B  
  

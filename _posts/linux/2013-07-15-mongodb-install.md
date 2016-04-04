@@ -7,10 +7,10 @@ keywords: Linux,MongoDB
 description: Mongodb 学习整理之安装
 ---
 
-###下载  
+### 下载  
 下载MongoDB，此处下载的版本是：[mongodb-linux-i686-1.8.1.tgz.tar](http://fastdl.mongodb.org/linux/mongodb-linux-i686-1.8.1.tgz)  
 
-###安装  
+### 安装  
 
 **step1：**解压文件到某目录下,然后重命名：
   
@@ -59,7 +59,7 @@ bin下的mongod就是MongoDB的服务端进程，mongo就是其客户端，其�
 
  到这一步说明已经安装成功了。  
 
-###额外工作  
+### 额外工作  
 
 注意，上述我们启动MongoDB都是手动使用mongod来启动，这样关闭计算机后，下次再进来它又没启动了，所以还得手动启动，因此，为避免这种繁琐的工作，可以把mongod放到服务自启动项中，这样计算机一开启mongod服务也就启动了。编辑/etc/rc.local，加入下述代码然后再保存即可。 (也可以写一个脚本，然后开机自动运行)  
 
@@ -91,7 +91,7 @@ bin下的mongod就是MongoDB的服务端进程，mongo就是其客户端，其�
 
 可以看到登录成功了，说明我们可以像使用ls命令一样使用mongo命令了。  
 
-###安装图形化界面  
+### 安装图形化界面  
 
 mongoDB有许多图形化操作软件，我使用的是UMongo：  
 
